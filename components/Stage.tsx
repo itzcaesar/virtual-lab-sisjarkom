@@ -9,7 +9,8 @@ import OSModal from "./modals/OSModal";
 import NetworkModal from "./modals/NetworkModal";
 import WindowsVM from "./WindowsVM";
 import LinuxVM from "./LinuxVM";
-import { HardDrive, Monitor as MonitorIcon, Wifi, Plus } from "lucide-react";
+import BenchmarkModal from "./modals/BenchmarkModal";
+import { HardDrive, Monitor as MonitorIcon, Wifi, Plus, Zap } from "lucide-react";
 
 interface StageProps {
   gameState: GameState;
@@ -52,6 +53,9 @@ export default function Stage({
   // VM selector state
   const [showVMSelector, setShowVMSelector] = useState(false);
   const [activeVMModuleId, setActiveVMModuleId] = useState<string | null>(null);
+  
+  // Benchmark modal state
+  const [showBenchmark, setShowBenchmark] = useState(false);
 
   // Wrapper functions that mark the SPECIFIC module as configured
   const handleCompleteHardware = (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string }) => {
@@ -515,8 +519,20 @@ export default function Stage({
               </span>
             </motion.button>
 
+            {gameState.hardwareInstalled && (
+              <motion.button
+                onClick={() => setShowBenchmark(true)}
+                className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-yellow-500 transition-all ml-auto"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Zap className="w-4 h-4 text-yellow-400" />
+                <span className="text-xs font-mono text-yellow-400">Benchmark</span>
+              </motion.button>
+            )}
+
             {gameState.osInstalled && (
-              <div className="relative ml-auto">
+              <div className="relative">
                 <motion.button
                   onClick={() => handleOpenVM()}
                   className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-purple-500 transition-all"
@@ -677,6 +693,18 @@ export default function Stage({
             performanceMetrics={getActivePCSpecs()?.performanceMetrics || gameState.performanceMetrics}
             distro={getActiveOSEdition()}
             hardware={getActivePCHardware()}
+          />
+        )}
+        
+        {showBenchmark && gameState.hardwareInstalled && (
+          <BenchmarkModal
+            onClose={() => setShowBenchmark(false)}
+            hardware={{
+              cpu: gameState.cpuModel || Object.values(gameState.pcSpecs || {})[0]?.cpuModel || "Intel Core i5-12400",
+              ram: gameState.ramSize || Object.values(gameState.pcSpecs || {})[0]?.ramSize || "8GB DDR4",
+              storage: gameState.storage || Object.values(gameState.pcSpecs || {})[0]?.storage || "256GB SSD",
+              gpu: gameState.gpu || Object.values(gameState.pcSpecs || {})[0]?.gpu || "Integrated Graphics",
+            }}
           />
         )}
       </AnimatePresence>
