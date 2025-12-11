@@ -66,7 +66,6 @@ export default function LinuxVM({
           "  ifconfig   - Tampilkan konfigurasi jaringan",
           "  ping       - Tes konektivitas jaringan",
           "  firefox    - Buka browser web (memerlukan jaringan)",
-          "  htop       - Penampil proses sistem",
           ""
         ]);
         break;

@@ -444,7 +444,62 @@ export default function Home() {
 
   return (
     <main id="main-container" className="min-h-screen bg-zinc-950 text-zinc-100 flex">
-      <div className="flex-1 p-8">
+      {/* Left Sidebar - System Specs */}
+      {gameState.hardwareInstalled && (
+        <aside className="w-80 bg-zinc-900 border-r border-zinc-800 p-6 flex flex-col gap-6 h-screen overflow-y-auto scrollbar-hide">
+          <h3 className="text-sm font-bold text-emerald-400 mb-2 font-mono flex items-center gap-2">
+            <span>💻</span> SPESIFIKASI SISTEM
+          </h3>
+          <div className="space-y-3">
+            {Object.keys(gameState.pcSpecs || {}).length > 0 ? (
+              Object.entries(gameState.pcSpecs || {}).map(([pcId, spec]) => (
+                <CollapsiblePCSpec 
+                  key={pcId} 
+                  pcId={pcId} 
+                  spec={spec} 
+                  ipAddress={gameState.ipAddress}
+                />
+              ))
+            ) : (
+              <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
+                <div className="space-y-3 text-xs font-mono">
+                  <div className="flex flex-col">
+                    <span className="text-zinc-500">CPU</span>
+                    <span className="text-emerald-400">{gameState.cpuModel || "N/A"}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-zinc-500">RAM</span>
+                    <span className="text-emerald-400">{gameState.ramSize || "N/A"}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-zinc-500">Penyimpanan</span>
+                    <span className="text-emerald-400">{gameState.storage || "N/A"}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-zinc-500">GPU</span>
+                    <span className="text-emerald-400">{gameState.gpu || "N/A"}</span>
+                  </div>
+                  {gameState.osInstalled && (
+                    <div className="flex flex-col">
+                      <span className="text-zinc-500">Sistem Operasi</span>
+                      <span className="text-cyan-400">{gameState.osInstalled.toUpperCase()}{gameState.linuxDistro ? ` (${gameState.linuxDistro})` : ""}</span>
+                    </div>
+                  )}
+                  {gameState.ipAddress && (
+                    <div className="flex flex-col">
+                      <span className="text-zinc-500">Alamat IP</span>
+                      <span className="text-emerald-400">{gameState.ipAddress}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </aside>
+      )}
+
+      {/* Main Content Area */}
+      <div className="flex-1 p-8 flex flex-col">
         <header className="mb-8 flex items-start justify-between">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-3">
@@ -499,74 +554,9 @@ export default function Home() {
           toggleBrowser={toggleBrowser}
           removePCSpecs={removePCSpecs}
         />
-        
-        {/* Spesifikasi Sistem - Di Bawah Canvas */}
-        {gameState.hardwareInstalled && Object.keys(gameState.pcSpecs || {}).length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-lg p-4 shadow-sm"
-          >
-            <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-3 font-mono flex items-center gap-2">
-              <span>💻</span> SPESIFIKASI SISTEM
-            </h3>
-            <div className="space-y-2">
-              {Object.entries(gameState.pcSpecs || {}).map(([pcId, spec]) => (
-                <CollapsiblePCSpec 
-                  key={pcId} 
-                  pcId={pcId} 
-                  spec={spec} 
-                  ipAddress={gameState.ipAddress}
-                />
-              ))}
-            </div>
-          </motion.div>
-        )}
-        
-        {/* Fallback jika pcSpecs kosong tapi hardware terinstall */}
-        {gameState.hardwareInstalled && Object.keys(gameState.pcSpecs || {}).length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-lg p-4 shadow-sm"
-          >
-            <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-3 font-mono flex items-center gap-2">
-              <span>💻</span> SPESIFIKASI SISTEM
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-xs font-mono">
-              <div className="flex flex-col">
-                <span className="text-zinc-600 dark:text-zinc-500">CPU</span>
-                <span className="text-emerald-600 dark:text-emerald-400 truncate">{gameState.cpuModel || "N/A"}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-zinc-600 dark:text-zinc-500">RAM</span>
-                <span className="text-emerald-600 dark:text-emerald-400">{gameState.ramSize || "N/A"}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-zinc-600 dark:text-zinc-500">Penyimpanan</span>
-                <span className="text-emerald-600 dark:text-emerald-400 truncate">{gameState.storage || "N/A"}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-zinc-600 dark:text-zinc-500">GPU</span>
-                <span className="text-emerald-600 dark:text-emerald-400 truncate">{gameState.gpu || "N/A"}</span>
-              </div>
-              {gameState.osInstalled && (
-                <div className="flex flex-col">
-                  <span className="text-zinc-600 dark:text-zinc-500">Sistem Operasi</span>
-                  <span className="text-cyan-600 dark:text-cyan-400">{gameState.osInstalled.toUpperCase()}{gameState.linuxDistro ? ` (${gameState.linuxDistro})` : ""}</span>
-                </div>
-              )}
-              {gameState.ipAddress && (
-                <div className="flex flex-col">
-                  <span className="text-zinc-600 dark:text-zinc-500">Alamat IP</span>
-                  <span className="text-emerald-600 dark:text-emerald-400">{gameState.ipAddress}</span>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
       </div>
 
+      {/* Right Sidebar - Logs */}
       <Sidebar gameState={gameState} />
       
       <AnimatePresence>

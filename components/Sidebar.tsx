@@ -91,7 +91,7 @@ export default function Sidebar({ gameState }: SidebarProps) {
   }, [gameState.pcSpecs, gameState.cpuModel, gameState.ramSize, gameState.storage, gameState.gpu]);
 
   return (
-    <aside className="w-80 bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6 overflow-y-auto">
+    <aside className="w-80 bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6 h-screen overflow-y-auto scrollbar-hide">
       {/* Progres Setup */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -250,7 +250,7 @@ export default function Sidebar({ gameState }: SidebarProps) {
       )}
 
       {/* Log Informasi */}
-      <div className="flex flex-col">
+      <div className="flex flex-col min-h-0">
         <h2 className="text-xl font-bold text-cyan-400 mb-4 font-mono">
           [ LOG INFO ]
         </h2>
