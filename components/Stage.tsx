@@ -433,7 +433,7 @@ export default function Stage({
 
   return (
     <>
-      <div className="relative w-full h-[600px] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col">
+      <div className="relative w-full flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col">
         {/* Progress Bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">

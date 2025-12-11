@@ -499,8 +499,8 @@ export default function Home() {
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 p-8 flex flex-col">
-        <header className="mb-8 flex items-start justify-between">
+      <div className="flex-1 py-8 flex flex-col">
+        <header className="mb-8 px-8 flex items-start justify-between">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-3">
               <Monitor 
@@ -542,7 +542,8 @@ export default function Home() {
           </div>
         </header>
         
-        <Stage 
+        <div className="px-8 flex-1 flex flex-col">
+          <Stage 
           gameState={gameState}
           setGameState={setGameState}
           addLog={addLog}
@@ -553,7 +554,8 @@ export default function Home() {
           resetLab={resetLab}
           toggleBrowser={toggleBrowser}
           removePCSpecs={removePCSpecs}
-        />
+          />
+        </div>
       </div>
 
       {/* Right Sidebar - Logs */}
