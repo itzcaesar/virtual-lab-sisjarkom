@@ -65,14 +65,17 @@ export default function DraggableCanvas({
   };
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    // Only start panning if clicking on the canvas container or background elements
-    const target = e.target as HTMLElement;
-    const isCanvas = e.target === e.currentTarget;
-    const isBackground = target.classList.contains("canvas-bg") || 
-                         target.classList.contains("canvas-pan-area") ||
-                         target.tagName === "svg";
+    // Start panning if middle mouse button OR if left click on canvas background
+    if (e.button === 1) {
+      // Middle mouse button always pans
+      e.preventDefault();
+      setIsPanning(true);
+      setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+      return;
+    }
     
-    if (isCanvas || isBackground) {
+    // Left click - only pan if clicking directly on the canvas div
+    if (e.target === canvasRef.current) {
       e.preventDefault();
       setIsPanning(true);
       setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
@@ -160,9 +163,6 @@ export default function DraggableCanvas({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      {/* Pan Area - clickable layer for panning */}
-      <div className="absolute inset-0 canvas-pan-area" />
-
       {/* Animated Grid Background */}
       <div
         className="absolute inset-0 opacity-30 canvas-bg pointer-events-none"
@@ -178,6 +178,16 @@ export default function DraggableCanvas({
 
       {/* Vignette Effect */}
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-zinc-900/80 pointer-events-none" />
+
+      {/* Pan Overlay - transparent clickable layer for panning */}
+      <div 
+        className="absolute inset-0 z-0"
+        onMouseDown={(e) => {
+          e.preventDefault();
+          setIsPanning(true);
+          setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+        }}
+      />
 
       {/* Pan Reset Button */}
       {(panOffset.x !== 0 || panOffset.y !== 0) && (
@@ -323,7 +333,7 @@ export default function DraggableCanvas({
             return (
               <motion.div
                 key={module.id}
-                className={`absolute ${deleteMode ? "cursor-pointer" : "cursor-move"} select-none`}
+                className={`absolute ${deleteMode ? "cursor-pointer" : "cursor-move"} select-none z-10`}
                 style={{
                   left: module.position.x,
                   top: module.position.y,

@@ -229,54 +229,42 @@ export default function MotherboardBuilder({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Preset Configurations */}
-      <div className="glass rounded-lg p-4">
-        <h4 className="text-sm font-semibold text-cyan-400 mb-3">Quick Presets</h4>
-        <div className="grid grid-cols-3 gap-3">
+      <div className="glass rounded-lg p-3">
+        <h4 className="text-xs font-semibold text-cyan-400 mb-2">Quick Presets</h4>
+        <div className="grid grid-cols-3 gap-2">
           {presetConfigs.map((preset, idx) => (
             <motion.button
               key={idx}
               onClick={() => loadPreset(preset)}
-              className={`glass rounded-lg p-4 text-left border-2 border-${preset.color}-500/30 hover:border-${preset.color}-500 transition-all`}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              className={`glass rounded-lg p-2 text-left border border-${preset.color}-500/30 hover:border-${preset.color}-500 transition-all`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-start justify-between mb-2">
-                <h5 className="font-bold text-white text-sm">{preset.name}</h5>
-                <span className={`text-${preset.color}-400 text-xs`}>{preset.price}</span>
+              <div className="flex items-center justify-between mb-1">
+                <h5 className="font-bold text-white text-xs">{preset.name}</h5>
+                <span className={`text-${preset.color}-400 text-[10px]`}>{preset.price}</span>
               </div>
-              <p className="text-xs text-zinc-400 mb-3">{preset.desc}</p>
-              <div className="space-y-1 text-[10px] text-zinc-500">
-                <div>CPU: {preset.cpu.split(" - ")[0]}</div>
-                <div>RAM: {preset.ram.split(" - ")[0]}</div>
-                <div>Storage: {preset.storage.split(" - ")[0]}</div>
-                <div>GPU: {preset.gpu.split(" - ")[0]}</div>
-              </div>
+              <p className="text-[10px] text-zinc-400">{preset.desc}</p>
             </motion.button>
           ))}
         </div>
       </div>
 
       {/* Info Panel */}
-      <div className="glass rounded-lg p-4 flex items-start gap-3">
-        <Info className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-zinc-300">
-          <p className="font-semibold mb-2">Cara Merakit PC:</p>
-          <ol className="space-y-1 text-zinc-400 list-decimal list-inside">
-            <li>Pilih preset cepat ATAU drag komponen manual</li>
-            <li>CPU → CPU Socket (tengah)</li>
-            <li>RAM → RAM Slots (kanan atas)</li>
-            <li>GPU → PCIe x16 Slot (tengah bawah)</li>
-            <li>Storage → SATA Port (kanan bawah)</li>
-          </ol>
+      <div className="glass rounded-lg p-3 flex items-start gap-2">
+        <Info className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+        <div className="text-xs text-zinc-300">
+          <p className="font-semibold mb-1">Cara Merakit:</p>
+          <p className="text-zinc-400">Pilih preset ATAU drag komponen ke socket yang sesuai</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-6">
+      <div className="grid grid-cols-12 gap-4">
         {/* Component Inventory */}
-        <div className="col-span-4 space-y-4 max-h-[500px] overflow-y-auto pr-2">
-          <h4 className="text-sm font-semibold text-zinc-300 flex items-center gap-2 sticky top-0 bg-zinc-900 pb-2">
+        <div className="col-span-4 space-y-3 max-h-[350px] overflow-y-auto pr-2">
+          <h4 className="text-xs font-semibold text-zinc-300 flex items-center gap-2 sticky top-0 bg-zinc-900 pb-2 z-10">
             <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
             Komponen yang Dipilih
           </h4>
@@ -498,7 +486,7 @@ export default function MotherboardBuilder({
             </motion.div>
           )}
 
-          <div className="relative w-full h-[450px] bg-gradient-to-br from-emerald-950/30 to-cyan-950/30 border-2 border-zinc-700 rounded-lg overflow-hidden">
+          <div className="relative w-full h-[320px] bg-gradient-to-br from-emerald-950/30 to-cyan-950/30 border-2 border-zinc-700 rounded-lg overflow-hidden">
             {/* Motherboard Background Pattern */}
             <div className="absolute inset-0 opacity-20">
               <div className="absolute inset-0" style={{

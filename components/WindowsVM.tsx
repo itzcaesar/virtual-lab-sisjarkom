@@ -175,36 +175,119 @@ export default function WindowsVM({
                 </div>
 
                 {/* Browser Content */}
-                <div className="flex-1 bg-white relative">
+                <div className="flex-1 bg-white overflow-y-auto">
                   {isLoading ? (
-                    <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="h-full flex items-center justify-center">
                       <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
                     </div>
-                  ) : (
+                  ) : browserContent === "google" ? (
                     <div className="p-8">
-                      <div className="max-w-2xl mx-auto">
-                        <div className="text-center mb-8">
-                          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      <div className="max-w-xl mx-auto">
+                        <div className="text-center mb-6">
+                          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-red-500 via-yellow-500 via-green-500 to-blue-600 bg-clip-text text-transparent">
                             Google
                           </h1>
-                          <div className="bg-zinc-100 rounded-full p-4 text-zinc-600">
-                            🔍 Search the web...
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                              placeholder="Search Google..."
+                              className="flex-1 border border-zinc-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <button 
+                              onClick={handleSearch}
+                              className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-600"
+                            >
+                              Search
+                            </button>
                           </div>
                         </div>
 
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-8">
-                          <h3 className="font-bold text-blue-900 mb-2">✅ Koneksi Berhasil!</h3>
-                          <p className="text-sm text-blue-800">
-                            Virtual machine Windows berhasil terhubung ke internet melalui router.
-                            IP Address: <span className="font-mono font-bold">{ipAddress}</span>
-                          </p>
-                          <div className="mt-3 text-xs text-blue-600 font-mono">
-                            <div>• Gateway: 192.168.1.1</div>
-                            <div>• DNS: 8.8.8.8</div>
-                            <div>• Status: Online</div>
+                        <div className="flex justify-center gap-4 mt-6">
+                          <button 
+                            onClick={() => { setBrowserUrl("https://youtube.com"); handleBrowserNavigate("https://youtube.com"); }}
+                            className="px-4 py-2 text-sm bg-zinc-100 hover:bg-zinc-200 rounded"
+                          >
+                            🎬 YouTube
+                          </button>
+                          <button 
+                            onClick={() => { setBrowserUrl("https://github.com"); handleBrowserNavigate("https://github.com"); }}
+                            className="px-4 py-2 text-sm bg-zinc-100 hover:bg-zinc-200 rounded"
+                          >
+                            💻 GitHub
+                          </button>
+                        </div>
+
+                        {networkConnected && (
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-6 text-sm">
+                            <p className="text-green-700">✅ Connected • IP: {ipAddress}</p>
                           </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : browserContent === "youtube" ? (
+                    <div className="bg-zinc-900 min-h-full p-4">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="text-red-500 text-2xl font-bold">▶ YouTube</div>
+                        <input className="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-4 py-2 text-white text-sm" placeholder="Search videos..." />
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        {["Tech Tutorial", "Music Video", "Gaming Stream", "News", "Coding Tips", "Cat Videos"].map((title, i) => (
+                          <div key={i} className="bg-zinc-800 rounded-lg overflow-hidden">
+                            <div className="aspect-video bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-4xl">
+                              {["📺", "🎵", "🎮", "📰", "💻", "🐱"][i]}
+                            </div>
+                            <div className="p-2">
+                              <p className="text-white text-sm font-semibold truncate">{title}</p>
+                              <p className="text-zinc-400 text-xs">Virtual Channel • 10K views</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : browserContent === "github" ? (
+                    <div className="bg-zinc-900 min-h-full p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="text-white text-2xl">🐙</div>
+                        <span className="text-white text-xl font-bold">GitHub</span>
+                      </div>
+                      <div className="bg-zinc-800 rounded-lg p-4 mb-4">
+                        <h3 className="text-white font-bold mb-2">📁 virtual-lab-sisjarkom</h3>
+                        <p className="text-zinc-400 text-sm mb-3">Interactive virtual lab simulation for computer systems</p>
+                        <div className="flex gap-4 text-xs text-zinc-500">
+                          <span>⭐ 42 stars</span>
+                          <span>🔀 12 forks</span>
+                          <span>🟢 TypeScript</span>
                         </div>
                       </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {["Next.js", "React", "TypeScript", "Tailwind CSS"].map((tech, i) => (
+                          <div key={i} className="bg-zinc-800 rounded p-3 text-center">
+                            <span className="text-zinc-300 text-sm">{tech}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : browserContent === "search-results" ? (
+                    <div className="p-6">
+                      <p className="text-zinc-500 text-sm mb-4">Results for "{searchQuery}"</p>
+                      <div className="space-y-4">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="border-b pb-4">
+                            <a href="#" className="text-blue-600 hover:underline text-lg">Search Result {i}: {searchQuery}</a>
+                            <p className="text-green-700 text-sm">www.example{i}.com</p>
+                            <p className="text-zinc-600 text-sm">This is a simulated search result for your query about {searchQuery}...</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center">
+                      <div className="text-6xl mb-4">🌐</div>
+                      <h2 className="text-xl font-bold text-zinc-800 mb-2">{browserUrl}</h2>
+                      <p className="text-zinc-500">Page loaded successfully</p>
                     </div>
                   )}
                 </div>

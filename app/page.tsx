@@ -6,7 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import WikiPanel from "@/components/WikiPanel";
 import { AnimatePresence, motion } from "framer-motion";
 import { calculatePerformance, getPerformanceTier, type PerformanceMetrics } from "@/lib/performance";
-import { Sparkles } from "lucide-react";
+import { Monitor } from "lucide-react";
 
 export type Phase = "idle" | "hardware" | "os" | "network" | "complete";
 export type OSType = "windows" | "linux" | null;
@@ -202,7 +202,7 @@ export default function Home() {
                 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
-                <Sparkles 
+                <Monitor 
                   className="w-9 h-9 rainbow-icon" 
                   style={{ 
                     filter: "drop-shadow(0 0 10px currentColor)",

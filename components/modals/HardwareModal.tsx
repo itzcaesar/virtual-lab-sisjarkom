@@ -107,8 +107,8 @@ export default function HardwareModal({
     >
       <motion.div
         className={`bg-zinc-900 border-2 border-emerald-500/50 rounded-2xl ${
-          step === "build" ? "max-w-7xl" : "max-w-2xl"
-        } w-full p-8 relative shadow-2xl shadow-emerald-500/20 transition-all`}
+          step === "build" ? "max-w-5xl max-h-[85vh] overflow-y-auto" : "max-w-2xl"
+        } w-full p-6 relative shadow-2xl shadow-emerald-500/20 transition-all`}
         initial={{ scale: 0.8, y: 50 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.8, y: 50 }}
