@@ -8,6 +8,91 @@
   --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Code", "Courier New", monospace;
 }
 
+/* Disable text selection globally */
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Allow selection for input fields and textareas */
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* Hide scrollbar on main page */
+body {
+  overflow: hidden;
+}
+
+#main-container {
+  overflow-y: auto;
+  height: 100vh;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+#main-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Light theme variables */
+html.light {
+  --background: #f4f4f5;
+  --foreground: #18181b;
+}
+
+html.light body {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* Light theme overrides */
+html.light .bg-zinc-950 {
+  background-color: #f4f4f5 !important;
+}
+
+html.light .bg-zinc-900 {
+  background-color: #e4e4e7 !important;
+}
+
+html.light .bg-zinc-800 {
+  background-color: #d4d4d8 !important;
+}
+
+html.light .text-zinc-100 {
+  color: #18181b !important;
+}
+
+html.light .text-zinc-300 {
+  color: #3f3f46 !important;
+}
+
+html.light .text-zinc-400 {
+  color: #52525b !important;
+}
+
+html.light .text-zinc-500 {
+  color: #71717a !important;
+}
+
+html.light .border-zinc-800 {
+  border-color: #a1a1aa !important;
+}
+
+html.light .border-zinc-700 {
+  border-color: #a1a1aa !important;
+}
+
+html.light .text-white {
+  color: #18181b !important;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -15,12 +100,21 @@ body {
 }
 
 @layer utilities {
+  .card {
+    @apply bg-zinc-900 border border-zinc-800;
+  }
+  
+  .card-hover {
+    @apply hover:bg-zinc-800 hover:border-zinc-700 transition-all duration-300;
+  }
+  
+  /* Keep glass as alias for backward compatibility during transition */
   .glass {
-    @apply bg-white/5 backdrop-blur-md border border-white/10;
+    @apply bg-zinc-900 border border-zinc-800;
   }
   
   .glass-hover {
-    @apply hover:bg-white/10 hover:border-white/20 transition-all duration-300;
+    @apply hover:bg-zinc-800 hover:border-zinc-700 transition-all duration-300;
   }
   
   .bg-gradient-radial {
@@ -76,4 +170,27 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* Light theme scrollbar */
+html.light ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Hide scrollbar utility class */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

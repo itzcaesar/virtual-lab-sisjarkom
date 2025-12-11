@@ -144,7 +144,7 @@ const wikiData: Record<WikiSection, WikiTopic[]> = {
   os: [
     {
       id: "os-basics",
-      title: "Operating System Basics",
+      title: "Dasar-dasar Sistem Operasi",
       icon: Monitor,
       content: "Operating System (OS) adalah software yang mengelola hardware dan menjalankan aplikasi. Pilih Windows untuk GUI atau Linux dengan 6 pilihan distribusi.",
       tips: [
@@ -246,7 +246,7 @@ const wikiData: Record<WikiSection, WikiTopic[]> = {
     },
     {
       id: "performance",
-      title: "Network Performance",
+      title: "Performa Jaringan",
       icon: Zap,
       content: "Performa jaringan mempengaruhi kecepatan browsing, download, dan koneksi ke server. Konfigurasi yang baik mengoptimalkan latency dan throughput.",
       tips: [
@@ -264,10 +264,10 @@ export default function WikiPanel({ currentPhase, onClose }: WikiPanelProps) {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
   const sections = [
-    { id: "overview" as WikiSection, name: "Overview", icon: BookOpen },
-    { id: "hardware" as WikiSection, name: "Hardware", icon: Cpu },
-    { id: "os" as WikiSection, name: "Operating System", icon: Monitor },
-    { id: "network" as WikiSection, name: "Network", icon: Cable },
+    { id: "overview" as WikiSection, name: "Ikhtisar", icon: BookOpen },
+    { id: "hardware" as WikiSection, name: "Perangkat Keras", icon: Cpu },
+    { id: "os" as WikiSection, name: "Sistem Operasi", icon: Monitor },
+    { id: "network" as WikiSection, name: "Jaringan", icon: Cable },
   ];
 
   const currentTopics = wikiData[selectedSection];
@@ -275,13 +275,13 @@ export default function WikiPanel({ currentPhase, onClose }: WikiPanelProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-zinc-900 border-2 border-cyan-500/50 rounded-2xl max-w-5xl w-full h-[80vh] relative shadow-2xl shadow-cyan-500/20 flex overflow-hidden"
+        className="bg-zinc-900 border-2 border-cyan-500/50 rounded-2xl max-w-5xl w-full h-[80vh] relative shadow-2xl flex overflow-hidden"
         initial={{ scale: 0.8, y: 50 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.8, y: 50 }}
@@ -327,7 +327,7 @@ export default function WikiPanel({ currentPhase, onClose }: WikiPanelProps) {
                 {sections.find((s) => s.id === selectedSection)?.name}
               </h3>
               <p className="text-sm text-zinc-400 mt-1">
-                {currentTopics.length} topik tersedia
+                {currentTopics.length} topik
               </p>
             </div>
             <button
@@ -354,7 +354,7 @@ export default function WikiPanel({ currentPhase, onClose }: WikiPanelProps) {
                       <motion.button
                         key={topic.id}
                         onClick={() => setSelectedTopic(topic.id)}
-                        className="glass p-4 rounded-lg text-left hover:border-cyan-500/50 transition-all group"
+                        className="card p-4 rounded-lg text-left hover:border-cyan-500/50 transition-all group"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
@@ -401,7 +401,7 @@ export default function WikiPanel({ currentPhase, onClose }: WikiPanelProps) {
                     Kembali ke daftar topik
                   </button>
 
-                  <div className="glass rounded-lg p-6">
+                  <div className="card rounded-lg p-6">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="p-3 bg-cyan-500/20 rounded-lg">
                         <currentTopic.icon className="w-8 h-8 text-cyan-400" />
@@ -419,7 +419,7 @@ export default function WikiPanel({ currentPhase, onClose }: WikiPanelProps) {
                       <div className="flex items-center gap-2 mb-3">
                         <Zap className="w-4 h-4 text-yellow-400" />
                         <h5 className="text-sm font-semibold text-yellow-400">
-                          Tips & Best Practices
+                          Tips & Praktik Terbaik
                         </h5>
                       </div>
                       <ul className="space-y-2">

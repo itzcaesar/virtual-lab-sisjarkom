@@ -132,7 +132,7 @@ export default function Window({
   if (isMinimized) {
     return (
       <motion.div
-        className={`fixed bottom-4 glass rounded-lg px-4 py-2 border ${colorClasses[color]} cursor-pointer`}
+        className={`fixed bottom-4 card rounded-lg px-4 py-2 border ${colorClasses[color]} cursor-pointer`}
         style={{ left: position.x, zIndex }}
         onClick={() => setIsMinimized(false)}
         whileHover={{ scale: 1.05 }}
@@ -145,7 +145,7 @@ export default function Window({
   return (
     <motion.div
       ref={windowRef}
-      className={`fixed bg-zinc-900/95 backdrop-blur-md rounded-lg border-2 ${colorClasses[color]} shadow-2xl overflow-hidden`}
+      className={`fixed bg-zinc-900/95 rounded-lg border-2 ${colorClasses[color]} shadow-2xl overflow-hidden`}
       style={{
         left: position.x,
         top: position.y,

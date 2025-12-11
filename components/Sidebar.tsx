@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GameState } from "@/app/page";
-import { CheckCircle2, Circle, Zap } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { getPerformanceTier } from "@/lib/performance";
+import { GameState, PCSpecs } from "@/app/page";
+import { Zap, BookOpen, CheckCircle, Circle, ArrowRight } from "lucide-react";
+import { useEffect, useRef, useMemo } from "react";
+import { getPerformanceTier, parseCPUSpecs, parseRAMSpecs, parseStorageSpecs, parseGPUSpecs } from "@/lib/performance";
 
 interface SidebarProps {
   gameState: GameState;
@@ -13,95 +13,164 @@ interface SidebarProps {
 export default function Sidebar({ gameState }: SidebarProps) {
   const logEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [gameState.logs]);
+  // Removed auto-scroll to prevent jumping when user is reading logs
 
-  const tasks = [
-    {
-      title: "Instalasi Hardware",
-      completed: gameState.hardwareInstalled,
-      description: "CPU & RAM",
-    },
-    {
-      title: "Instalasi Sistem Operasi",
-      completed: gameState.osInstalled !== null,
-      description: gameState.osInstalled ? gameState.osInstalled.toUpperCase() : "Belum dipilih",
-    },
-    {
-      title: "Konfigurasi Jaringan",
-      completed: gameState.networkConnected,
-      description: "Ethernet",
-    },
+  // Progress calculation
+  const progressSteps = [
+    { id: "hardware", label: "Hardware", completed: gameState.hardwareInstalled },
+    { id: "os", label: "Sistem Operasi", completed: !!gameState.osInstalled },
+    { id: "network", label: "Jaringan", completed: gameState.networkConnected },
   ];
 
-  return (
-    <aside className="w-96 bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6">
-      {/* System Specs (when hardware installed) */}
-      {gameState.hardwareInstalled && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-lg p-4"
-        >
-          <h3 className="text-sm font-bold text-emerald-400 mb-3 font-mono flex items-center gap-2">
-            <span>💻</span> SYSTEM SPECS
-          </h3>
-          <div className="space-y-2 text-xs font-mono">
-            <div className="flex justify-between">
-              <span className="text-zinc-500">CPU:</span>
-              <span className="text-emerald-400 text-right max-w-[200px] truncate">{gameState.cpuModel || "N/A"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-zinc-500">RAM:</span>
-              <span className="text-emerald-400">{gameState.ramSize || "N/A"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-zinc-500">Storage:</span>
-              <span className="text-emerald-400 text-right max-w-[200px] truncate">{gameState.storage || "N/A"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-zinc-500">GPU:</span>
-              <span className="text-emerald-400 text-right max-w-[200px] truncate">{gameState.gpu || "N/A"}</span>
-            </div>
-            {gameState.osInstalled && (
-              <div className="flex justify-between">
-                <span className="text-zinc-500">OS:</span>
-                <span className="text-cyan-400">{gameState.osInstalled.toUpperCase()}</span>
-              </div>
-            )}
-            {gameState.ipAddress && (
-              <div className="flex justify-between">
-                <span className="text-zinc-500">IP:</span>
-                <span className="text-emerald-400">{gameState.ipAddress}</span>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      )}
+  const completedSteps = progressSteps.filter(s => s.completed).length;
+  const progressPercent = (completedSteps / progressSteps.length) * 100;
 
-      {/* Performance Metrics */}
+  // Aggregate all PC specs for total performance metrics
+  const aggregatedSpecs = useMemo(() => {
+    const pcSpecs = Object.values(gameState.pcSpecs || {});
+    if (pcSpecs.length === 0) {
+      // Fallback to single PC specs from gameState
+      if (gameState.cpuModel) {
+        const cpuInfo = parseCPUSpecs(gameState.cpuModel);
+        const ramInfo = parseRAMSpecs(gameState.ramSize || "8GB DDR4");
+        const storageInfo = parseStorageSpecs(gameState.storage || "256GB SSD");
+        const gpuInfo = parseGPUSpecs(gameState.gpu || "GTX 1650");
+        return {
+          totalCores: cpuInfo.cores,
+          totalThreads: cpuInfo.threads,
+          totalRAM: ramInfo.gb,
+          ramType: ramInfo.type,
+          totalStorage: storageInfo.gb,
+          storageType: storageInfo.type,
+          totalGPUCores: gpuInfo.cores,
+          totalVRAM: gpuInfo.vram,
+          pcCount: 1,
+        };
+      }
+      return null;
+    }
+
+    let totalCores = 0;
+    let totalThreads = 0;
+    let totalRAM = 0;
+    let totalStorage = 0;
+    let totalGPUCores = 0;
+    let totalVRAM = 0;
+    let ramType = "DDR4";
+    let storageType = "SSD";
+
+    pcSpecs.forEach((spec) => {
+      const cpuInfo = parseCPUSpecs(spec.cpuModel);
+      const ramInfo = parseRAMSpecs(spec.ramSize);
+      const storageInfo = parseStorageSpecs(spec.storage);
+      const gpuInfo = parseGPUSpecs(spec.gpu);
+
+      totalCores += cpuInfo.cores;
+      totalThreads += cpuInfo.threads;
+      totalRAM += ramInfo.gb;
+      totalStorage += storageInfo.gb;
+      totalGPUCores += gpuInfo.cores;
+      totalVRAM += gpuInfo.vram;
+      
+      // Keep the best type
+      if (ramInfo.type === "DDR5") ramType = "DDR5";
+      if (storageInfo.type === "NVMe SSD") storageType = "NVMe SSD";
+    });
+
+    return {
+      totalCores,
+      totalThreads,
+      totalRAM,
+      ramType,
+      totalStorage,
+      storageType,
+      totalGPUCores,
+      totalVRAM,
+      pcCount: pcSpecs.length,
+    };
+  }, [gameState.pcSpecs, gameState.cpuModel, gameState.ramSize, gameState.storage, gameState.gpu]);
+
+  return (
+    <aside className="w-80 bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6">
+      {/* Progres Setup */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-zinc-800 border border-zinc-700 rounded-lg p-4"
+      >
+        <h3 className="text-sm font-bold text-purple-400 mb-3 font-mono flex items-center gap-2">
+          <BookOpen className="w-4 h-4" />
+          PROGRES SETUP
+        </h3>
+        
+        {/* Progress Bar */}
+        <div className="mb-3">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs text-zinc-500">{completedSteps}/3 Langkah</span>
+            <span className="text-xs text-purple-400">{Math.round(progressPercent)}%</span>
+          </div>
+          <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPercent}%` }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+
+        {/* Steps */}
+        <div className="space-y-2">
+          {progressSteps.map((step, index) => (
+            <div key={step.id} className="flex items-center gap-2 text-xs">
+              {step.completed ? (
+                <CheckCircle className="w-4 h-4 text-emerald-400" />
+              ) : (
+                <Circle className="w-4 h-4 text-zinc-600" />
+              )}
+              <span className={step.completed ? "text-emerald-400" : "text-zinc-500"}>
+                {step.label}
+              </span>
+              {index < progressSteps.length - 1 && !step.completed && progressSteps[index - 1]?.completed !== false && (
+                <ArrowRight className="w-3 h-3 text-zinc-600 ml-auto" />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Status Message */}
+        <div className="mt-3 pt-3 border-t border-zinc-700">
+          <p className="text-xs text-zinc-400">
+            {completedSteps === 0 && "Klik PC Tower untuk memulai instalasi hardware"}
+            {completedSteps === 1 && "Klik Monitor untuk menginstal sistem operasi"}
+            {completedSteps === 2 && "Klik Router untuk mengatur koneksi jaringan"}
+            {completedSteps === 3 && "✨ Lab virtual siap digunakan!"}
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Metrik Performa */}
       {gameState.performanceMetrics && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-lg p-4 border border-cyan-500/30"
+          className="bg-zinc-800 border border-zinc-700 rounded-lg p-4"
         >
           <h3 className="text-sm font-bold text-cyan-400 mb-3 font-mono flex items-center gap-2">
             <Zap className="w-4 h-4" />
-            PERFORMANCE
+            PERFORMA
           </h3>
           
           <div className="space-y-3">
-            {/* Overall Score */}
+            {/* Skor Keseluruhan */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-xs text-zinc-500">Overall</span>
+                <span className="text-xs text-zinc-500">Keseluruhan</span>
                 <span className={`text-sm font-bold ${getPerformanceTier(gameState.performanceMetrics.overall).color}`}>
                   {gameState.performanceMetrics.overall}/100
                 </span>
               </div>
-              <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden">
                 <motion.div
                   className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500"
                   initial={{ width: 0 }}
@@ -114,31 +183,56 @@ export default function Sidebar({ gameState }: SidebarProps) {
               </p>
             </div>
 
-            {/* Component Scores */}
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-zinc-500">CPU:</span>
-                <span className="text-emerald-400">{gameState.performanceMetrics.cpuScore}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-500">RAM:</span>
-                <span className="text-cyan-400">{gameState.performanceMetrics.ramScore}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Storage:</span>
-                <span className="text-blue-400">{gameState.performanceMetrics.storageScore}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-500">GPU:</span>
-                <span className="text-purple-400">{gameState.performanceMetrics.gpuScore}</span>
-              </div>
+            {/* Skor Komponen dengan Detail Hardware - Agregat dari semua PC */}
+            <div className="space-y-2 text-xs">
+              {aggregatedSpecs && (
+                <>
+                  {aggregatedSpecs.pcCount > 1 && (
+                    <div className="text-xs text-zinc-400 mb-2 pb-2 border-b border-zinc-700">
+                      Total dari {aggregatedSpecs.pcCount} PC
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-zinc-500">CPU:</span>
+                    <span className="text-emerald-400 font-mono">
+                      {aggregatedSpecs.totalCores} Cores / {aggregatedSpecs.totalThreads} Threads
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-zinc-500">RAM:</span>
+                    <span className="text-cyan-400 font-mono">
+                      {aggregatedSpecs.totalRAM}GB {aggregatedSpecs.ramType}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-zinc-500">Penyimpanan:</span>
+                    <span className="text-blue-400 font-mono">
+                      {aggregatedSpecs.totalStorage >= 1024 
+                        ? `${(aggregatedSpecs.totalStorage / 1024).toFixed(1)}TB` 
+                        : `${aggregatedSpecs.totalStorage}GB`} {aggregatedSpecs.storageType}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-zinc-500">GPU:</span>
+                    <span className="text-purple-400 font-mono">
+                      {aggregatedSpecs.totalGPUCores} cores / {aggregatedSpecs.totalVRAM}GB VRAM
+                    </span>
+                  </div>
+                  {gameState.psu && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-500">PSU:</span>
+                      <span className="text-yellow-400 font-mono">{gameState.psu}</span>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
-            {/* Performance Impacts */}
+            {/* Dampak Performa */}
             {gameState.networkConnected && (
               <div className="border-t border-zinc-700 pt-2 space-y-1 text-xs font-mono">
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">VM Boot:</span>
+                  <span className="text-zinc-500">Boot VM:</span>
                   <span className="text-emerald-400">{gameState.performanceMetrics.vmBootTime}ms</span>
                 </div>
                 <div className="flex justify-between">
@@ -146,7 +240,7 @@ export default function Sidebar({ gameState }: SidebarProps) {
                   <span className="text-cyan-400">{gameState.performanceMetrics.browserLoadTime}ms</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Apps:</span>
+                  <span className="text-zinc-500">Aplikasi:</span>
                   <span className="text-blue-400">{gameState.performanceMetrics.appResponseTime}ms</span>
                 </div>
               </div>
@@ -155,47 +249,12 @@ export default function Sidebar({ gameState }: SidebarProps) {
         </motion.div>
       )}
 
-      {/* Task Checklist */}
-      <div>
-        <h2 className="text-xl font-bold text-emerald-400 mb-4 font-mono">
-          [ TASK CHECKLIST ]
-        </h2>
-        <div className="space-y-3">
-          {tasks.map((task, index) => (
-            <motion.div
-              key={index}
-              className={`glass rounded-lg p-3 flex items-start gap-3 transition-all ${
-                task.completed ? "border-emerald-500/30" : ""
-              }`}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              {task.completed ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-              ) : (
-                <Circle className="w-5 h-5 text-zinc-600 flex-shrink-0 mt-0.5" />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className={`font-medium text-sm ${task.completed ? "text-zinc-300 line-through" : "text-zinc-500"}`}>
-                  {task.title}
-                </p>
-                <p className={`text-xs font-mono ${task.completed ? "text-emerald-500" : "text-zinc-600"}`}>
-                  {task.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Info Log */}
+      {/* Log Informasi */}
       <div className="flex-1 flex flex-col min-h-0">
         <h2 className="text-xl font-bold text-cyan-400 mb-4 font-mono">
-          [ INFO LOG ]
+          [ LOG INFO ]
         </h2>
-        <div className="glass rounded-lg p-4 overflow-y-auto font-mono text-xs space-y-1 max-h-[400px]">
+        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 overflow-y-auto font-mono text-xs space-y-1 max-h-[400px]">
           {gameState.logs.map((log, index) => (
             <motion.div
               key={index}

@@ -14,6 +14,18 @@ export interface NetworkConfig {
   dns: string;
 }
 
+export interface DetailedHardwareInfo {
+  cpuCores: number;
+  cpuThreads: number;
+  cpuFrequency: string;
+  ramGB: number;
+  ramType: string;
+  storageGB: number;
+  storageType: string;
+  gpuCores: number;
+  gpuVRAM: number;
+}
+
 export interface PerformanceMetrics {
   overall: number; // 0-100
   cpuScore: number;
@@ -24,7 +36,65 @@ export interface PerformanceMetrics {
   vmBootTime: number; // milliseconds
   browserLoadTime: number; // milliseconds
   appResponseTime: number; // milliseconds
+  hardwareDetails?: DetailedHardwareInfo;
 }
+
+// Parse CPU specs to get cores, threads, frequency
+export const parseCPUSpecs = (cpu: string): { cores: number; threads: number; frequency: string } => {
+  // Try to extract from bracket notation first: [12 Cores / 20 Threads @ 3.6GHz]
+  const bracketMatch = cpu.match(/\[(\d+)\s*Cores\s*\/\s*(\d+)\s*Threads\s*@\s*([\d.]+GHz)\]/i);
+  if (bracketMatch) {
+    return { cores: parseInt(bracketMatch[1]), threads: parseInt(bracketMatch[2]), frequency: bracketMatch[3] };
+  }
+  
+  // Fallback to model-based detection
+  if (cpu.includes("i9-13900K")) return { cores: 24, threads: 32, frequency: "5.8 GHz" };
+  if (cpu.includes("Ryzen 9")) return { cores: 16, threads: 32, frequency: "5.7 GHz" };
+  if (cpu.includes("i7-12700K")) return { cores: 12, threads: 20, frequency: "5.0 GHz" };
+  if (cpu.includes("Ryzen 7 5800X")) return { cores: 8, threads: 16, frequency: "4.7 GHz" };
+  if (cpu.includes("i5-12400")) return { cores: 6, threads: 12, frequency: "4.4 GHz" };
+  if (cpu.includes("Ryzen 5")) return { cores: 6, threads: 12, frequency: "4.6 GHz" };
+  return { cores: 4, threads: 8, frequency: "3.5 GHz" };
+};
+
+// Parse RAM specs to get GB and type
+export const parseRAMSpecs = (ram: string): { gb: number; type: string } => {
+  const gbMatch = ram.match(/(\d+)GB/);
+  const gb = gbMatch ? parseInt(gbMatch[1]) : 8;
+  const type = ram.includes("DDR5") ? "DDR5" : "DDR4";
+  return { gb, type };
+};
+
+// Parse storage specs to get size and type
+export const parseStorageSpecs = (storage: string): { gb: number; type: string } => {
+  const sizeMatch = storage.match(/(\d+)(TB|GB)/);
+  let gb = 512;
+  if (sizeMatch) {
+    gb = sizeMatch[2] === "TB" ? parseInt(sizeMatch[1]) * 1024 : parseInt(sizeMatch[1]);
+  }
+  const type = storage.includes("NVMe") ? "NVMe SSD" : storage.includes("SATA") ? "SATA SSD" : "HDD";
+  return { gb, type };
+};
+
+// Parse GPU specs to get cores and VRAM
+export const parseGPUSpecs = (gpu: string): { cores: number; vram: number } => {
+  // Try to extract from bracket notation first: [3584 Cores, 12GB GDDR6]
+  const bracketMatch = gpu.match(/\[(\d+)\s*Cores,\s*(\d+)GB/i);
+  if (bracketMatch) {
+    return { cores: parseInt(bracketMatch[1]), vram: parseInt(bracketMatch[2]) };
+  }
+  
+  // Fallback to model-based detection
+  if (gpu.includes("RTX 4090")) return { cores: 16384, vram: 24 };
+  if (gpu.includes("RTX 4080")) return { cores: 9728, vram: 16 };
+  if (gpu.includes("RTX 4070")) return { cores: 5888, vram: 12 };
+  if (gpu.includes("RTX 3080")) return { cores: 8704, vram: 10 };
+  if (gpu.includes("RTX 3070")) return { cores: 5888, vram: 8 };
+  if (gpu.includes("RTX 3060")) return { cores: 3584, vram: 12 };
+  if (gpu.includes("RX 6700 XT")) return { cores: 2560, vram: 12 };
+  if (gpu.includes("GTX 1660")) return { cores: 1408, vram: 6 };
+  return { cores: 1024, vram: 4 };
+};
 
 // CPU scoring
 const getCPUScore = (cpu: string): number => {
@@ -103,6 +173,24 @@ export const calculatePerformance = (
   const gpuScore = getGPUScore(hardware.gpu);
   const networkScore = network ? getNetworkScore(network) : 50;
   
+  // Parse detailed hardware info
+  const cpuSpecs = parseCPUSpecs(hardware.cpu);
+  const ramSpecs = parseRAMSpecs(hardware.ram);
+  const storageSpecs = parseStorageSpecs(hardware.storage);
+  const gpuSpecs = parseGPUSpecs(hardware.gpu);
+  
+  const hardwareDetails: DetailedHardwareInfo = {
+    cpuCores: cpuSpecs.cores,
+    cpuThreads: cpuSpecs.threads,
+    cpuFrequency: cpuSpecs.frequency,
+    ramGB: ramSpecs.gb,
+    ramType: ramSpecs.type,
+    storageGB: storageSpecs.gb,
+    storageType: storageSpecs.type,
+    gpuCores: gpuSpecs.cores,
+    gpuVRAM: gpuSpecs.vram,
+  };
+  
   // Overall score (weighted average)
   const overall = Math.round(
     cpuScore * 0.3 +
@@ -132,6 +220,7 @@ export const calculatePerformance = (
     vmBootTime,
     browserLoadTime,
     appResponseTime,
+    hardwareDetails,
   };
 };
 

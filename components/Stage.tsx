@@ -15,12 +15,13 @@ interface StageProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   addLog: (message: string) => void;
-  completeHardware: () => void;
-  completeOS: (os: OSType) => void;
+  completeHardware: (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string }, pcId?: string) => void;
+  completeOS: (os: OSType, distro?: string, pcId?: string) => void;
   completeNetwork: () => void;
   toggleVM: () => void;
   toggleBrowser: () => void;
   resetLab: () => void;
+  removePCSpecs: (pcId: string) => void;
 }
 
 export default function Stage({
@@ -33,6 +34,7 @@ export default function Stage({
   toggleVM,
   toggleBrowser,
   resetLab,
+  removePCSpecs,
 }: StageProps) {
   const [modules, setModules] = useState<CanvasModule[]>([]);
   const [cables, setCables] = useState<CableConnection[]>([]);
@@ -40,36 +42,85 @@ export default function Stage({
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [moduleCounter, setModuleCounter] = useState({ pc: 0, monitor: 0, router: 0 });
   const [deleteMode, setDeleteMode] = useState(false);
+  
+  // Track which specific module is being configured
+  const [configuringModuleId, setConfiguringModuleId] = useState<string | null>(null);
+  
+  // Track individual PC configurations (maps module ID to OS type)
+  const [pcConfigurations, setPcConfigurations] = useState<Record<string, { os: OSType; hardware: boolean; network: boolean }>>({});
+  
+  // VM selector state
+  const [showVMSelector, setShowVMSelector] = useState(false);
+  const [activeVMModuleId, setActiveVMModuleId] = useState<string | null>(null);
 
-  // Wrapper functions that also mark modules as configured
-  const handleCompleteHardware = () => {
-    completeHardware();
-    // Mark all PC modules as configured
-    setModules((prev) =>
-      prev.map((m) => (m.type === "pc" ? { ...m, configured: true } : m))
-    );
+  // Wrapper functions that mark the SPECIFIC module as configured
+  const handleCompleteHardware = (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string }) => {
+    completeHardware(specs, configuringModuleId || undefined);
+    // Mark only the specific PC module being configured
+    if (configuringModuleId) {
+      setModules((prev) =>
+        prev.map((m) => (m.id === configuringModuleId ? { ...m, configured: true } : m))
+      );
+      // Track this PC's hardware config
+      setPcConfigurations(prev => ({
+        ...prev,
+        [configuringModuleId]: { ...prev[configuringModuleId], hardware: true, os: null, network: false }
+      }));
+    }
   };
 
-  const handleCompleteOS = (os: OSType) => {
-    completeOS(os);
-    // Mark all monitor modules as configured
-    setModules((prev) =>
-      prev.map((m) => (m.type === "monitor" ? { ...m, configured: true } : m))
-    );
+  const handleCompleteOS = (os: OSType, distro?: string) => {
+    // Find the PC connected to this monitor via cables
+    const connectedCable = cables.find(c => c.to === configuringModuleId || c.from === configuringModuleId);
+    const connectedPCId = connectedCable ? 
+      (modules.find(m => m.id === connectedCable.from && m.type === "pc")?.id ||
+       modules.find(m => m.id === connectedCable.to && m.type === "pc")?.id) : null;
+    
+    // Fallback to any configured PC or first PC
+    const pcModule = connectedPCId ? 
+      modules.find(m => m.id === connectedPCId) :
+      modules.find(m => m.type === "pc" && m.configured) ||
+      modules.find(m => m.type === "pc");
+    
+    const pcIdToUse = pcModule?.id || undefined;
+    
+    completeOS(os, distro, pcIdToUse);
+    
+    // Mark only the specific monitor module being configured
+    if (configuringModuleId) {
+      setModules((prev) =>
+        prev.map((m) => (m.id === configuringModuleId ? { ...m, configured: true } : m))
+      );
+      
+      // Store OS config for the associated PC
+      if (pcModule) {
+        setPcConfigurations(prev => ({
+          ...prev,
+          [pcModule.id]: { ...prev[pcModule.id], os, hardware: true }
+        }));
+      }
+    }
   };
 
   const handleCompleteNetwork = () => {
     completeNetwork();
-    // Mark all router modules as configured
-    setModules((prev) =>
-      prev.map((m) => (m.type === "router" ? { ...m, configured: true } : m))
-    );
+    // Mark only the specific router module being configured
+    if (configuringModuleId) {
+      setModules((prev) =>
+        prev.map((m) => (m.id === configuringModuleId ? { ...m, configured: true } : m))
+      );
+    }
+  };
+  
+  // Get configured PCs with OS installed
+  const getConfiguredPCs = () => {
+    return modules.filter(m => m.type === "pc" && pcConfigurations[m.id]?.os);
   };
 
   // Canvas presets
   const canvasPresets = [
     {
-      name: "Simple Network",
+      name: "Jaringan Sederhana",
       modules: [
         { type: "pc" as const, position: { x: 200, y: 300 }, label: "PC-1" },
         { type: "monitor" as const, position: { x: 400, y: 300 }, label: "MONITOR-1" },
@@ -81,7 +132,7 @@ export default function Stage({
       ],
     },
     {
-      name: "Multi-PC Lab",
+      name: "Lab Multi-PC",
       modules: [
         { type: "pc" as const, position: { x: 150, y: 200 }, label: "PC-1" },
         { type: "monitor" as const, position: { x: 300, y: 200 }, label: "MONITOR-1" },
@@ -97,7 +148,7 @@ export default function Stage({
       ],
     },
     {
-      name: "Server Room",
+      name: "Ruang Server",
       modules: [
         { type: "pc" as const, position: { x: 150, y: 150 }, label: "SERVER-1" },
         { type: "monitor" as const, position: { x: 300, y: 150 }, label: "MONITOR-1" },
@@ -130,11 +181,12 @@ export default function Stage({
     const newCounter = { ...moduleCounter, [type]: moduleCounter[type] + 1 };
     setModuleCounter(newCounter);
 
+    const label = `${type.toUpperCase()}-${newCounter[type]}`;
     const newModule: CanvasModule = {
-      id: `${type}-${Date.now()}`,
+      id: label.toLowerCase().replace(/[^a-z0-9]/g, '-'),
       type,
       position: { x: 150 + modules.length * 50, y: 200 + modules.length * 30 },
-      label: `${type.toUpperCase()}-${newCounter[type]}`,
+      label: label,
       configured: 
         (type === "pc" && gameState.hardwareInstalled) ||
         (type === "monitor" && !!gameState.osInstalled) ||
@@ -153,22 +205,29 @@ export default function Stage({
 
   const handleModuleClick = (module: CanvasModule) => {
     setSelectedModule(module.id);
+    setConfiguringModuleId(module.id);
     
     // Open configuration based on module type - allow reconfiguration anytime
     if (module.type === "pc") {
       openPhase("hardware");
-      if (gameState.hardwareInstalled) {
+      if (module.configured) {
         addLog(`Membuka konfigurasi hardware ${module.label} untuk modifikasi...`);
       } else {
         addLog(`Mengkonfigurasi ${module.label}...`);
       }
     } else if (module.type === "monitor") {
-      if (!gameState.hardwareInstalled) {
+      // Find connected PC to check if hardware is installed
+      const connectedCable = cables.find(c => c.to === module.id || c.from === module.id);
+      const connectedPCId = connectedCable ? 
+        (connectedCable.to === module.id ? connectedCable.from : connectedCable.to) : null;
+      const connectedPC = connectedPCId ? modules.find(m => m.id === connectedPCId && m.type === "pc") : null;
+      
+      if (!connectedPC?.configured && !gameState.hardwareInstalled) {
         addLog(`⚠️ Install hardware terlebih dahulu sebelum mengkonfigurasi OS`);
         return;
       }
       openPhase("os");
-      if (gameState.osInstalled) {
+      if (module.configured) {
         addLog(`Membuka konfigurasi OS ${module.label} untuk modifikasi...`);
       } else {
         addLog(`Menginstal OS pada ${module.label}...`);
@@ -179,12 +238,87 @@ export default function Stage({
         return;
       }
       openPhase("network");
-      if (gameState.networkConnected) {
+      if (module.configured) {
         addLog(`Membuka konfigurasi ${module.label} untuk modifikasi...`);
       } else {
         addLog(`Mengkonfigurasi ${module.label}...`);
       }
     }
+  };
+  
+  // Handle VM selection
+  const handleOpenVM = (moduleId?: string) => {
+    const configuredPCs = getConfiguredPCs();
+    
+    if (configuredPCs.length === 0) {
+      addLog(`⚠️ Tidak ada PC yang sudah dikonfigurasi dengan OS`);
+      return;
+    }
+    
+    if (configuredPCs.length === 1 || moduleId) {
+      // Single PC or specific PC selected
+      const targetId = moduleId || configuredPCs[0].id;
+      setActiveVMModuleId(targetId);
+      setShowVMSelector(false);
+      toggleVM();
+    } else {
+      // Multiple PCs - show selector
+      setShowVMSelector(true);
+    }
+  };
+  
+  const selectVMAndOpen = (moduleId: string) => {
+    setActiveVMModuleId(moduleId);
+    setShowVMSelector(false);
+    toggleVM();
+  };
+  
+  // Get the OS type for the active VM
+  const getActiveVMOS = (): OSType | null => {
+    if (!activeVMModuleId) return gameState.osInstalled;
+    return pcConfigurations[activeVMModuleId]?.os || gameState.osInstalled;
+  };
+
+  // Get active PC's full specs
+  const getActivePCSpecs = () => {
+    if (activeVMModuleId && gameState.pcSpecs[activeVMModuleId]) {
+      return gameState.pcSpecs[activeVMModuleId];
+    }
+    // Fallback to first available PC spec
+    const firstPCId = Object.keys(gameState.pcSpecs)[0];
+    return firstPCId ? gameState.pcSpecs[firstPCId] : null;
+  };
+
+  // Get active PC's OS edition (Windows or Linux distro)
+  const getActiveOSEdition = (): string => {
+    const specs = getActivePCSpecs();
+    if (!specs) return gameState.windowsEdition || gameState.linuxDistro || "Unknown";
+    
+    if (specs.osInstalled === "windows") {
+      return specs.windowsEdition || gameState.windowsEdition || "Windows 11 Pro";
+    } else if (specs.osInstalled === "linux") {
+      return specs.linuxDistro || gameState.linuxDistro || "Ubuntu";
+    }
+    return "Unknown";
+  };
+
+  // Get active PC's hardware specs
+  const getActivePCHardware = () => {
+    const specs = getActivePCSpecs();
+    if (!specs) {
+      return {
+        cpu: gameState.cpuModel || "Unknown CPU",
+        ram: gameState.ramSize || "Unknown RAM",
+        storage: gameState.storage || "Unknown Storage",
+        gpu: gameState.gpu || "Unknown GPU"
+      };
+    }
+    return {
+      cpu: specs.cpuModel,
+      ram: specs.ramSize,
+      storage: specs.storage,
+      gpu: specs.gpu
+    };
   };
 
   const handleCableStart = (moduleId: string) => {
@@ -212,7 +346,7 @@ export default function Stage({
     }
 
     const newCable: CableConnection = {
-      id: `cable-${Date.now()}`,
+      id: `cable-${cables.length + 1}`,
       from: connectingFrom,
       to: moduleId,
       type: cableType,
@@ -227,15 +361,28 @@ export default function Stage({
 
   const handleModuleDelete = (moduleId: string) => {
     const module = modules.find((m) => m.id === moduleId);
+    
+    // If it's a PC being deleted, remove its specs
+    if (module?.type === "pc" && gameState.pcSpecs[moduleId]) {
+      removePCSpecs(moduleId);
+    }
+    
+    // Remove from pcConfigurations
+    setPcConfigurations((prev) => {
+      const newConfig = { ...prev };
+      delete newConfig[moduleId];
+      return newConfig;
+    });
+    
     setModules((prev) => prev.filter((m) => m.id !== moduleId));
     setCables((prev) => prev.filter((c) => c.from !== moduleId && c.to !== moduleId));
-    addLog(`Module ${module?.label} dihapus dari canvas`);
+    addLog(`${module?.label} dihapus dari canvas`);
   };
 
   const loadCanvasPreset = (presetIndex: number) => {
     const preset = canvasPresets[presetIndex];
     const newModules = preset.modules.map((m, idx) => ({
-      id: `${m.type}-preset-${Date.now()}-${idx}`,
+      id: m.label.toLowerCase().replace(/[^a-z0-9]/g, '-'),
       type: m.type,
       position: m.position,
       label: m.label,
@@ -248,7 +395,7 @@ export default function Stage({
     setModules(newModules);
 
     const newCables = preset.cables.map((c, idx) => ({
-      id: `cable-preset-${Date.now()}-${idx}`,
+      id: `cable-${idx + 1}`,
       from: newModules[c.from].id,
       to: newModules[c.to].id,
       type: c.type,
@@ -270,6 +417,10 @@ export default function Stage({
     setSelectedModule(null);
     setModuleCounter({ pc: 0, monitor: 0, router: 0 });
     setDeleteMode(false);
+    setConfiguringModuleId(null);
+    setPcConfigurations({});
+    setShowVMSelector(false);
+    setActiveVMModuleId(null);
     resetLab();
     addLog("Canvas direset");
   };
@@ -282,17 +433,17 @@ export default function Stage({
 
   return (
     <>
-      <div className="relative w-full h-[600px] glass rounded-2xl p-4 flex flex-col">
+      <div className="relative w-full h-[600px] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col">
         {/* Progress Bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono text-zinc-400">Progress Instalasi</span>
+            <span className="text-xs font-mono text-zinc-400">Progres Instalasi</span>
             <div className="flex items-center gap-4">
               <span className="text-xs font-mono text-emerald-400 font-bold">{progress}%</span>
               {(modules.length > 0 || progress > 0) && (
                 <motion.button
                   onClick={handleReset}
-                  className="px-3 py-1 glass rounded text-xs font-mono text-red-400 hover:text-red-300 hover:border-red-500/50 transition-all flex items-center gap-1"
+                  className="px-3 py-1 bg-zinc-800 border border-zinc-700 rounded text-xs font-mono text-red-400 hover:text-red-300 hover:border-red-500/50 transition-all flex items-center gap-1"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -317,7 +468,7 @@ export default function Stage({
           <div className="flex gap-2">
             <motion.button
               onClick={() => addModule("pc")}
-              className="flex items-center gap-2 px-3 py-2 glass rounded border border-emerald-500/30 hover:border-emerald-500 transition-all"
+              className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-emerald-500 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -328,7 +479,7 @@ export default function Stage({
 
             <motion.button
               onClick={() => addModule("monitor")}
-              className="flex items-center gap-2 px-3 py-2 glass rounded border border-cyan-500/30 hover:border-cyan-500 transition-all"
+              className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-cyan-500 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -339,7 +490,7 @@ export default function Stage({
 
             <motion.button
               onClick={() => addModule("router")}
-              className="flex items-center gap-2 px-3 py-2 glass rounded border border-blue-500/30 hover:border-blue-500 transition-all"
+              className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-blue-500 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -352,7 +503,7 @@ export default function Stage({
 
             <motion.button
               onClick={() => setDeleteMode(!deleteMode)}
-              className={`flex items-center gap-2 px-3 py-2 glass rounded border transition-all ${
+              className={`flex items-center gap-2 px-3 py-2 bg-zinc-800 border rounded transition-all ${
                 deleteMode ? "border-red-500 bg-red-950/30" : "border-zinc-700"
               }`}
               whileHover={{ scale: 1.05 }}
@@ -360,31 +511,76 @@ export default function Stage({
             >
               <span className="text-lg">🗑️</span>
               <span className={`text-xs font-mono ${deleteMode ? "text-red-400" : "text-zinc-400"}`}>
-                {deleteMode ? "Delete ON" : "Delete"}
+                {deleteMode ? "Hapus AKTIF" : "Hapus"}
               </span>
             </motion.button>
 
             {gameState.osInstalled && (
-              <motion.button
-                onClick={toggleVM}
-                className="flex items-center gap-2 px-3 py-2 glass rounded border border-purple-500/30 hover:border-purple-500 transition-all ml-auto"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <MonitorIcon className="w-4 h-4 text-purple-400" />
-                <span className="text-xs font-mono text-purple-400">Open VM</span>
-              </motion.button>
+              <div className="relative ml-auto">
+                <motion.button
+                  onClick={() => handleOpenVM()}
+                  className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-purple-500 transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <MonitorIcon className="w-4 h-4 text-purple-400" />
+                  <span className="text-xs font-mono text-purple-400">
+                    Buka VM {getConfiguredPCs().length > 1 ? `(${getConfiguredPCs().length})` : ""}
+                  </span>
+                </motion.button>
+                
+                {/* VM Selector Dropdown */}
+                <AnimatePresence>
+                  {showVMSelector && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full right-0 mt-2 w-48 bg-zinc-900 border border-zinc-700 rounded-lg overflow-hidden z-50"
+                    >
+                      <div className="p-2 border-b border-zinc-700">
+                        <p className="text-xs font-mono text-zinc-400">Pilih PC untuk buka VM:</p>
+                      </div>
+                      {getConfiguredPCs().map((pc) => {
+                        const osType = pcConfigurations[pc.id]?.os;
+                        return (
+                          <motion.button
+                            key={pc.id}
+                            onClick={() => selectVMAndOpen(pc.id)}
+                            className="w-full p-2 flex items-center gap-2 hover:bg-zinc-800 transition-all text-left"
+                            whileHover={{ x: 5 }}
+                          >
+                            <HardDrive className="w-4 h-4 text-emerald-400" />
+                            <div className="flex-1">
+                              <p className="text-xs font-mono text-zinc-300">{pc.label}</p>
+                              <p className={`text-[10px] ${osType === "windows" ? "text-blue-400" : "text-orange-400"}`}>
+                                {osType === "windows" ? "🪟 Windows" : `🐧 Linux`}
+                              </p>
+                            </div>
+                          </motion.button>
+                        );
+                      })}
+                      <motion.button
+                        onClick={() => setShowVMSelector(false)}
+                        className="w-full p-2 text-xs font-mono text-zinc-500 hover:bg-zinc-800 transition-all border-t border-zinc-700"
+                      >
+                        Batal
+                      </motion.button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
           </div>
 
           {/* Canvas Presets */}
           <div className="flex gap-2 items-center">
-            <span className="text-xs font-mono text-zinc-500">Presets:</span>
+            <span className="text-xs font-mono text-zinc-500">Preset:</span>
             {canvasPresets.map((preset, idx) => (
               <motion.button
                 key={idx}
                 onClick={() => loadCanvasPreset(idx)}
-                className="px-3 py-1 glass rounded border border-zinc-700 hover:border-cyan-500 transition-all text-xs font-mono text-zinc-400 hover:text-cyan-400"
+                className="px-3 py-1 bg-zinc-800 border border-zinc-700 rounded hover:border-cyan-500 transition-all text-xs font-mono text-zinc-400 hover:text-cyan-400"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -422,7 +618,7 @@ export default function Stage({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              <div className="glass rounded-full px-6 py-3 border-2 border-emerald-500/50 shadow-lg shadow-emerald-500/20">
+              <div className="bg-zinc-900 border-2 border-emerald-500/50 rounded-full px-6 py-3 shadow-lg shadow-emerald-500/20">
                 <p className="text-emerald-400 font-bold font-mono flex items-center gap-2">
                   <span className="text-2xl">🎉</span>
                   <span>Lab Virtual Selesai Dikonfigurasi!</span>
@@ -458,25 +654,29 @@ export default function Stage({
 
       {/* Virtual Machines */}
       <AnimatePresence>
-        {gameState.vmMode && gameState.osInstalled === "windows" && (
+        {gameState.vmMode && getActiveVMOS() === "windows" && (
           <WindowsVM
             onClose={toggleVM}
             networkConnected={gameState.networkConnected}
             onOpenBrowser={toggleBrowser}
             browserOpen={gameState.browserOpen}
             ipAddress={gameState.ipAddress}
+            edition={getActiveOSEdition()}
+            hardware={getActivePCHardware()}
+            performanceMetrics={getActivePCSpecs()?.performanceMetrics}
           />
         )}
 
-        {gameState.vmMode && gameState.osInstalled === "linux" && (
+        {gameState.vmMode && getActiveVMOS() === "linux" && (
           <LinuxVM
             onClose={toggleVM}
             networkConnected={gameState.networkConnected}
             onOpenBrowser={toggleBrowser}
             browserOpen={gameState.browserOpen}
             ipAddress={gameState.ipAddress}
-            performanceMetrics={gameState.performanceMetrics}
-            distro={gameState.linuxDistro || "Ubuntu"}
+            performanceMetrics={getActivePCSpecs()?.performanceMetrics || gameState.performanceMetrics}
+            distro={getActiveOSEdition()}
+            hardware={getActivePCHardware()}
           />
         )}
       </AnimatePresence>

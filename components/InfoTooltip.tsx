@@ -24,7 +24,7 @@ export default function InfoTooltip({ title, content, position = "top" }: InfoTo
     <div className="relative inline-block">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-1 rounded-full glass hover:bg-cyan-500/20 transition-colors"
+        className="p-1 rounded-full card hover:bg-cyan-500/20 transition-colors"
         type="button"
       >
         <Info className="w-4 h-4 text-cyan-400" />
@@ -44,7 +44,7 @@ export default function InfoTooltip({ title, content, position = "top" }: InfoTo
 
             {/* Tooltip */}
             <motion.div
-              className={`absolute z-50 w-64 glass rounded-lg p-4 shadow-xl border border-cyan-500/30 ${positionClasses[position]}`}
+              className={`absolute z-50 w-64 card rounded-lg p-4 shadow-xl border border-cyan-500/30 ${positionClasses[position]}`}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}

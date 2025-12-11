@@ -10,6 +10,21 @@ interface WindowsVMProps {
   onOpenBrowser: () => void;
   browserOpen: boolean;
   ipAddress?: string;
+  edition?: string;
+  hardware?: {
+    cpu: string;
+    ram: string;
+    storage: string;
+    gpu: string;
+  };
+  performanceMetrics?: {
+    overall: number;
+    cpuScore: number;
+    ramScore: number;
+    storageScore: number;
+    gpuScore: number;
+    hardwareDetails?: any;
+  };
 }
 
 export default function WindowsVM({ 
@@ -17,7 +32,10 @@ export default function WindowsVM({
   networkConnected, 
   onOpenBrowser, 
   browserOpen,
-  ipAddress 
+  ipAddress,
+  edition = "Windows 11 Pro",
+  hardware,
+  performanceMetrics
 }: WindowsVMProps) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [browserUrl, setBrowserUrl] = useState("https://www.google.com");
@@ -59,13 +77,13 @@ export default function WindowsVM({
 
   return (
     <motion.div
-      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className={`bg-gradient-to-br from-blue-950 to-slate-900 border-2 border-blue-500/50 rounded-lg shadow-2xl shadow-blue-500/20 overflow-hidden ${
+        className={`bg-gradient-to-br from-blue-950 to-slate-900 border-2 border-blue-500/50 rounded-lg shadow-2xl overflow-hidden ${
           isMaximized ? "w-full h-full" : "w-[90%] h-[90%] max-w-6xl"
         }`}
         initial={{ scale: 0.9, y: 20 }}
@@ -77,7 +95,7 @@ export default function WindowsVM({
         <div className="bg-blue-600 h-10 flex items-center justify-between px-4 select-none">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-white/30 rounded" />
-            <span className="text-white text-sm font-semibold">Windows 11 Pro - Virtual Machine</span>
+            <span className="text-white text-sm font-semibold">{edition} - Mesin Virtual</span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -132,13 +150,30 @@ export default function WindowsVM({
           </div>
 
           {/* System Info Widget */}
-          <div className="absolute bottom-4 right-4 glass rounded-lg p-4 w-64">
-            <h3 className="text-white font-bold mb-2 text-sm">System Info</h3>
+          <div className="absolute bottom-4 right-4 card rounded-lg p-4 w-72">
+            <h3 className="text-white font-bold mb-2 text-sm">Info Sistem</h3>
             <div className="text-xs text-white/80 space-y-1 font-mono">
-              <div>OS: Windows 11 Pro</div>
-              <div>Status: Running</div>
+              <div className="flex justify-between">
+                <span className="text-white/60">OS:</span>
+                <span className="text-blue-400">{edition}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">Status:</span>
+                <span className="text-emerald-400">Berjalan</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">CPU:</span>
+                <span className="text-yellow-400">{cpuUsage}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">RAM:</span>
+                <span className="text-cyan-400">{ramUsage}%</span>
+              </div>
               {networkConnected && ipAddress && (
-                <div className="text-emerald-400">Network: Connected ({ipAddress})</div>
+                <div className="flex justify-between pt-1 border-t border-white/10">
+                  <span className="text-white/60">Jaringan:</span>
+                  <span className="text-emerald-400">Terhubung ({ipAddress})</span>
+                </div>
               )}
             </div>
           </div>
@@ -163,7 +198,7 @@ export default function WindowsVM({
                       value={browserUrl}
                       onChange={(e) => setBrowserUrl(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleBrowserNavigate()}
-                      className="flex-1 bg-white rounded px-3 py-1 text-sm border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 bg-white rounded px-3 py-1 text-sm text-black border focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <button
@@ -193,14 +228,14 @@ export default function WindowsVM({
                               value={searchQuery}
                               onChange={(e) => setSearchQuery(e.target.value)}
                               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                              placeholder="Search Google..."
-                              className="flex-1 border border-zinc-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="Cari di Google..."
+                              className="flex-1 border border-zinc-300 rounded-full px-4 py-2 text-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <button 
                               onClick={handleSearch}
                               className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-600"
                             >
-                              Search
+                              Cari
                             </button>
                           </div>
                         </div>
@@ -222,7 +257,7 @@ export default function WindowsVM({
 
                         {networkConnected && (
                           <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-6 text-sm">
-                            <p className="text-green-700">✅ Connected • IP: {ipAddress}</p>
+                            <p className="text-green-700">✅ Terhubung • IP: {ipAddress}</p>
                           </div>
                         )}
                       </div>
@@ -231,7 +266,7 @@ export default function WindowsVM({
                     <div className="bg-zinc-900 min-h-full p-4">
                       <div className="flex items-center gap-4 mb-4">
                         <div className="text-red-500 text-2xl font-bold">▶ YouTube</div>
-                        <input className="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-4 py-2 text-white text-sm" placeholder="Search videos..." />
+                        <input className="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-4 py-2 text-zinc-100 text-sm placeholder-zinc-400" placeholder="Cari video..." />
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         {["Tech Tutorial", "Music Video", "Gaming Stream", "News", "Coding Tips", "Cat Videos"].map((title, i) => (
@@ -240,8 +275,8 @@ export default function WindowsVM({
                               {["📺", "🎵", "🎮", "📰", "💻", "🐱"][i]}
                             </div>
                             <div className="p-2">
-                              <p className="text-white text-sm font-semibold truncate">{title}</p>
-                              <p className="text-zinc-400 text-xs">Virtual Channel • 10K views</p>
+                              <p className="text-zinc-100 text-sm font-semibold truncate">{title}</p>
+                              <p className="text-zinc-300 text-xs">Kanal Virtual • 10rb tayangan</p>
                             </div>
                           </div>
                         ))}
@@ -250,35 +285,35 @@ export default function WindowsVM({
                   ) : browserContent === "github" ? (
                     <div className="bg-zinc-900 min-h-full p-6">
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="text-white text-2xl">🐙</div>
-                        <span className="text-white text-xl font-bold">GitHub</span>
+                        <div className="text-zinc-100 text-2xl">🐙</div>
+                        <span className="text-zinc-100 text-xl font-bold">GitHub</span>
                       </div>
                       <div className="bg-zinc-800 rounded-lg p-4 mb-4">
-                        <h3 className="text-white font-bold mb-2">📁 virtual-lab-sisjarkom</h3>
-                        <p className="text-zinc-400 text-sm mb-3">Interactive virtual lab simulation for computer systems</p>
+                        <h3 className="text-zinc-100 font-bold mb-2">📁 virtual-lab-sisjarkom</h3>
+                        <p className="text-zinc-300 text-sm mb-3">Simulasi lab virtual interaktif untuk sistem jaringan komputer</p>
                         <div className="flex gap-4 text-xs text-zinc-500">
-                          <span>⭐ 42 stars</span>
-                          <span>🔀 12 forks</span>
+                          <span>⭐ 42 bintang</span>
+                          <span>🔀 12 fork</span>
                           <span>🟢 TypeScript</span>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         {["Next.js", "React", "TypeScript", "Tailwind CSS"].map((tech, i) => (
                           <div key={i} className="bg-zinc-800 rounded p-3 text-center">
-                            <span className="text-zinc-300 text-sm">{tech}</span>
+                            <span className="text-zinc-100 text-sm">{tech}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   ) : browserContent === "search-results" ? (
                     <div className="p-6">
-                      <p className="text-zinc-500 text-sm mb-4">Results for "{searchQuery}"</p>
+                      <p className="text-zinc-500 text-sm mb-4">Hasil untuk "{searchQuery}"</p>
                       <div className="space-y-4">
                         {[1, 2, 3].map((i) => (
                           <div key={i} className="border-b pb-4">
-                            <a href="#" className="text-blue-600 hover:underline text-lg">Search Result {i}: {searchQuery}</a>
-                            <p className="text-green-700 text-sm">www.example{i}.com</p>
-                            <p className="text-zinc-600 text-sm">This is a simulated search result for your query about {searchQuery}...</p>
+                            <a href="#" className="text-blue-600 hover:underline text-lg">Hasil Pencarian {i}: {searchQuery}</a>
+                            <p className="text-green-700 text-sm">www.contoh{i}.com</p>
+                            <p className="text-zinc-600 text-sm">Ini adalah hasil pencarian simulasi untuk pencarian Anda tentang {searchQuery}...</p>
                           </div>
                         ))}
                       </div>
@@ -287,7 +322,7 @@ export default function WindowsVM({
                     <div className="p-8 text-center">
                       <div className="text-6xl mb-4">🌐</div>
                       <h2 className="text-xl font-bold text-zinc-800 mb-2">{browserUrl}</h2>
-                      <p className="text-zinc-500">Page loaded successfully</p>
+                      <p className="text-zinc-500">Halaman berhasil dimuat</p>
                     </div>
                   )}
                 </div>

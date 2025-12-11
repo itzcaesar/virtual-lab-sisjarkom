@@ -10,8 +10,14 @@ interface LinuxVMProps {
   onOpenBrowser: () => void;
   browserOpen: boolean;
   ipAddress?: string;
-  performanceMetrics?: { browserLoadTime: number };
+  performanceMetrics?: any;
   distro: string;
+  hardware?: {
+    cpu: string;
+    ram: string;
+    storage: string;
+    gpu: string;
+  };
 }
 
 export default function LinuxVM({ 
@@ -21,14 +27,15 @@ export default function LinuxVM({
   browserOpen,
   ipAddress,
   performanceMetrics,
-  distro
+  distro,
+  hardware
 }: LinuxVMProps) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [commandHistory, setCommandHistory] = useState<string[]>([
-    `Welcome to ${distro} (GNU/Linux)`,
-    "System information loaded successfully",
+    `Selamat datang di ${distro} (GNU/Linux)`,
+    "Informasi sistem berhasil dimuat",
     "",
-    "Type 'help' for available commands",
+    "Ketik 'help' untuk melihat perintah yang tersedia",
     ""
   ]);
   const [currentCommand, setCurrentCommand] = useState("");
@@ -48,29 +55,24 @@ export default function LinuxVM({
       case "help":
         setCommandHistory((prev) => [
           ...prev,
-          "Available commands:",
-          "  help       - Show this help message",
-          "  clear      - Clear terminal",
-          "  ls         - List files and directories",
-          "  ifconfig   - Show network configuration",
-          "  ping       - Test network connectivity",
-          "  whoami     - Display current user",
-          "  date       - Show current date and time",
-          "  uname      - Show system information",
-          "  firefox    - Open web browser (requires network)",
-          "  vim        - Open Vim text editor",
-          "  nano       - Open Nano text editor",
-          "  htop       - Process viewer (requires network)",
-          "  neofetch   - Display system information (requires network)",
-          "  pwd        - Print working directory",
-          "  cat        - Display file contents",
-          "  echo       - Print text to terminal",
+          "Perintah yang tersedia:",
+          "  help       - Tampilkan pesan bantuan ini",
+          "  clear      - Bersihkan terminal",
+          "  ls         - Daftar file dan direktori",
+          "  pwd        - Cetak direktori kerja",
+          "  whoami     - Tampilkan pengguna saat ini",
+          "  date       - Tampilkan tanggal dan waktu",
+          "  uname      - Tampilkan informasi sistem",
+          "  ifconfig   - Tampilkan konfigurasi jaringan",
+          "  ping       - Tes konektivitas jaringan",
+          "  firefox    - Buka browser web (memerlukan jaringan)",
+          "  htop       - Penampil proses sistem",
           ""
         ]);
         break;
 
       case "clear":
-        setCommandHistory(["Terminal cleared", ""]);
+        setCommandHistory(["Terminal dibersihkan", ""]);
         break;
 
       case "ls":
@@ -95,7 +97,7 @@ export default function LinuxVM({
             ""
           ]);
         } else {
-          setCommandHistory((prev) => [...prev, "Error: Network not configured", ""]);
+          setCommandHistory((prev) => [...prev, "Error: Jaringan belum dikonfigurasi", ""]);
         }
         break;
 
@@ -148,123 +150,39 @@ export default function LinuxVM({
         if (networkConnected) {
           setCommandHistory((prev) => [
             ...prev,
-            "Opening Firefox...",
+            "Membuka Firefox...",
             ""
           ]);
           setTimeout(() => onOpenBrowser(), 500);
         } else {
           setCommandHistory((prev) => [
             ...prev,
-            "Error: Network connection required to open browser",
+            "Error: Koneksi jaringan diperlukan untuk membuka browser",
             ""
           ]);
         }
-        break;
-
-      case "vim":
-        setCommandHistory((prev) => [
-          ...prev,
-          "Vim - Vi IMproved 8.2 (2021 Jan 01)",
-          "Type ':q' to exit, 'i' to insert mode",
-          "Tutorial: vimtutor",
-          "(Simulated editor - not fully functional in this environment)",
-          ""
-        ]);
-        break;
-
-      case "nano":
-        setCommandHistory((prev) => [
-          ...prev,
-          "GNU nano 5.6",
-          "Text Editor - Use Ctrl+X to exit",
-          "(Simulated editor - not fully functional in this environment)",
-          ""
-        ]);
         break;
 
       case "htop":
-        if (networkConnected) {
-          setCommandHistory((prev) => [
-            ...prev,
-            "┌─────────────────────── htop 3.0.5 ───────────────────────┐",
-            "│ CPU[||||||||||||           35%]   Tasks: 142, 203 thr; 1 │",
-            "│ Mem[|||||||||||||||     3.2G/16G]   Load avg: 0.82 0.76  │",
-            "│ Swp[                    0K/4.0G]   Uptime: 02:34:17      │",
-            "│  PID USER      RES  CPU% COMMAND                         │",
-            "│  1234 user      2.1G 12.0 firefox                        │",
-            "│  5678 user      156M  5.2 terminal                       │",
-            "│  9012 user       98M  2.1 systemd                        │",
-            "└───────────────────────────────────────────────────────────┘",
-            ""
-          ]);
-        } else {
-          setCommandHistory((prev) => [
-            ...prev,
-            "Error: htop requires network connection for package data",
-            ""
-          ]);
-        }
-        break;
-
-      case "neofetch":
-        if (networkConnected) {
-          setCommandHistory((prev) => [
-            ...prev,
-            "       _,met$$$$$gg.          user@" + distro.toLowerCase(),
-            "    ,g$$$$$$$$$$$$$$$P.       -----------",
-            "  ,g$$P\"     \"\"\"Y$$.\"        OS: Ubuntu 22.04 LTS x86_64",
-            " ,$$P'              `$$$.     Host: Virtual Lab Machine",
-            "',$$P       ,ggs.     `$$b:   Kernel: 5.15.0-91-generic",
-            "`d$$'     ,$P\"'   .    $$$    Uptime: 2 hours, 34 mins",
-            " $$P      d$'     ,    $$P    Shell: bash 5.1.16",
-            " $$:      $$.   -    ,d$$'    Terminal: VirtualLab",
-            " $$;      Y$b._   _,d$P'      CPU: " + (ipAddress ? "Detected" : "Unknown"),
-            " Y$$.    `.`\"Y$$$$P\"'         Memory: 3.2G / 16G",
-            " `$$b      \"-.__              ",
-            "  `Y$$                        ",
-            "   `Y$$.                      ",
-            "     `$$b.                    ",
-            "       `Y$$b.                 ",
-            "          `\"Y$b._             ",
-            "              `\"\"\"            ",
-            ""
-          ]);
-        } else {
-          setCommandHistory((prev) => [
-            ...prev,
-            "Error: neofetch requires network connection",
-            ""
-          ]);
-        }
+        setCommandHistory((prev) => [
+          ...prev,
+          "┌─────────────────────── htop 3.0.5 ────────────────────────┐",
+          "│ CPU[||||||||||||           35%]   Tasks: 142, 203 thr; 1  │",
+          "│ Mem[|||||||||||||||     3.2G/16G]   Load avg: 0.82 0.76   │",
+          "│ Swp[                    0K/4.0G]   Uptime: 02:34:17       │",
+          "│  PID USER      RES  CPU% COMMAND                          │",
+          "│  1234 user      2.1G 12.0 firefox                         │",
+          "│  5678 user      156M  5.2 terminal                        │",
+          "│  9012 user       98M  2.1 systemd                         │",
+          "└───────────────────────────────────────────────────────────┘",
+          ""
+        ]);
         break;
 
       case "pwd":
         setCommandHistory((prev) => [
           ...prev,
           "/home/user",
-          ""
-        ]);
-        break;
-
-      case "cat /etc/os-release":
-      case "cat os-release":
-        setCommandHistory((prev) => [
-          ...prev,
-          "NAME=\"Ubuntu\"",
-          "VERSION=\"22.04 LTS (Jammy Jellyfish)\"",
-          "ID=ubuntu",
-          "ID_LIKE=debian",
-          "PRETTY_NAME=\"Ubuntu 22.04 LTS\"",
-          "VERSION_ID=\"22.04\"",
-          ""
-        ]);
-        break;
-
-      case trimmedCmd.startsWith("echo ") ? trimmedCmd : null:
-        const echoText = cmd.slice(5).trim();
-        setCommandHistory((prev) => [
-          ...prev,
-          echoText,
           ""
         ]);
         break;
@@ -276,8 +194,8 @@ export default function LinuxVM({
       default:
         setCommandHistory((prev) => [
           ...prev,
-          `bash: ${trimmedCmd}: command not found`,
-          "Type 'help' for available commands",
+          `bash: ${trimmedCmd}: perintah tidak ditemukan`,
+          "Ketik 'help' untuk melihat perintah yang tersedia",
           ""
         ]);
     }
@@ -287,13 +205,13 @@ export default function LinuxVM({
 
   return (
     <motion.div
-      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className={`bg-slate-900 border-2 border-green-500/50 rounded-lg shadow-2xl shadow-green-500/20 overflow-hidden ${
+        className={`bg-slate-900 border-2 border-green-500/50 rounded-lg shadow-2xl overflow-hidden ${
           isMaximized ? "w-full h-full" : "w-[90%] h-[90%] max-w-6xl"
         }`}
         initial={{ scale: 0.9, y: 20 }}
@@ -374,7 +292,7 @@ export default function LinuxVM({
                       }
                     }}
                     className="flex-1 bg-slate-600 text-white px-4 py-2 rounded text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="Enter URL..."
+                    placeholder="Masukkan URL..."
                   />
                   <button
                     onClick={() => {
@@ -398,7 +316,7 @@ export default function LinuxVM({
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         />
                         <p className="text-zinc-600 font-mono text-sm">
-                          Loading... ({performanceMetrics?.browserLoadTime || 1000}ms)
+                          Memuat... ({performanceMetrics?.browserLoadTime || 1000}ms)
                         </p>
                       </div>
                     </div>
@@ -416,8 +334,8 @@ export default function LinuxVM({
                           </div>
                           <input
                             type="text"
-                            placeholder="Search the web without being tracked..."
-                            className="w-full mt-6 px-6 py-4 border-2 border-zinc-300 rounded-full focus:border-green-500 focus:outline-none text-lg"
+                            placeholder="Cari web tanpa dilacak..."
+                            className="w-full mt-6 px-6 py-4 border-2 border-zinc-300 rounded-full focus:border-green-500 focus:outline-none text-lg text-zinc-900"
                           />
                         </div>
                       </>
@@ -435,8 +353,8 @@ export default function LinuxVM({
                         </h1>
                         <input
                           type="text"
-                          placeholder="Search Google or type a URL"
-                          className="w-full px-6 py-4 border-2 border-zinc-300 rounded-full focus:border-blue-500 focus:outline-none text-lg shadow-lg"
+                          placeholder="Cari Google atau ketik URL"
+                          className="w-full px-6 py-4 border-2 border-zinc-300 rounded-full focus:border-blue-500 focus:outline-none text-lg shadow-lg text-zinc-900"
                         />
                       </div>
                     )}
@@ -444,29 +362,29 @@ export default function LinuxVM({
                     {browserURL.includes("github") && (
                       <div className="text-center mb-8">
                         <h1 className="text-5xl font-bold mb-4">GitHub</h1>
-                        <p className="text-xl text-zinc-600 mb-6">Where the world builds software</p>
+                        <p className="text-xl text-zinc-600 mb-6">Tempat dunia membangun perangkat lunak</p>
                         <div className="flex gap-4 justify-center">
                           <button className="px-6 py-3 bg-zinc-900 text-white rounded-lg font-semibold">
-                            Sign in
+                            Masuk
                           </button>
                           <button className="px-6 py-3 border-2 border-zinc-900 text-zinc-900 rounded-lg font-semibold">
-                            Sign up
+                            Daftar
                           </button>
                         </div>
                       </div>
                     )}
 
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-8">
-                      <h3 className="font-bold text-green-900 mb-2">✅ Network Active!</h3>
+                      <h3 className="font-bold text-green-900 mb-2">✅ Jaringan Aktif!</h3>
                       <p className="text-sm text-green-800">
-                        Linux terminal berhasil mengakses internet melalui eth0 interface.
+                        Terminal Linux berhasil mengakses internet melalui interface eth0.
                       </p>
                       <div className="mt-3 text-xs text-green-600 font-mono space-y-1">
                         <div>inet: {ipAddress || "192.168.1.100"}</div>
                         <div>gateway: 192.168.1.1</div>
                         <div>DNS: 8.8.8.8</div>
-                        <div>status: connected</div>
-                        <div>load time: {performanceMetrics?.browserLoadTime || 1000}ms</div>
+                        <div>status: terhubung</div>
+                        <div>waktu muat: {performanceMetrics?.browserLoadTime || 1000}ms</div>
                       </div>
                     </div>
 
@@ -512,12 +430,14 @@ export default function LinuxVM({
                 value={currentCommand}
                 onChange={(e) => setCurrentCommand(e.target.value)}
                 onKeyDown={(e) => {
+                  e.stopPropagation();
                   if (e.key === "Enter") {
                     executeCommand(currentCommand);
                   }
                 }}
+                onKeyUp={(e) => e.stopPropagation()}
+                onClick={(e) => e.currentTarget.focus()}
                 className="flex-1 bg-transparent text-zinc-300 outline-none caret-green-400"
-                autoFocus
                 spellCheck={false}
               />
               <motion.div

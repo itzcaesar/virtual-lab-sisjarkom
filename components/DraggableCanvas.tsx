@@ -205,17 +205,17 @@ export default function DraggableCanvas({
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-zinc-900/80 pointer-events-none" />
 
       {/* Pan Instructions */}
-      <div className="absolute top-2 right-2 glass rounded px-2 py-1 text-[10px] font-mono text-zinc-500 z-10 pointer-events-none">
-        {spaceHeld ? "🖱️ Drag to pan" : "Hold SPACE + drag to pan"}
+      <div className="absolute top-2 right-2 card rounded px-2 py-1 text-[10px] font-mono text-zinc-500 z-10 pointer-events-none">
+        {spaceHeld ? "🖱️ Seret untuk geser" : "Tahan SPASI + seret untuk geser"}
       </div>
 
       {/* Pan Reset Button */}
       {(panOffset.x !== 0 || panOffset.y !== 0) && (
         <button
           onClick={resetPan}
-          className="absolute top-2 left-2 px-2 py-1 glass rounded text-xs font-mono text-zinc-400 hover:text-white z-10"
+          className="absolute top-2 left-2 px-2 py-1 card rounded text-xs font-mono text-zinc-400 hover:text-white z-10"
         >
-          Reset View
+          Reset Tampilan
         </button>
       )}
 
@@ -370,7 +370,7 @@ export default function DraggableCanvas({
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
                 <div
-                  className={`glass rounded-lg p-4 border-2 transition-all ${
+                  className={`card rounded-lg p-4 border-2 transition-all ${
                     deleteMode ? "border-red-500 hover:bg-red-950/50" : getModuleColor(module.type)
                   } ${
                     isSelected
@@ -476,16 +476,16 @@ export default function DraggableCanvas({
             >
               <Cable className="w-12 h-12 mx-auto mb-4 opacity-50" />
             </motion.div>
-            <p>Drag modules dari sidebar untuk memulai</p>
-            <p className="text-xs mt-2 text-zinc-600">Klik kanan untuk menghubungkan kabel</p>
-            <p className="text-xs mt-1 text-zinc-600">Drag canvas kosong untuk pan</p>
+            <p>Drag modules dari topbar untuk memulai</p>
+            <p className="text-xs mt-2 text-zinc-600">Klik pada dot untuk menghubungkan kabel</p>
+            <p className="text-xs mt-1 text-zinc-600">Drag canvas kosong dan tahan SPACE untuk pan</p>
           </div>
         </motion.div>
       )}
 
       {connectingFrom && (
         <motion.div
-          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 glass rounded-lg px-4 py-2 border border-yellow-500/50"
+          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 card rounded-lg px-4 py-2 border border-yellow-500/50"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
@@ -496,8 +496,8 @@ export default function DraggableCanvas({
       )}
 
       {/* Canvas Info */}
-      <div className="absolute bottom-2 right-2 text-xs font-mono text-zinc-600 glass px-2 py-1 rounded">
-        {modules.length} modules • {cables.length} cables
+      <div className="absolute bottom-2 right-2 text-xs font-mono text-zinc-600 card px-2 py-1 rounded">
+        {modules.length} modul • {cables.length} kabel
       </div>
     </div>
   );
