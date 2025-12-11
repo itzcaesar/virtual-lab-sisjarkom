@@ -163,22 +163,6 @@ export default function LinuxVM({
         }
         break;
 
-      case "htop":
-        setCommandHistory((prev) => [
-          ...prev,
-          "┌─────────────────────── htop 3.0.5 ────────────────────────┐",
-          "│ CPU[||||||||||||           35%]   Tasks: 142, 203 thr; 1  │",
-          "│ Mem[|||||||||||||||     3.2G/16G]   Load avg: 0.82 0.76   │",
-          "│ Swp[                    0K/4.0G]   Uptime: 02:34:17       │",
-          "│  PID USER      RES  CPU% COMMAND                          │",
-          "│  1234 user      2.1G 12.0 firefox                         │",
-          "│  5678 user      156M  5.2 terminal                        │",
-          "│  9012 user       98M  2.1 systemd                         │",
-          "└───────────────────────────────────────────────────────────┘",
-          ""
-        ]);
-        break;
-
       case "pwd":
         setCommandHistory((prev) => [
           ...prev,
@@ -430,13 +414,12 @@ export default function LinuxVM({
                 value={currentCommand}
                 onChange={(e) => setCurrentCommand(e.target.value)}
                 onKeyDown={(e) => {
-                  e.stopPropagation();
                   if (e.key === "Enter") {
+                    e.preventDefault();
                     executeCommand(currentCommand);
                   }
                 }}
-                onKeyUp={(e) => e.stopPropagation()}
-                onClick={(e) => e.currentTarget.focus()}
+                autoFocus
                 className="flex-1 bg-transparent text-zinc-300 outline-none caret-green-400"
                 spellCheck={false}
               />

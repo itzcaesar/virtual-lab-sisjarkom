@@ -6,7 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import WikiPanel from "@/components/WikiPanel";
 import { AnimatePresence, motion } from "framer-motion";
 import { calculatePerformance, getPerformanceTier, type PerformanceMetrics } from "@/lib/performance";
-import { Monitor, Info, X, Users, GraduationCap, Sun, Moon, Smartphone, ChevronDown, ChevronUp } from "lucide-react";
+import { Monitor, Info, X, Users, GraduationCap, Smartphone, ChevronDown, ChevronUp } from "lucide-react";
 
 export type Phase = "idle" | "hardware" | "os" | "network" | "complete";
 export type OSType = "windows" | "linux" | null;
@@ -46,7 +46,7 @@ export interface GameState {
   performanceMetrics?: PerformanceMetrics;
   wikiOpen: boolean;
   infoOpen: boolean;
-  theme: "dark" | "light";
+
   // Multi-PC support
   pcSpecs: Record<string, PCSpecs>;
   activePCId?: string;
@@ -187,7 +187,7 @@ export default function Home() {
     browserOpen: false,
     wikiOpen: false,
     infoOpen: false,
-    theme: "dark",
+
     pcSpecs: {},
   });
   
@@ -202,15 +202,7 @@ export default function Home() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Apply theme to document
-  useEffect(() => {
-    document.documentElement.classList.remove("dark", "light");
-    document.documentElement.classList.add(gameState.theme);
-  }, [gameState.theme]);
 
-  const toggleTheme = () => {
-    setGameState((prev) => ({ ...prev, theme: prev.theme === "dark" ? "light" : "dark" }));
-  };
 
   const addLog = (message: string) => {
     setGameState((prev) => ({
@@ -394,7 +386,7 @@ export default function Home() {
       browserOpen: false,
       wikiOpen: false,
       infoOpen: false,
-      theme: prev.theme, // Preserve theme
+
       pcSpecs: {}, // Reset PC specs
     }));
   };
@@ -470,14 +462,6 @@ export default function Home() {
           </div>
           
           <div className="flex gap-3">
-            <button
-              onClick={toggleTheme}
-              className="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm font-mono text-zinc-300 hover:text-white hover:border-yellow-500/50 transition-all flex items-center gap-2"
-              title={gameState.theme === "dark" ? "Mode Terang" : "Mode Gelap"}
-            >
-              {gameState.theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-            
             <button
               onClick={toggleInfo}
               className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm font-mono text-zinc-300 hover:text-white hover:border-emerald-500/50 transition-all flex items-center gap-2"

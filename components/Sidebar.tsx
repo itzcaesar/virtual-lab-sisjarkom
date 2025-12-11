@@ -91,7 +91,7 @@ export default function Sidebar({ gameState }: SidebarProps) {
   }, [gameState.pcSpecs, gameState.cpuModel, gameState.ramSize, gameState.storage, gameState.gpu]);
 
   return (
-    <aside className="w-80 bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6">
+    <aside className="w-80 bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6 overflow-y-auto">
       {/* Progres Setup */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -250,11 +250,11 @@ export default function Sidebar({ gameState }: SidebarProps) {
       )}
 
       {/* Log Informasi */}
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex flex-col">
         <h2 className="text-xl font-bold text-cyan-400 mb-4 font-mono">
           [ LOG INFO ]
         </h2>
-        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 overflow-y-auto font-mono text-xs space-y-1 max-h-[400px]">
+        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 font-mono text-xs space-y-1">
           {gameState.logs.map((log, index) => (
             <motion.div
               key={index}
