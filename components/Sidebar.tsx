@@ -1,21 +1,38 @@
+/**
+ * Sidebar Component
+ * 
+ * Displays lab progress, performance metrics, and activity logs
+ * Shows aggregated specs for multi-PC setups
+ * 
+ * @module components/Sidebar
+ */
+
 "use client";
 
+import { useRef, useMemo } from "react";
 import { motion } from "framer-motion";
-import { GameState, PCSpecs } from "@/app/page";
 import { Zap, BookOpen, CheckCircle, Circle, ArrowRight } from "lucide-react";
-import { useEffect, useRef, useMemo } from "react";
+
+// Type imports
+import { GameState, PCSpecs } from "@/app/page";
+
+// Utility imports
 import { getPerformanceTier, parseCPUSpecs, parseRAMSpecs, parseStorageSpecs, parseGPUSpecs } from "@/lib/performance";
 
 interface SidebarProps {
   gameState: GameState;
 }
 
+/**
+ * Right sidebar component showing progress, performance, and logs
+ * Displays real-time system status and aggregated metrics for all PCs
+ */
 export default function Sidebar({ gameState }: SidebarProps) {
   const logEndRef = useRef<HTMLDivElement>(null);
 
-  // Removed auto-scroll to prevent jumping when user is reading logs
-
-  // Progress calculation
+  // ============================================================================
+  // PROGRESS CALCULATION
+  // ============================================================================
   const progressSteps = [
     { id: "hardware", label: "Hardware", completed: gameState.hardwareInstalled },
     { id: "os", label: "Sistem Operasi", completed: !!gameState.osInstalled },
@@ -25,7 +42,15 @@ export default function Sidebar({ gameState }: SidebarProps) {
   const completedSteps = progressSteps.filter(s => s.completed).length;
   const progressPercent = (completedSteps / progressSteps.length) * 100;
 
-  // Aggregate all PC specs for total performance metrics
+  // ============================================================================
+  // AGGREGATED SPECS CALCULATION
+  // ============================================================================
+  
+  /**
+   * Calculate aggregated specs from all PCs
+   * Sums up CPU cores, RAM, storage, and GPU specs across all machines
+   * Falls back to single PC mode if no multi-PC specs exist
+   */
   const aggregatedSpecs = useMemo(() => {
     const pcSpecs = Object.values(gameState.pcSpecs || {});
     if (pcSpecs.length === 0) {
@@ -91,7 +116,7 @@ export default function Sidebar({ gameState }: SidebarProps) {
   }, [gameState.pcSpecs, gameState.cpuModel, gameState.ramSize, gameState.storage, gameState.gpu]);
 
   return (
-    <aside className="w-80 bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6 h-screen overflow-y-auto scrollbar-hide">
+    <aside className="w-80 bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6 h-screen overflow-hidden">
       {/* Progres Setup */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -250,12 +275,12 @@ export default function Sidebar({ gameState }: SidebarProps) {
       )}
 
       {/* Log Informasi */}
-      <div className="flex flex-col min-h-0">
-        <h2 className="text-xl font-bold text-cyan-400 mb-4 font-mono">
+      <div className="flex flex-col flex-1 min-h-0">
+        <h2 className="text-xl font-bold text-cyan-400 mb-4 font-mono flex-shrink-0">
           [ LOG INFO ]
         </h2>
-        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 font-mono text-xs space-y-1">
-          {gameState.logs.map((log, index) => (
+        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 font-mono text-xs space-y-1 flex-1 overflow-y-auto">
+          {gameState.logs.slice(-50).map((log, index) => (
             <motion.div
               key={index}
               className="text-zinc-400"

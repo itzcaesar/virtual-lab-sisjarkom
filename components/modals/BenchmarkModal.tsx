@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Cpu, MemoryStick, HardDrive, Monitor as MonitorIcon, Zap, CheckCircle, Loader2 } from "lucide-react";
+import { X, Cpu, MemoryStick, HardDrive, Monitor as MonitorIcon, Zap, CheckCircle, Loader2, TrendingUp, Award, Clock, Thermometer } from "lucide-react";
 import { useState, useEffect } from "react";
 import { parseCPUSpecs, parseRAMSpecs, parseStorageSpecs, parseGPUSpecs } from "@/lib/performance";
 
@@ -24,12 +24,33 @@ interface BenchmarkTest {
   maxScore: number;
   description: string;
   color: string;
+  fps?: number;
+  latency?: number;
+  temperature?: number;
+}
+
+interface DetailedMetrics {
+  totalTests: number;
+  passedTests: number;
+  avgFPS: number;
+  avgLatency: number;
+  peakTemp: number;
+  runTime: number;
 }
 
 export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [currentTestIndex, setCurrentTestIndex] = useState(-1);
   const [overallScore, setOverallScore] = useState(0);
+  const [startTime, setStartTime] = useState<number>(0);
+  const [metrics, setMetrics] = useState<DetailedMetrics>({
+    totalTests: 6,
+    passedTests: 0,
+    avgFPS: 0,
+    avgLatency: 0,
+    peakTemp: 0,
+    runTime: 0,
+  });
 
   // Parse hardware specs
   const cpuInfo = parseCPUSpecs(hardware.cpu);
@@ -72,6 +93,8 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
       maxScore: calculateCPUScore(),
       description: `${cpuInfo.cores} Cores / ${cpuInfo.threads} Threads @ ${cpuInfo.frequency}`,
       color: "emerald",
+      latency: 0,
+      temperature: 0,
     },
     {
       name: "CPU Multi-Core",
@@ -82,6 +105,8 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
       maxScore: calculateCPUScore() * 1.5,
       description: "Parallel processing test",
       color: "emerald",
+      latency: 0,
+      temperature: 0,
     },
     {
       name: "RAM Speed",
@@ -92,6 +117,8 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
       maxScore: calculateRAMScore(),
       description: `${ramInfo.gb}GB ${ramInfo.type}`,
       color: "cyan",
+      latency: 0,
+      temperature: 0,
     },
     {
       name: "Storage Read/Write",
@@ -102,6 +129,8 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
       maxScore: calculateStorageScore(),
       description: `${storageInfo.gb >= 1024 ? (storageInfo.gb / 1024).toFixed(1) + "TB" : storageInfo.gb + "GB"} ${storageInfo.type}`,
       color: "blue",
+      latency: 0,
+      temperature: 0,
     },
     {
       name: "GPU Compute",
@@ -112,6 +141,8 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
       maxScore: calculateGPUScore(),
       description: `${gpuInfo.cores} Cores / ${gpuInfo.vram}GB VRAM`,
       color: "purple",
+      fps: 0,
+      temperature: 0,
     },
     {
       name: "GPU Graphics",
@@ -122,12 +153,20 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
       maxScore: calculateGPUScore() * 0.8,
       description: "3D rendering performance",
       color: "purple",
+      fps: 0,
+      temperature: 0,
     },
   ]);
 
   const runBenchmark = async () => {
     setIsRunning(true);
     setCurrentTestIndex(0);
+    setStartTime(Date.now());
+    
+    let totalFPS = 0;
+    let totalLatency = 0;
+    let peakTemp = 0;
+    let passedCount = 0;
 
     for (let i = 0; i < tests.length; i++) {
       setCurrentTestIndex(i);
@@ -139,37 +178,81 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
         )
       );
 
-      // Simulate benchmark with progressive scoring
+      // Simulate benchmark with progressive scoring and metrics
       const targetScore = tests[i].maxScore;
       const steps = 20;
       const increment = targetScore / steps;
       
+      // Generate random metrics based on component
+      const isGPU = tests[i].component === "GPU";
+      const targetFPS = isGPU ? Math.floor(60 + Math.random() * 180) : 0;
+      const targetLatency = !isGPU ? Math.floor(1 + Math.random() * 10) : 0;
+      const targetTemp = 45 + Math.floor(Math.random() * 40); // 45-85°C
+      
       for (let step = 0; step <= steps; step++) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         const currentScore = Math.round(increment * step);
+        const progress = step / steps;
         
         setTests((prev) =>
           prev.map((test, idx) =>
-            idx === i ? { ...test, score: currentScore } : test
+            idx === i ? { 
+              ...test, 
+              score: currentScore,
+              fps: isGPU ? Math.round(targetFPS * progress) : undefined,
+              latency: !isGPU ? Math.round(targetLatency * progress) : undefined,
+              temperature: Math.round(targetTemp * progress),
+            } : test
           )
         );
+      }
+
+      // Finalize metrics
+      if (isGPU) {
+        totalFPS += targetFPS;
+      } else {
+        totalLatency += targetLatency;
+      }
+      
+      if (targetTemp > peakTemp) peakTemp = targetTemp;
+      
+      // Mark as passed if score is at least 60% of max
+      if (targetScore >= tests[i].maxScore * 0.6) {
+        passedCount++;
       }
 
       // Mark test as completed
       setTests((prev) =>
         prev.map((test, idx) =>
-          idx === i ? { ...test, status: "completed", score: targetScore } : test
+          idx === i ? { 
+            ...test, 
+            status: "completed", 
+            score: targetScore,
+            fps: isGPU ? targetFPS : undefined,
+            latency: !isGPU ? targetLatency : undefined,
+            temperature: targetTemp,
+          } : test
         )
       );
 
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
-    // Calculate overall score
+    // Calculate overall metrics
+    const runTime = Math.round((Date.now() - startTime) / 1000);
     const totalScore = tests.reduce((sum, test) => sum + test.score, 0);
     const maxTotalScore = tests.reduce((sum, test) => sum + test.maxScore, 0);
     const overall = Math.round((totalScore / maxTotalScore) * 100);
+    
     setOverallScore(overall);
+    setMetrics({
+      totalTests: tests.length,
+      passedTests: passedCount,
+      avgFPS: Math.round(totalFPS / 2), // 2 GPU tests
+      avgLatency: Math.round(totalLatency / 4), // 4 non-GPU tests
+      peakTemp: peakTemp,
+      runTime: runTime,
+    });
     
     setIsRunning(false);
     setCurrentTestIndex(-1);
@@ -224,19 +307,93 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
         <div className="p-6 space-y-6">
           {/* Overall Score */}
           {overallScore > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-zinc-800 border border-zinc-700 rounded-lg p-6 text-center"
-            >
-              <p className="text-sm text-zinc-400 mb-2">Overall Performance Score</p>
-              <div className="text-6xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-2">
-                {overallScore}
-              </div>
-              <p className={`text-xl font-semibold ${getOverallRating(overallScore).color}`}>
-                {getOverallRating(overallScore).text}
-              </p>
-            </motion.div>
+            <div className="space-y-4">
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-zinc-800 border border-zinc-700 rounded-lg p-6 text-center"
+              >
+                <p className="text-sm text-zinc-400 mb-2">Overall Performance Score</p>
+                <div className="text-6xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                  {overallScore}
+                </div>
+                <p className={`text-xl font-semibold ${getOverallRating(overallScore).color}`}>
+                  {getOverallRating(overallScore).text}
+                </p>
+              </motion.div>
+
+              {/* Detailed Metrics Summary */}
+              {metrics && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-zinc-800 border border-zinc-700 rounded-lg p-4"
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <Award className="w-5 h-5 text-yellow-400" />
+                    <h3 className="font-semibold text-white font-mono">Performance Metrics</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-zinc-900 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CheckCircle className="w-4 h-4 text-emerald-400" />
+                        <span className="text-xs text-zinc-400">Tests Passed</span>
+                      </div>
+                      <p className="text-xl font-bold text-white font-mono">
+                        {metrics.passedTests}/{metrics.totalTests}
+                      </p>
+                    </div>
+
+                    <div className="bg-zinc-900 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Clock className="w-4 h-4 text-cyan-400" />
+                        <span className="text-xs text-zinc-400">Runtime</span>
+                      </div>
+                      <p className="text-xl font-bold text-white font-mono">
+                        {metrics.runTime}s
+                      </p>
+                    </div>
+
+                    <div className="bg-zinc-900 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <TrendingUp className="w-4 h-4 text-emerald-400" />
+                        <span className="text-xs text-zinc-400">Avg FPS (GPU)</span>
+                      </div>
+                      <p className={`text-xl font-bold font-mono ${metrics.avgFPS >= 120 ? 'text-emerald-400' : metrics.avgFPS >= 60 ? 'text-cyan-400' : 'text-yellow-400'}`}>
+                        {metrics.avgFPS}
+                      </p>
+                    </div>
+
+                    <div className="bg-zinc-900 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Clock className="w-4 h-4 text-cyan-400" />
+                        <span className="text-xs text-zinc-400">Avg Latency</span>
+                      </div>
+                      <p className={`text-xl font-bold font-mono ${metrics.avgLatency <= 3 ? 'text-emerald-400' : metrics.avgLatency <= 6 ? 'text-cyan-400' : 'text-yellow-400'}`}>
+                        {metrics.avgLatency}ms
+                      </p>
+                    </div>
+
+                    <div className="bg-zinc-900 rounded-lg p-3 col-span-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Thermometer className="w-4 h-4 text-orange-400" />
+                        <span className="text-xs text-zinc-400">Peak Temperature</span>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <p className={`text-xl font-bold font-mono ${metrics.peakTemp <= 65 ? 'text-emerald-400' : metrics.peakTemp <= 75 ? 'text-yellow-400' : 'text-orange-400'}`}>
+                          {metrics.peakTemp}°C
+                        </p>
+                        <span className="text-xs text-zinc-500">
+                          {metrics.peakTemp <= 65 ? '(Optimal)' : metrics.peakTemp <= 75 ? '(Good)' : metrics.peakTemp <= 85 ? '(Warm)' : '(Hot)'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
           )}
 
           {/* Benchmark Tests */}
@@ -281,21 +438,56 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
 
                   {/* Score Display */}
                   {test.score > 0 && (
-                    <div className="mb-2">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs text-zinc-500">Score</span>
-                        <span className={`text-sm font-bold font-mono ${getScoreColor(test.score, test.maxScore)}`}>
-                          {test.score.toLocaleString()} / {test.maxScore.toLocaleString()}
-                        </span>
+                    <div className="space-y-2">
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs text-zinc-500">Score</span>
+                          <span className={`text-sm font-bold font-mono ${getScoreColor(test.score, test.maxScore)}`}>
+                            {test.score.toLocaleString()} / {test.maxScore.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden">
+                          <motion.div
+                            className={`h-full bg-gradient-to-r from-${test.color}-500 to-${test.color}-400`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${percentage}%` }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        </div>
                       </div>
-                      <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden">
-                        <motion.div
-                          className={`h-full bg-gradient-to-r from-${test.color}-500 to-${test.color}-400`}
-                          initial={{ width: 0 }}
-                          animate={{ width: `${percentage}%` }}
-                          transition={{ duration: 0.3 }}
-                        />
-                      </div>
+                      
+                      {/* Performance Metrics */}
+                      {(test.fps !== undefined || test.latency !== undefined || test.temperature !== undefined) && (
+                        <div className="flex gap-3 text-xs">
+                          {test.fps !== undefined && (
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-emerald-400" />
+                              <span className="text-zinc-400">FPS:</span>
+                              <span className={`font-mono font-semibold ${test.fps >= 120 ? 'text-emerald-400' : test.fps >= 60 ? 'text-cyan-400' : 'text-yellow-400'}`}>
+                                {test.fps}
+                              </span>
+                            </div>
+                          )}
+                          {test.latency !== undefined && (
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-cyan-400" />
+                              <span className="text-zinc-400">Latency:</span>
+                              <span className={`font-mono font-semibold ${test.latency <= 3 ? 'text-emerald-400' : test.latency <= 6 ? 'text-cyan-400' : 'text-yellow-400'}`}>
+                                {test.latency}ms
+                              </span>
+                            </div>
+                          )}
+                          {test.temperature !== undefined && (
+                            <div className="flex items-center gap-1">
+                              <Thermometer className="w-3 h-3 text-orange-400" />
+                              <span className="text-zinc-400">Temp:</span>
+                              <span className={`font-mono font-semibold ${test.temperature <= 65 ? 'text-emerald-400' : test.temperature <= 75 ? 'text-yellow-400' : 'text-orange-400'}`}>
+                                {test.temperature}°C
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </motion.div>

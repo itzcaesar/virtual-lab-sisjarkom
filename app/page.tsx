@@ -1,16 +1,40 @@
+/**
+ * Virtual Lab SISJARKOM - Main Application Page
+ * 
+ * A comprehensive PC building and networking simulator styled after Cisco Packet Tracer.
+ * Allows users to build computers, install operating systems, and configure networks.
+ * 
+ * @module app/page
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Monitor, Info, X, Users, GraduationCap, Smartphone, ChevronDown, ChevronUp } from "lucide-react";
+
+// Component imports
 import Stage from "@/components/Stage";
 import Sidebar from "@/components/Sidebar";
 import WikiPanel from "@/components/WikiPanel";
-import { AnimatePresence, motion } from "framer-motion";
-import { calculatePerformance, getPerformanceTier, type PerformanceMetrics } from "@/lib/performance";
-import { Monitor, Info, X, Users, GraduationCap, Smartphone, ChevronDown, ChevronUp } from "lucide-react";
 
+// Utility imports
+import { calculatePerformance, getPerformanceTier, type PerformanceMetrics } from "@/lib/performance";
+
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+/** Lab progression phases */
 export type Phase = "idle" | "hardware" | "os" | "network" | "complete";
+
+/** Operating system types */
 export type OSType = "windows" | "linux" | null;
 
+/**
+ * Individual PC specifications
+ * Contains hardware and software configuration for a single computer
+ */
 export interface PCSpecs {
   cpuModel: string;
   ramSize: string;
@@ -23,36 +47,55 @@ export interface PCSpecs {
   performanceMetrics?: PerformanceMetrics;
 }
 
+/**
+ * Main application state
+ * Manages the entire lab simulation state including multi-PC support
+ */
 export interface GameState {
+  // Phase management
   currentPhase: Phase;
   hardwareInstalled: boolean;
   osInstalled: OSType;
+  
+  // Operating system configuration
   linuxDistro?: string;
   windowsEdition?: string;
+  
+  // Network configuration
   networkConnected: boolean;
-  logs: string[];
+  ipAddress?: string;
+  subnetMask?: string;
+  gateway?: string;
+  dns?: string;
+  
+  // Hardware specifications (legacy - used for single PC mode)
   cpuModel?: string;
   ramSize?: string;
   storage?: string;
   gpu?: string;
   psu?: string;
-  ipAddress?: string;
-  subnetMask?: string;
-  gateway?: string;
-  dns?: string;
+  
+  // UI state
+  logs: string[];
   startTime: number;
   vmMode: boolean;
   browserOpen: boolean;
-  performanceMetrics?: PerformanceMetrics;
   wikiOpen: boolean;
   infoOpen: boolean;
-
+  
+  // Performance metrics
+  performanceMetrics?: PerformanceMetrics;
+  
   // Multi-PC support
   pcSpecs: Record<string, PCSpecs>;
   activePCId?: string;
 }
 
-// Developer info
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/** Project development team */
 const developers = [
   { name: "Alessandro Fathi Z", nim: "707022500026" },
   { name: "Muhammad Caesar Rifqi", nim: "707022500036" },
@@ -61,7 +104,15 @@ const developers = [
   { name: "Dian Hijratulaini", nim: "707022500118" },
 ];
 
-// Mobile not supported component
+// ============================================================================
+// COMPONENTS
+// ============================================================================
+
+/**
+ * Mobile not supported screen
+ * Displays a message when users try to access the app on mobile devices
+ * Requires minimum screen width of 1024px
+ */
 function MobileNotSupported() {
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6">
@@ -101,7 +152,14 @@ function MobileNotSupported() {
   );
 }
 
-// Collapsible PC Spec component
+/**
+ * Collapsible PC specifications display
+ * Shows hardware and software specs for a single PC with expand/collapse functionality
+ * 
+ * @param pcId - Unique identifier for the PC
+ * @param spec - PC specifications object
+ * @param ipAddress - Optional IP address if network is configured
+ */
 function CollapsiblePCSpec({ pcId, spec, ipAddress }: { pcId: string; spec: PCSpecs; ipAddress?: string }) {
   const [isOpen, setIsOpen] = useState(true);
   
@@ -173,7 +231,17 @@ function CollapsiblePCSpec({ pcId, spec, ipAddress }: { pcId: string; spec: PCSp
   );
 }
 
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+/**
+ * Home - Main application component
+ * Manages the entire virtual lab state and renders all sub-components
+ * Handles mobile detection and responsive layout
+ */
 export default function Home() {
+  // Mobile detection state
   const [isMobile, setIsMobile] = useState(false);
   
   const [gameState, setGameState] = useState<GameState>({
@@ -191,7 +259,14 @@ export default function Home() {
     pcSpecs: {},
   });
   
-  // Check for mobile device
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
+  
+  /**
+   * Mobile device detection
+   * Checks if viewport width is below 1024px and shows mobile warning
+   */
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -202,8 +277,14 @@ export default function Home() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // ============================================================================
+  // EVENT HANDLERS
+  // ============================================================================
 
-
+  /**
+   * Add timestamped log entry
+   * @param message - Log message to add
+   */
   const addLog = (message: string) => {
     setGameState((prev) => ({
       ...prev,
@@ -211,6 +292,13 @@ export default function Home() {
     }));
   };
 
+  /**
+   * Complete hardware installation phase
+   * Randomly selects components if not provided, calculates performance metrics
+   * 
+   * @param specs - Optional hardware specifications
+   * @param pcId - Optional PC identifier for multi-PC support
+   */
   const completeHardware = (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string }, pcId?: string) => {
     const cpuModels = [
       "Intel Core i7-12700K [12 Cores / 20 Threads @ 3.6GHz]",
@@ -295,6 +383,14 @@ export default function Home() {
     addLog("Klik pada Monitor untuk menginstal sistem operasi.");
   };
 
+  /**
+   * Complete operating system installation phase
+   * Updates PC specs with OS information
+   * 
+   * @param os - Operating system type (windows/linux)
+   * @param distro - OS distribution/edition name
+   * @param pcId - Optional PC identifier for multi-PC support
+   */
   const completeOS = (os: OSType, distro?: string, pcId?: string) => {
     setGameState((prev) => {
       // Update pcSpecs if pcId is provided
@@ -329,7 +425,14 @@ export default function Home() {
     addLog("Klik pada Router untuk mengatur koneksi jaringan.");
   };
 
+  /**
+   * Complete network configuration phase
+   * Generates or uses provided network settings, recalculates performance with network impact
+   * 
+   * @param config - Optional network configuration (IP, subnet, gateway, DNS)
+   */
   const completeNetwork = (config?: { ip: string; subnet: string; gateway: string; dns: string }) => {
+    // Generate random IP if not provided
     const generateIP = () => `192.168.1.${Math.floor(Math.random() * 200) + 10}`;
     const ipAddress = config?.ip || generateIP();
     const subnetMask = config?.subnet || "255.255.255.0";
@@ -374,6 +477,10 @@ export default function Home() {
     addLog("🎉 Semua fase selesai! Lab virtual siap digunakan.");
   };
 
+  /**
+   * Reset entire lab to initial state
+   * Clears all configurations and returns to start
+   */
   const resetLab = () => {
     setGameState((prev) => ({
       currentPhase: "idle",
@@ -386,19 +493,28 @@ export default function Home() {
       browserOpen: false,
       wikiOpen: false,
       infoOpen: false,
-
-      pcSpecs: {}, // Reset PC specs
+      pcSpecs: {},
     }));
   };
 
+  /**
+   * Toggle wiki panel visibility
+   */
   const toggleWiki = () => {
     setGameState((prev) => ({ ...prev, wikiOpen: !prev.wikiOpen }));
   };
 
+  /**
+   * Toggle info modal visibility
+   */
   const toggleInfo = () => {
     setGameState((prev) => ({ ...prev, infoOpen: !prev.infoOpen }));
   };
 
+  /**
+   * Toggle virtual machine mode
+   * Opens/closes VM window and logs the action
+   */
   const toggleVM = () => {
     setGameState((prev) => ({ ...prev, vmMode: !prev.vmMode }));
     if (!gameState.vmMode) {
@@ -408,6 +524,10 @@ export default function Home() {
     }
   };
 
+  /**
+   * Toggle browser window in VM
+   * Opens/closes browser and logs the action
+   */
   const toggleBrowser = () => {
     setGameState((prev) => ({ ...prev, browserOpen: !prev.browserOpen }));
     if (!gameState.browserOpen) {
@@ -415,6 +535,12 @@ export default function Home() {
     }
   };
 
+  /**
+   * Remove PC specifications from multi-PC setup
+   * Deletes PC and updates global hardware/OS state accordingly
+   * 
+   * @param pcId - Unique identifier of the PC to remove
+   */
   const removePCSpecs = (pcId: string) => {
     setGameState((prev) => {
       const newPcSpecs = { ...prev.pcSpecs };
@@ -509,7 +635,7 @@ export default function Home() {
                   filter: "drop-shadow(0 0 10px currentColor)",
                 }}
               />
-              Virtual Lab: Trinitas Digital
+              Virtual Lab
             </h1>
             <p className="text-zinc-400 mt-2 font-mono text-sm">
               Simulasi Teknisi Lab // Hardware → OS → Jaringan

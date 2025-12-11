@@ -1,8 +1,23 @@
+/**
+ * Stage Component
+ * 
+ * Main workspace for building and managing virtual lab components
+ * Handles drag-and-drop canvas, module connections, and modal interactions
+ * Supports multi-PC configurations and VM operations
+ * 
+ * @module components/Stage
+ */
+
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { HardDrive, Monitor as MonitorIcon, Wifi, Plus, Zap } from "lucide-react";
+
+// Type imports
 import { GameState, Phase, OSType } from "@/app/page";
+
+// Component imports
 import DraggableCanvas, { CanvasModule, CableConnection } from "./DraggableCanvas";
 import HardwareModal from "./modals/HardwareModal";
 import OSModal from "./modals/OSModal";
@@ -10,7 +25,6 @@ import NetworkModal from "./modals/NetworkModal";
 import WindowsVM from "./WindowsVM";
 import LinuxVM from "./LinuxVM";
 import BenchmarkModal from "./modals/BenchmarkModal";
-import { HardDrive, Monitor as MonitorIcon, Wifi, Plus, Zap } from "lucide-react";
 
 interface StageProps {
   gameState: GameState;
@@ -25,6 +39,10 @@ interface StageProps {
   removePCSpecs: (pcId: string) => void;
 }
 
+/**
+ * Stage - Main workspace component
+ * Manages canvas modules, cable connections, and configuration modals
+ */
 export default function Stage({
   gameState,
   setGameState,
@@ -37,6 +55,11 @@ export default function Stage({
   resetLab,
   removePCSpecs,
 }: StageProps) {
+  // ============================================================================
+  // STATE MANAGEMENT
+  // ============================================================================
+  
+  // Canvas state
   const [modules, setModules] = useState<CanvasModule[]>([]);
   const [cables, setCables] = useState<CableConnection[]>([]);
   const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
@@ -44,10 +67,10 @@ export default function Stage({
   const [moduleCounter, setModuleCounter] = useState({ pc: 0, monitor: 0, router: 0 });
   const [deleteMode, setDeleteMode] = useState(false);
   
-  // Track which specific module is being configured
+  // Configuration tracking
   const [configuringModuleId, setConfiguringModuleId] = useState<string | null>(null);
   
-  // Track individual PC configurations (maps module ID to OS type)
+  // Multi-PC configuration tracking (maps module ID to OS type)
   const [pcConfigurations, setPcConfigurations] = useState<Record<string, { os: OSType; hardware: boolean; network: boolean }>>({});
   
   // VM selector state
@@ -519,31 +542,32 @@ export default function Stage({
               </span>
             </motion.button>
 
-            {gameState.hardwareInstalled && (
-              <motion.button
-                onClick={() => setShowBenchmark(true)}
-                className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-yellow-500 transition-all ml-auto"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Zap className="w-4 h-4 text-yellow-400" />
-                <span className="text-xs font-mono text-yellow-400">Benchmark</span>
-              </motion.button>
-            )}
-
-            {gameState.osInstalled && (
-              <div className="relative">
+            <div className="flex gap-2 ml-auto">
+              {gameState.hardwareInstalled && (
                 <motion.button
-                  onClick={() => handleOpenVM()}
-                  className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-purple-500 transition-all"
+                  onClick={() => setShowBenchmark(true)}
+                  className="flex items-center justify-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-yellow-500 transition-all w-[140px] h-[36px]"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <MonitorIcon className="w-4 h-4 text-purple-400" />
-                  <span className="text-xs font-mono text-purple-400">
-                    Buka VM {getConfiguredPCs().length > 1 ? `(${getConfiguredPCs().length})` : ""}
-                  </span>
+                  <Zap className="w-4 h-4 text-yellow-400" />
+                  <span className="text-xs font-mono text-yellow-400">Benchmark</span>
                 </motion.button>
+              )}
+
+              {gameState.osInstalled && (
+                <div className="relative">
+                  <motion.button
+                    onClick={() => handleOpenVM()}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-purple-500 transition-all w-[140px] h-[36px]"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <MonitorIcon className="w-4 h-4 text-purple-400" />
+                    <span className="text-xs font-mono text-purple-400 whitespace-nowrap">
+                      Buka VM {getConfiguredPCs().length > 1 ? `(${getConfiguredPCs().length})` : ""}
+                    </span>
+                  </motion.button>
                 
                 {/* VM Selector Dropdown */}
                 <AnimatePresence>
@@ -586,7 +610,8 @@ export default function Stage({
                   )}
                 </AnimatePresence>
               </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Canvas Presets */}
