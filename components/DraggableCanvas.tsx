@@ -1,8 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useRef } from "react";
-import { Monitor, HardDrive, Wifi, Cable, Zap } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Monitor, HardDrive, Wifi, Cable, Zap, CheckCircle2, Settings } from "lucide-react";
 
 export interface CanvasModule {
   id: string;
@@ -64,21 +64,45 @@ export default function DraggableCanvas({
     setDraggingModule(module.id);
   };
 
+  // Track if space is held for pan mode
+  const [spaceHeld, setSpaceHeld] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space" && !spaceHeld) {
+        e.preventDefault();
+        setSpaceHeld(true);
+      }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        setSpaceHeld(false);
+        setIsPanning(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [spaceHeld]);
+
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    // Start panning if middle mouse button OR if left click on canvas background
+    // Middle mouse button always pans
     if (e.button === 1) {
-      // Middle mouse button always pans
       e.preventDefault();
       setIsPanning(true);
       setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
       return;
     }
     
-    // Left click - only pan if clicking directly on the canvas div
-    if (e.target === canvasRef.current) {
+    // Space + Left click for panning
+    if (spaceHeld && e.button === 0) {
       e.preventDefault();
       setIsPanning(true);
       setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+      return;
     }
   };
 
@@ -156,12 +180,13 @@ export default function DraggableCanvas({
     <div
       ref={canvasRef}
       className={`relative w-full h-full bg-zinc-900/50 rounded-lg overflow-hidden ${
-        isPanning ? "cursor-grabbing" : "cursor-grab"
+        isPanning ? "cursor-grabbing" : spaceHeld ? "cursor-grab" : "cursor-default"
       }`}
       onMouseDown={handleCanvasMouseDown}
       onMouseMove={handleCanvasMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      tabIndex={0}
     >
       {/* Animated Grid Background */}
       <div
@@ -179,15 +204,10 @@ export default function DraggableCanvas({
       {/* Vignette Effect */}
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-zinc-900/80 pointer-events-none" />
 
-      {/* Pan Overlay - transparent clickable layer for panning */}
-      <div 
-        className="absolute inset-0 z-0"
-        onMouseDown={(e) => {
-          e.preventDefault();
-          setIsPanning(true);
-          setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
-        }}
-      />
+      {/* Pan Instructions */}
+      <div className="absolute top-2 right-2 glass rounded px-2 py-1 text-[10px] font-mono text-zinc-500 z-10 pointer-events-none">
+        {spaceHeld ? "🖱️ Drag to pan" : "Hold SPACE + drag to pan"}
+      </div>
 
       {/* Pan Reset Button */}
       {(panOffset.x !== 0 || panOffset.y !== 0) && (
@@ -333,7 +353,7 @@ export default function DraggableCanvas({
             return (
               <motion.div
                 key={module.id}
-                className={`absolute ${deleteMode ? "cursor-pointer" : "cursor-move"} select-none z-10`}
+                className={`absolute ${deleteMode ? "cursor-pointer" : "cursor-move"} select-none z-10 group`}
                 style={{
                   left: module.position.x,
                   top: module.position.y,
@@ -377,21 +397,47 @@ export default function DraggableCanvas({
                   }}
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <Icon className="w-8 h-8 text-white" />
+                    <div className="relative">
+                      <Icon className="w-8 h-8 text-white" />
+                    </div>
                     <p className="text-xs font-mono text-white whitespace-nowrap">
                       {module.label}
                     </p>
                   </div>
 
-                  {/* Status indicator */}
-                  <motion.div
-                    className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.7, 1, 0.7],
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
+                  {/* Configured Checkmark - shows when module is configured */}
+                  {module.configured && (
+                    <motion.div
+                      className="absolute -top-2 -right-2 bg-emerald-500 rounded-full p-0.5"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </motion.div>
+                  )}
+
+                  {/* Settings icon on hover when configured - indicates reconfigurable */}
+                  {module.configured && (
+                    <motion.div
+                      className="absolute -bottom-1 -right-1 bg-zinc-700 rounded-full p-0.5 opacity-0 group-hover:opacity-100"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      <Settings className="w-3 h-3 text-zinc-300" />
+                    </motion.div>
+                  )}
+
+                  {/* Status indicator dot */}
+                  {!module.configured && (
+                    <motion.div
+                      className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full"
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.7, 1, 0.7],
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
                 </div>
 
                 {/* Connection Points */}

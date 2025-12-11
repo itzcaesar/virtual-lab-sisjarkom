@@ -41,6 +41,31 @@ export default function Stage({
   const [moduleCounter, setModuleCounter] = useState({ pc: 0, monitor: 0, router: 0 });
   const [deleteMode, setDeleteMode] = useState(false);
 
+  // Wrapper functions that also mark modules as configured
+  const handleCompleteHardware = () => {
+    completeHardware();
+    // Mark all PC modules as configured
+    setModules((prev) =>
+      prev.map((m) => (m.type === "pc" ? { ...m, configured: true } : m))
+    );
+  };
+
+  const handleCompleteOS = (os: OSType) => {
+    completeOS(os);
+    // Mark all monitor modules as configured
+    setModules((prev) =>
+      prev.map((m) => (m.type === "monitor" ? { ...m, configured: true } : m))
+    );
+  };
+
+  const handleCompleteNetwork = () => {
+    completeNetwork();
+    // Mark all router modules as configured
+    setModules((prev) =>
+      prev.map((m) => (m.type === "router" ? { ...m, configured: true } : m))
+    );
+  };
+
   // Canvas presets
   const canvasPresets = [
     {
@@ -110,6 +135,10 @@ export default function Stage({
       type,
       position: { x: 150 + modules.length * 50, y: 200 + modules.length * 30 },
       label: `${type.toUpperCase()}-${newCounter[type]}`,
+      configured: 
+        (type === "pc" && gameState.hardwareInstalled) ||
+        (type === "monitor" && !!gameState.osInstalled) ||
+        (type === "router" && gameState.networkConnected),
     };
 
     setModules([...modules, newModule]);
@@ -125,16 +154,36 @@ export default function Stage({
   const handleModuleClick = (module: CanvasModule) => {
     setSelectedModule(module.id);
     
-    // Open configuration based on module type
-    if (module.type === "pc" && !gameState.hardwareInstalled) {
+    // Open configuration based on module type - allow reconfiguration anytime
+    if (module.type === "pc") {
       openPhase("hardware");
-      addLog(`Mengkonfigurasi ${module.label}...`);
-    } else if (module.type === "monitor" && gameState.hardwareInstalled && !gameState.osInstalled) {
+      if (gameState.hardwareInstalled) {
+        addLog(`Membuka konfigurasi hardware ${module.label} untuk modifikasi...`);
+      } else {
+        addLog(`Mengkonfigurasi ${module.label}...`);
+      }
+    } else if (module.type === "monitor") {
+      if (!gameState.hardwareInstalled) {
+        addLog(`⚠️ Install hardware terlebih dahulu sebelum mengkonfigurasi OS`);
+        return;
+      }
       openPhase("os");
-      addLog(`Menginstal OS pada ${module.label}...`);
-    } else if (module.type === "router" && gameState.osInstalled && !gameState.networkConnected) {
+      if (gameState.osInstalled) {
+        addLog(`Membuka konfigurasi OS ${module.label} untuk modifikasi...`);
+      } else {
+        addLog(`Menginstal OS pada ${module.label}...`);
+      }
+    } else if (module.type === "router") {
+      if (!gameState.osInstalled) {
+        addLog(`⚠️ Install OS terlebih dahulu sebelum mengkonfigurasi network`);
+        return;
+      }
       openPhase("network");
-      addLog(`Mengkonfigurasi ${module.label}...`);
+      if (gameState.networkConnected) {
+        addLog(`Membuka konfigurasi ${module.label} untuk modifikasi...`);
+      } else {
+        addLog(`Mengkonfigurasi ${module.label}...`);
+      }
     }
   };
 
@@ -190,6 +239,10 @@ export default function Stage({
       type: m.type,
       position: m.position,
       label: m.label,
+      configured: 
+        (m.type === "pc" && gameState.hardwareInstalled) ||
+        (m.type === "monitor" && !!gameState.osInstalled) ||
+        (m.type === "router" && gameState.networkConnected),
     }));
 
     setModules(newModules);
@@ -385,19 +438,19 @@ export default function Stage({
         {gameState.currentPhase === "hardware" && (
           <HardwareModal
             onClose={closeModal}
-            onComplete={completeHardware}
+            onComplete={handleCompleteHardware}
             addLog={addLog}
           />
         )}
 
         {gameState.currentPhase === "os" && (
-          <OSModal onClose={closeModal} onComplete={completeOS} addLog={addLog} />
+          <OSModal onClose={closeModal} onComplete={handleCompleteOS} addLog={addLog} />
         )}
 
         {gameState.currentPhase === "network" && (
           <NetworkModal
             onClose={closeModal}
-            onComplete={completeNetwork}
+            onComplete={handleCompleteNetwork}
             addLog={addLog}
           />
         )}
