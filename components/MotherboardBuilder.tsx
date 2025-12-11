@@ -110,17 +110,27 @@ export default function MotherboardBuilder({
 
   const loadPreset = (preset: typeof presetConfigs[0]) => {
     // Auto-install all components from preset
-    const componentsToInstall = [
-      { type: "cpu" as const, name: preset.cpu.split(" - ")[0] },
-      { type: "ram" as const, name: preset.ram.split(" - ")[0] },
-      { type: "storage" as const, name: preset.storage.split(" - ")[0] },
-      { type: "gpu" as const, name: preset.gpu.split(" - ")[0] },
-    ];
+    const presetComponents = {
+      cpu: { id: "cpu", type: "cpu" as const, name: preset.cpu.split(" - ")[0], specs: preset.cpu, price: "$" },
+      ram: { id: "ram", type: "ram" as const, name: preset.ram.split(" - ")[0], specs: preset.ram, price: "$" },
+      storage: { id: "storage", type: "storage" as const, name: preset.storage.split(" - ")[0], specs: preset.storage, price: "$" },
+      gpu: { id: "gpu", type: "gpu" as const, name: preset.gpu.split(" - ")[0], specs: preset.gpu, price: "$" },
+    };
 
     const updatedSockets = sockets.map((socket) => ({ ...socket, installed: true }));
     setSockets(updatedSockets);
 
-    componentsToInstall.forEach((comp) => {
+    // Map components to sockets
+    const newSocketContents: Record<string, ComponentItem> = {
+      "cpu-socket": presetComponents.cpu,
+      "ram-slot-1": presetComponents.ram,
+      "ram-slot-2": presetComponents.ram,
+      "pcie-slot": presetComponents.gpu,
+      "sata-port": presetComponents.storage,
+    };
+    setSocketContents(newSocketContents);
+
+    Object.values(presetComponents).forEach((comp) => {
       const uniqueId = `${comp.type}-preset-${Date.now()}`;
       setInstalledComponents((prev) => new Set(prev).add(uniqueId));
       onComponentInstalled(comp.type, comp.name);
@@ -139,6 +149,9 @@ export default function MotherboardBuilder({
 
   const [draggedComponent, setDraggedComponent] = useState<ComponentItem | null>(null);
   const [installedComponents, setInstalledComponents] = useState<Set<string>>(new Set());
+  
+  // Track which component is installed in which socket
+  const [socketContents, setSocketContents] = useState<Record<string, ComponentItem | null>>({});
 
   const handleDragStart = (component: ComponentItem) => {
     setDraggedComponent(component);
@@ -169,6 +182,12 @@ export default function MotherboardBuilder({
     setSockets(sockets.map(s => 
       s.id === socket.id ? { ...s, installed: true } : s
     ));
+    
+    // Store which component is in which socket
+    setSocketContents(prev => ({
+      ...prev,
+      [socket.id]: draggedComponent
+    }));
     
     setInstalledComponents(prev => new Set(prev).add(uniqueId));
     onComponentInstalled(draggedComponent.type, draggedComponent.name);
@@ -297,7 +316,10 @@ export default function MotherboardBuilder({
 
           {/* All Available Components by Category */}
           <div className="border-t border-zinc-700 pt-4 mt-4">
-            <h5 className="text-xs font-semibold text-zinc-400 mb-3">Katalog Komponen</h5>
+            <h5 className="text-xs font-semibold text-zinc-400 mb-3 flex items-center gap-2">
+              <span>📦</span> Katalog Komponen
+              <span className="text-[10px] text-zinc-600">(drag ke socket)</span>
+            </h5>
             
             {/* CPU Category */}
             <div className="mb-4">
@@ -307,11 +329,21 @@ export default function MotherboardBuilder({
               </div>
               <div className="space-y-1.5">
                 {allCPUOptions.map((cpu, idx) => (
-                  <div 
+                  <motion.div 
                     key={idx} 
-                    className={`text-xs p-2 rounded bg-zinc-800/50 border border-zinc-700 ${
+                    draggable={true}
+                    onDragStart={() => handleDragStart({
+                      id: `cpu-catalog-${idx}`,
+                      type: "cpu",
+                      name: cpu.name,
+                      specs: `${cpu.name} - ${cpu.cores} @ ${cpu.speed}`,
+                      price: cpu.price
+                    })}
+                    className={`text-xs p-2 rounded bg-zinc-800/50 border border-zinc-700 cursor-grab active:cursor-grabbing hover:border-emerald-500/50 transition-all ${
                       selectedCPU.includes(cpu.name) ? "border-emerald-500/50 bg-emerald-950/20" : ""
                     }`}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -320,7 +352,7 @@ export default function MotherboardBuilder({
                       </div>
                       <span className="text-emerald-400">{cpu.price}</span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -333,11 +365,21 @@ export default function MotherboardBuilder({
               </div>
               <div className="space-y-1.5">
                 {allRAMOptions.map((ram, idx) => (
-                  <div 
+                  <motion.div 
                     key={idx} 
-                    className={`text-xs p-2 rounded bg-zinc-800/50 border border-zinc-700 ${
+                    draggable={true}
+                    onDragStart={() => handleDragStart({
+                      id: `ram-catalog-${idx}`,
+                      type: "ram",
+                      name: ram.name,
+                      specs: `${ram.name} - ${ram.speed}`,
+                      price: ram.price
+                    })}
+                    className={`text-xs p-2 rounded bg-zinc-800/50 border border-zinc-700 cursor-grab active:cursor-grabbing hover:border-cyan-500/50 transition-all ${
                       selectedRAM.includes(ram.name) ? "border-cyan-500/50 bg-cyan-950/20" : ""
                     }`}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -346,7 +388,7 @@ export default function MotherboardBuilder({
                       </div>
                       <span className="text-cyan-400">{ram.price}</span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -359,11 +401,21 @@ export default function MotherboardBuilder({
               </div>
               <div className="space-y-1.5">
                 {allStorageOptions.map((storage, idx) => (
-                  <div 
+                  <motion.div 
                     key={idx} 
-                    className={`text-xs p-2 rounded bg-zinc-800/50 border border-zinc-700 ${
+                    draggable={true}
+                    onDragStart={() => handleDragStart({
+                      id: `storage-catalog-${idx}`,
+                      type: "storage",
+                      name: storage.name,
+                      specs: `${storage.name} - ${storage.type} ${storage.speed}`,
+                      price: storage.price
+                    })}
+                    className={`text-xs p-2 rounded bg-zinc-800/50 border border-zinc-700 cursor-grab active:cursor-grabbing hover:border-blue-500/50 transition-all ${
                       selectedStorage.includes(storage.name) ? "border-blue-500/50 bg-blue-950/20" : ""
                     }`}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -372,7 +424,7 @@ export default function MotherboardBuilder({
                       </div>
                       <span className="text-blue-400">{storage.price}</span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -385,11 +437,21 @@ export default function MotherboardBuilder({
               </div>
               <div className="space-y-1.5">
                 {allGPUOptions.map((gpu, idx) => (
-                  <div 
+                  <motion.div 
                     key={idx} 
-                    className={`text-xs p-2 rounded bg-zinc-800/50 border border-zinc-700 ${
+                    draggable={true}
+                    onDragStart={() => handleDragStart({
+                      id: `gpu-catalog-${idx}`,
+                      type: "gpu",
+                      name: gpu.name,
+                      specs: `${gpu.name} - ${gpu.memory}`,
+                      price: gpu.price
+                    })}
+                    className={`text-xs p-2 rounded bg-zinc-800/50 border border-zinc-700 cursor-grab active:cursor-grabbing hover:border-purple-500/50 transition-all ${
                       selectedGPU.includes(gpu.name) ? "border-purple-500/50 bg-purple-950/20" : ""
                     }`}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -398,7 +460,7 @@ export default function MotherboardBuilder({
                       </div>
                       <span className="text-purple-400">{gpu.price}</span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -406,8 +468,37 @@ export default function MotherboardBuilder({
         </div>
 
         {/* Motherboard */}
-        <div className="col-span-8">
-          <div className="relative w-full h-[500px] bg-gradient-to-br from-emerald-950/30 to-cyan-950/30 border-2 border-zinc-700 rounded-lg overflow-hidden">
+        <div className="col-span-8 space-y-4">
+          {/* Installed Components Summary */}
+          {Object.keys(socketContents).length > 0 && (
+            <motion.div 
+              className="glass rounded-lg p-3 border border-emerald-500/30"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <h5 className="text-xs font-semibold text-emerald-400 mb-2 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                Komponen Terpasang
+              </h5>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {Object.entries(socketContents).map(([socketId, component]) => {
+                  if (!component) return null;
+                  const Icon = getComponentIcon(component.type);
+                  return (
+                    <div key={socketId} className="flex items-center gap-2 bg-zinc-800/50 rounded p-2">
+                      <Icon className="w-4 h-4 text-zinc-400" />
+                      <div className="overflow-hidden">
+                        <p className="text-[10px] text-zinc-300 font-mono truncate">{component.name}</p>
+                        <p className="text-[8px] text-zinc-500">{socketId.replace("-", " ").replace("slot", "")}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+
+          <div className="relative w-full h-[450px] bg-gradient-to-br from-emerald-950/30 to-cyan-950/30 border-2 border-zinc-700 rounded-lg overflow-hidden">
             {/* Motherboard Background Pattern */}
             <div className="absolute inset-0 opacity-20">
               <div className="absolute inset-0" style={{
@@ -429,17 +520,22 @@ export default function MotherboardBuilder({
 
             {/* Sockets */}
             {sockets.map((socket) => {
-              // Find installed component for this socket
-              const installedComponent = socket.installed 
-                ? components.find(c => c.type === socket.type && installedComponents.has(c.id))
-                : null;
+              // Get installed component from socketContents
+              const installedComponent = socketContents[socket.id] || null;
+              const Icon = getComponentIcon(socket.type);
               
               return (
-                <div
+                <motion.div
                   key={socket.id}
                   onDragOver={(e) => handleDragOver(e, socket)}
                   onDrop={(e) => handleDrop(e, socket)}
-                  className={`absolute border-2 border-dashed rounded-lg transition-all ${getSocketColor(socket)}`}
+                  className={`absolute border-2 rounded-lg transition-all ${
+                    socket.installed 
+                      ? "border-solid border-emerald-500 bg-emerald-950/40" 
+                      : draggedComponent && draggedComponent.type === socket.type 
+                        ? "border-dashed border-cyan-400 bg-cyan-950/30 animate-pulse" 
+                        : "border-dashed border-zinc-700 bg-zinc-900/50"
+                  }`}
                   style={{
                     top: socket.position.top,
                     left: socket.position.left,
@@ -447,27 +543,66 @@ export default function MotherboardBuilder({
                     height: `${socket.size.height}px`,
                     transform: 'translate(-50%, -50%)',
                   }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ 
+                    opacity: 1, 
+                    scale: 1,
+                    boxShadow: socket.installed 
+                      ? "0 0 20px rgba(16, 185, 129, 0.3)" 
+                      : "none"
+                  }}
+                  transition={{ duration: 0.3 }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center p-1">
                     {installedComponent ? (
-                      <div className="text-center">
-                        <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto mb-1" />
-                        <p className="text-[9px] font-mono text-emerald-400 leading-tight">
-                          {installedComponent.name.split(" ").slice(0, 2).join(" ")}
+                      <motion.div 
+                        className="text-center"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                        <div className="relative">
+                          <Icon className="w-6 h-6 text-emerald-400 mx-auto mb-1" />
+                          <motion.div 
+                            className="absolute -top-1 -right-1"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2 }}
+                          >
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          </motion.div>
+                        </div>
+                        <p className="text-[8px] font-mono text-emerald-400 leading-tight max-w-[90%] mx-auto truncate">
+                          {installedComponent.name.split(" ").slice(0, 3).join(" ")}
                         </p>
-                      </div>
+                        <p className="text-[7px] font-mono text-zinc-500 mt-0.5">
+                          {installedComponent.specs.split(" - ")[1]?.split(" ")[0] || ""}
+                        </p>
+                      </motion.div>
                     ) : (
                       <div className="text-center p-1">
-                        <p className="text-xs font-mono text-zinc-500 leading-tight">
+                        <Icon className="w-5 h-5 text-zinc-600 mx-auto mb-1 opacity-50" />
+                        <p className="text-[9px] font-mono text-zinc-500 leading-tight">
                           {socket.label.split(" ")[0]}
                         </p>
-                        <p className="text-[9px] font-mono text-zinc-600 mt-1">
-                          {socket.type.toUpperCase()}
+                        <p className="text-[8px] font-mono text-zinc-600 mt-0.5">
+                          Drop {socket.type.toUpperCase()}
                         </p>
                       </div>
                     )}
                   </div>
-                </div>
+                  
+                  {/* Hover glow effect */}
+                  {!socket.installed && draggedComponent?.type === socket.type && (
+                    <motion.div 
+                      className="absolute inset-0 rounded-lg"
+                      animate={{ 
+                        boxShadow: ["0 0 10px rgba(6, 182, 212, 0.3)", "0 0 20px rgba(6, 182, 212, 0.5)", "0 0 10px rgba(6, 182, 212, 0.3)"]
+                      }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                    />
+                  )}
+                </motion.div>
               );
             })}
 

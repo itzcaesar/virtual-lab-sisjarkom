@@ -4,8 +4,9 @@ import { useState } from "react";
 import Stage from "@/components/Stage";
 import Sidebar from "@/components/Sidebar";
 import WikiPanel from "@/components/WikiPanel";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { calculatePerformance, getPerformanceTier, type PerformanceMetrics } from "@/lib/performance";
+import { Sparkles } from "lucide-react";
 
 export type Phase = "idle" | "hardware" | "os" | "network" | "complete";
 export type OSType = "windows" | "linux" | null;
@@ -193,7 +194,21 @@ export default function Home() {
       <div className="flex-1 p-8">
         <header className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-3">
+              <motion.div
+                animate={{ 
+                  rotate: [0, 5, -5, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Sparkles 
+                  className="w-9 h-9 rainbow-icon" 
+                  style={{ 
+                    filter: "drop-shadow(0 0 10px currentColor)",
+                  }}
+                />
+              </motion.div>
               Virtual Lab: The Digital Trinity
             </h1>
             <p className="text-zinc-400 mt-2 font-mono text-sm">

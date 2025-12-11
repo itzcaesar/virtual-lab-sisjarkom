@@ -65,8 +65,15 @@ export default function DraggableCanvas({
   };
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    // Only start panning if clicking on empty canvas (not on a module)
-    if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains("canvas-bg")) {
+    // Only start panning if clicking on the canvas container or background elements
+    const target = e.target as HTMLElement;
+    const isCanvas = e.target === e.currentTarget;
+    const isBackground = target.classList.contains("canvas-bg") || 
+                         target.classList.contains("canvas-pan-area") ||
+                         target.tagName === "svg";
+    
+    if (isCanvas || isBackground) {
+      e.preventDefault();
       setIsPanning(true);
       setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
     }
@@ -153,9 +160,12 @@ export default function DraggableCanvas({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
+      {/* Pan Area - clickable layer for panning */}
+      <div className="absolute inset-0 canvas-pan-area" />
+
       {/* Animated Grid Background */}
       <div
-        className="absolute inset-0 opacity-30 canvas-bg"
+        className="absolute inset-0 opacity-30 canvas-bg pointer-events-none"
         style={{
           backgroundImage: `
             radial-gradient(circle at 1px 1px, rgba(16, 185, 129, 0.3) 1px, transparent 0)
