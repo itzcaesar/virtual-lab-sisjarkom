@@ -211,23 +211,23 @@ export default function NetworkModal({
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-zinc-900 border-2 border-emerald-500/50 rounded-2xl max-w-2xl w-full p-8 relative shadow-2xl"
-        initial={{ scale: 0.8, y: 50 }}
+        className="bg-[#0d1b2a]/95 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl max-w-2xl w-full p-8 relative shadow-2xl shadow-cyan-500/20"
+        initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.8, y: 50 }}
-        transition={{ type: "spring", damping: 25 }}
+        exit={{ scale: 0.95, y: 20 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-cyan-400/70 hover:text-cyan-300 transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
 
-        <h2 className="text-3xl font-bold text-emerald-400 mb-2">
+        <h2 className="text-3xl font-bold text-cyan-400 mb-2">
           Fase 3: Konfigurasi Jaringan
         </h2>
-        <p className="text-zinc-400 text-sm mb-6 font-mono">
+        <p className="text-cyan-300/70 text-sm mb-6 font-mono">
           Network // Koneksi ke Internet
         </p>
 
@@ -239,19 +239,19 @@ export default function NetworkModal({
           >
             <div className="card rounded-lg p-4 flex items-start gap-3">
               <Info className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-zinc-300">
+              <div className="text-sm text-cyan-300/90">
                 <p className="font-semibold mb-2">Tentang Jaringan Komputer:</p>
-                <ul className="space-y-2 text-zinc-400">
+                <ul className="space-y-2 text-cyan-300/70">
                   <li>
-                    <strong className="text-emerald-400">IP Address:</strong> Alamat unik
+                    <strong className="text-cyan-400">IP Address:</strong> Alamat unik
                     untuk mengidentifikasi komputer di jaringan.
                   </li>
                   <li>
-                    <strong className="text-emerald-400">Router:</strong> Perangkat yang
+                    <strong className="text-cyan-400">Router:</strong> Perangkat yang
                     menghubungkan komputer ke internet dan jaringan lain.
                   </li>
                   <li>
-                    <strong className="text-emerald-400">Data Packet:</strong> Data
+                    <strong className="text-cyan-400">Data Packet:</strong> Data
                     dipecah menjadi paket-paket kecil saat ditransmisikan.
                   </li>
                 </ul>
@@ -259,21 +259,21 @@ export default function NetworkModal({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="card rounded-lg p-4 text-center">
-                <Cable className="w-12 h-12 text-emerald-400 mx-auto mb-2" />
-                <p className="text-zinc-300 font-semibold text-sm">Koneksi Fisik</p>
-                <p className="text-zinc-500 text-xs mt-1">Kabel Ethernet RJ45</p>
+              <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-center">
+                <Cable className="w-12 h-12 text-blue-400 mx-auto mb-2" />
+                <p className="text-cyan-300 font-semibold text-sm">Koneksi Fisik</p>
+                <p className="text-cyan-400/50 text-xs mt-1">Kabel Ethernet RJ45</p>
               </div>
-              <div className="card rounded-lg p-4 text-center">
+              <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-center">
                 <Settings className="w-12 h-12 text-cyan-400 mx-auto mb-2" />
-                <p className="text-zinc-300 font-semibold text-sm">Konfigurasi IP</p>
-                <p className="text-zinc-500 text-xs mt-1">DHCP / Manual</p>
+                <p className="text-cyan-300 font-semibold text-sm">Konfigurasi IP</p>
+                <p className="text-cyan-400/50 text-xs mt-1">DHCP / Manual</p>
               </div>
             </div>
 
             <button
               onClick={() => setStep("cable")}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold py-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
             >
               <Cable className="w-5 h-5" />
               Pilih Jenis Kabel
@@ -288,7 +288,7 @@ export default function NetworkModal({
             className="space-y-6"
           >
             <div className="card rounded-lg p-4">
-              <p className="text-sm text-zinc-400 mb-4">
+              <p className="text-sm text-cyan-300/80 mb-4">
                 Pilih jenis kabel untuk koneksi jaringan:
               </p>
               
@@ -297,24 +297,24 @@ export default function NetworkModal({
                   <button
                     key={cable.id}
                     onClick={() => setCableType(cable.id as "ethernet" | "fiber")}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 ${
                       cableType === cable.id
-                        ? cable.color === "emerald" ? "border-emerald-500 bg-emerald-950/30" : "border-cyan-500 bg-cyan-950/30"
-                        : "border-zinc-700 hover:border-zinc-600"
+                        ? "border-cyan-500 bg-blue-950/30"
+                        : "border-cyan-500/20 hover:border-cyan-500/40 bg-blue-950/10"
                     }`}
                   >
                     <div className="text-3xl mb-2">{cable.icon}</div>
-                    <p className={`text-sm font-semibold ${cableType === cable.id ? (cable.color === "emerald" ? "text-emerald-400" : "text-cyan-400") : "text-zinc-300"}`}>
+                    <p className={`text-sm font-semibold ${cableType === cable.id ? "text-cyan-400" : "text-cyan-300"}`}>
                       {cable.name}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-1">Kecepatan: {cable.speed}</p>
-                    <p className="text-xs text-zinc-500">Latensi: {cable.latency}</p>
+                    <p className="text-xs text-cyan-400/60 mt-1">Kecepatan: {cable.speed}</p>
+                    <p className="text-xs text-cyan-400/60">Latensi: {cable.latency}</p>
                   </button>
                 ))}
               </div>
 
-              <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-3 text-xs text-zinc-400">
-                <p><span className="text-emerald-400 font-semibold">Ethernet Cat6:</span> Kabel tembaga standar, cocok untuk sebagian besar kebutuhan.</p>
+              <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-3 text-xs text-cyan-300/70">
+                <p><span className="text-blue-400 font-semibold">Ethernet Cat6:</span> Kabel tembaga standar, cocok untuk sebagian besar kebutuhan.</p>
                 <p className="mt-1"><span className="text-cyan-400 font-semibold">Fiber Optik:</span> Menggunakan cahaya untuk transmisi data, lebih cepat dan stabil.</p>
               </div>
             </div>
@@ -322,13 +322,13 @@ export default function NetworkModal({
             <div className="flex gap-3">
               <button
                 onClick={() => setStep("intro")}
-                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-3 rounded-lg transition-colors"
+                className="flex-1 bg-blue-950/30 hover:bg-blue-900/30 text-cyan-300 border border-cyan-500/20 font-semibold py-3 rounded-lg transition-all duration-200"
               >
                 Kembali
               </button>
               <button
                 onClick={() => setStep("configure")}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold py-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <Settings className="w-5 h-5" />
                 Konfigurasi IP
@@ -344,7 +344,7 @@ export default function NetworkModal({
             className="space-y-6"
           >
             <div className="card rounded-lg p-4">
-              <p className="text-sm text-zinc-400 mb-4">
+              <p className="text-sm text-cyan-300/80 mb-4">
                 Pilih mode konfigurasi jaringan untuk komputer Anda:
               </p>
               
@@ -353,26 +353,26 @@ export default function NetworkModal({
                   onClick={() => setConfigMode("dhcp")}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     configMode === "dhcp"
-                      ? "border-emerald-500 bg-emerald-950/30"
-                      : "border-zinc-700 hover:border-zinc-600"
+                      ? "border-cyan-500 bg-blue-950/30"
+                      : "border-cyan-500/20 hover:border-cyan-500/40 bg-blue-950/10"
                   }`}
                 >
-                  <Zap className={`w-8 h-8 mx-auto mb-2 ${configMode === "dhcp" ? "text-emerald-400" : "text-zinc-500"}`} />
-                  <p className="text-sm font-semibold text-zinc-300">DHCP</p>
-                  <p className="text-xs text-zinc-500 mt-1">Otomatis</p>
+                  <Zap className={`w-8 h-8 mx-auto mb-2 ${configMode === "dhcp" ? "text-cyan-400" : "text-cyan-400/40"}`} />
+                  <p className="text-sm font-semibold text-cyan-300">DHCP</p>
+                  <p className="text-xs text-cyan-400/60 mt-1">Otomatis</p>
                 </button>
                 
                 <button
                   onClick={() => setConfigMode("manual")}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     configMode === "manual"
-                      ? "border-cyan-500 bg-cyan-950/30"
-                      : "border-zinc-700 hover:border-zinc-600"
+                      ? "border-cyan-500 bg-blue-950/30"
+                      : "border-cyan-500/20 hover:border-cyan-500/40 bg-blue-950/10"
                   }`}
                 >
-                  <Settings className={`w-8 h-8 mx-auto mb-2 ${configMode === "manual" ? "text-cyan-400" : "text-zinc-500"}`} />
-                  <p className="text-sm font-semibold text-zinc-300">Manual</p>
-                  <p className="text-xs text-zinc-500 mt-1">Custom</p>
+                  <Settings className={`w-8 h-8 mx-auto mb-2 ${configMode === "manual" ? "text-cyan-400" : "text-cyan-400/40"}`} />
+                  <p className="text-sm font-semibold text-cyan-300">Manual</p>
+                  <p className="text-xs text-cyan-400/60 mt-1">Custom</p>
                 </button>
               </div>
 
@@ -380,56 +380,56 @@ export default function NetworkModal({
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
-                  className="space-y-4 border-t border-zinc-700 pt-4"
+                  className="space-y-4 border-t border-cyan-500/20 pt-4"
                 >
                   <div>
-                    <label className="text-xs text-zinc-400 mb-2 block font-mono">IP Address</label>
+                    <label className="text-xs text-cyan-300/80 mb-2 block font-mono">IP Address</label>
                     <input
                       type="text"
                       value={ipAddress}
                       onChange={(e) => { setIpAddress(e.target.value); setIpError(null); }}
                       onBlur={() => validateIP(ipAddress)}
                       placeholder="192.168.1.100"
-                      className={`w-full bg-zinc-800 border rounded px-3 py-2 text-sm text-zinc-300 font-mono focus:outline-none ${ipError ? "border-red-500" : "border-zinc-700 focus:border-cyan-500"}`}
+                      className={`w-full bg-blue-950/30 border rounded px-3 py-2 text-sm text-cyan-300 font-mono focus:outline-none transition-colors ${ipError ? "border-red-500" : "border-cyan-500/20 focus:border-cyan-500"}`}
                     />
                     {ipError && <p className="text-red-400 text-xs mt-1">{ipError}</p>}
                   </div>
 
                   <div>
-                    <label className="text-xs text-zinc-400 mb-2 block font-mono">Subnet Mask</label>
+                    <label className="text-xs text-cyan-300/80 mb-2 block font-mono">Subnet Mask</label>
                     <input
                       type="text"
                       value={subnetMask}
                       onChange={(e) => { setSubnetMask(e.target.value); setSubnetError(null); }}
                       onBlur={() => validateSubnet(subnetMask)}
                       placeholder="255.255.255.0"
-                      className={`w-full bg-zinc-800 border rounded px-3 py-2 text-sm text-zinc-300 font-mono focus:outline-none ${subnetError ? "border-red-500" : "border-zinc-700 focus:border-cyan-500"}`}
+                      className={`w-full bg-blue-950/30 border rounded px-3 py-2 text-sm text-cyan-300 font-mono focus:outline-none transition-colors ${subnetError ? "border-red-500" : "border-cyan-500/20 focus:border-cyan-500"}`}
                     />
                     {subnetError && <p className="text-red-400 text-xs mt-1">{subnetError}</p>}
                   </div>
 
                   <div>
-                    <label className="text-xs text-zinc-400 mb-2 block font-mono">Gateway</label>
+                    <label className="text-xs text-cyan-300/80 mb-2 block font-mono">Gateway</label>
                     <input
                       type="text"
                       value={gateway}
                       onChange={(e) => { setGateway(e.target.value); setGatewayError(null); }}
                       onBlur={() => validateGateway(gateway)}
                       placeholder="192.168.1.1"
-                      className={`w-full bg-zinc-800 border rounded px-3 py-2 text-sm text-zinc-300 font-mono focus:outline-none ${gatewayError ? "border-red-500" : "border-zinc-700 focus:border-cyan-500"}`}
+                      className={`w-full bg-blue-950/30 border rounded px-3 py-2 text-sm text-cyan-300 font-mono focus:outline-none transition-colors ${gatewayError ? "border-red-500" : "border-cyan-500/20 focus:border-cyan-500"}`}
                     />
                     {gatewayError && <p className="text-red-400 text-xs mt-1">{gatewayError}</p>}
                   </div>
 
                   <div>
-                    <label className="text-xs text-zinc-400 mb-2 block font-mono">DNS Server</label>
+                    <label className="text-xs text-cyan-300/80 mb-2 block font-mono">DNS Server</label>
                     <input
                       type="text"
                       value={dns}
                       onChange={(e) => { setDns(e.target.value); setDnsError(null); }}
                       onBlur={() => validateDns(dns)}
                       placeholder="8.8.8.8"
-                      className={`w-full bg-zinc-800 border rounded px-3 py-2 text-sm text-zinc-300 font-mono focus:outline-none ${dnsError ? "border-red-500" : "border-zinc-700 focus:border-cyan-500"}`}
+                      className={`w-full bg-blue-950/30 border rounded px-3 py-2 text-sm text-cyan-300 font-mono focus:outline-none transition-colors ${dnsError ? "border-red-500" : "border-cyan-500/20 focus:border-cyan-500"}`}
                     />
                     {dnsError && <p className="text-red-400 text-xs mt-1">{dnsError}</p>}
                   </div>
@@ -445,7 +445,7 @@ export default function NetworkModal({
             <div className="flex gap-3">
               <button
                 onClick={() => setStep("cable")}
-                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-3 rounded-lg transition-colors"
+                className="flex-1 bg-blue-950/30 hover:bg-blue-900/30 text-cyan-300 border border-cyan-500/20 font-semibold py-3 rounded-lg transition-all duration-200"
               >
                 Kembali
               </button>
@@ -471,39 +471,39 @@ export default function NetworkModal({
               
               <div className="space-y-4">
                 {/* Ringkasan Konfigurasi */}
-                <div className="bg-zinc-800 rounded-lg p-3 font-mono text-xs">
+                <div className="bg-cyan-800 rounded-lg p-3 font-mono text-xs">
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <span className="text-zinc-500">Mode:</span>
+                      <span className="text-cyan-500">Mode:</span>
                       <span className="text-white ml-2">{configMode.toUpperCase()}</span>
                     </div>
                     <div>
-                      <span className="text-zinc-500">IP:</span>
+                      <span className="text-cyan-500">IP:</span>
                       <span className="text-emerald-400 ml-2">{ipAddress}</span>
                     </div>
                     <div>
-                      <span className="text-zinc-500">Gateway:</span>
+                      <span className="text-cyan-500">Gateway:</span>
                       <span className="text-cyan-400 ml-2">{gateway}</span>
                     </div>
                     <div>
-                      <span className="text-zinc-500">DNS:</span>
+                      <span className="text-cyan-500">DNS:</span>
                       <span className="text-blue-400 ml-2">{dns}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Tes Ping */}
-                <div className="card rounded-lg p-3 border border-zinc-700">
+                <div className="card rounded-lg p-3 border border-cyan-700">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-3 h-3 rounded-full ${
-                        pingTest === "idle" ? "bg-zinc-600" :
+                        pingTest === "idle" ? "bg-blue-900" :
                         pingTest === "testing" ? "bg-yellow-500 animate-pulse" :
-                        pingTest === "success" ? "bg-emerald-500" : "bg-red-500"
+                        pingTest === "success" ? "bg-cyan-500" : "bg-red-500"
                       }`} />
                       <div>
-                        <p className="text-sm font-semibold text-zinc-300">Tes Ping</p>
-                        <p className="text-xs text-zinc-500">Menguji koneksi ke gateway</p>
+                        <p className="text-sm font-semibold text-cyan-300">Tes Ping</p>
+                        <p className="text-xs text-cyan-500">Menguji koneksi ke gateway</p>
                       </div>
                     </div>
                     {pingTest === "success" && (
@@ -513,17 +513,17 @@ export default function NetworkModal({
                 </div>
 
                 {/* Tes DNS */}
-                <div className="card rounded-lg p-3 border border-zinc-700">
+                <div className="card rounded-lg p-3 border border-cyan-700">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-3 h-3 rounded-full ${
-                        dnsTest === "idle" ? "bg-zinc-600" :
+                        dnsTest === "idle" ? "bg-blue-900" :
                         dnsTest === "testing" ? "bg-yellow-500 animate-pulse" :
-                        dnsTest === "success" ? "bg-emerald-500" : "bg-red-500"
+                        dnsTest === "success" ? "bg-cyan-500" : "bg-red-500"
                       }`} />
                       <div>
-                        <p className="text-sm font-semibold text-zinc-300">Resolusi DNS</p>
-                        <p className="text-xs text-zinc-500">Menguji respon server DNS</p>
+                        <p className="text-sm font-semibold text-cyan-300">Resolusi DNS</p>
+                        <p className="text-xs text-cyan-500">Menguji respon server DNS</p>
                       </div>
                     </div>
                     {dnsTest === "success" && (
@@ -537,7 +537,7 @@ export default function NetworkModal({
             <div className="flex gap-3">
               <button
                 onClick={() => setStep("configure")}
-                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-3 rounded-lg transition-colors"
+                className="flex-1 bg-blue-950/30 hover:bg-blue-900/30 text-cyan-300 border border-cyan-500/20 font-semibold py-3 rounded-lg transition-all duration-200"
               >
                 Kembali
               </button>
@@ -553,7 +553,7 @@ export default function NetworkModal({
               ) : pingTest === "success" && dnsTest === "success" ? (
                 <button
                   onClick={handleConnect}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold py-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   <Cable className="w-5 h-5" />
                   Terapkan Konfigurasi
@@ -561,7 +561,7 @@ export default function NetworkModal({
               ) : (
                 <button
                   disabled
-                  className="flex-1 bg-zinc-700 text-zinc-500 font-semibold py-3 rounded-lg cursor-wait"
+                  className="flex-1 bg-cyan-700 text-cyan-500 font-semibold py-3 rounded-lg cursor-wait"
                 >
                   Menguji...
                 </button>
@@ -580,15 +580,15 @@ export default function NetworkModal({
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             >
-              <Zap className="w-16 h-16 text-emerald-400" />
+              <Zap className="w-16 h-16 text-cyan-400" />
             </motion.div>
-            <p className="mt-6 text-zinc-300 font-mono">Menghubungkan ke jaringan...</p>
+            <p className="mt-6 text-cyan-300 font-mono">Menghubungkan ke jaringan...</p>
             
             <div className="mt-6 flex gap-2">
               {[0, 1, 2].map((i) => (
                 <motion.div
                   key={i}
-                  className="w-3 h-3 bg-emerald-500 rounded-full"
+                  className="w-3 h-3 bg-cyan-500 rounded-full"
                   animate={{ opacity: [0.3, 1, 0.3] }}
                   transition={{
                     duration: 1,
@@ -607,46 +607,46 @@ export default function NetworkModal({
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-6"
           >
-            <div className="bg-emerald-950/30 border border-emerald-500/50 rounded-lg p-6 text-center">
+            <div className="bg-blue-950/30 border border-cyan-500/30 rounded-lg p-6 text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", delay: 0.2 }}
+                transition={{ duration: 0.3, delay: 0.2, ease: "easeOut" }}
               >
-                <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl">✓</span>
                 </div>
               </motion.div>
-              <h3 className="text-2xl font-bold text-emerald-400 mb-2">
+              <h3 className="text-2xl font-bold text-cyan-400 mb-2">
                 Koneksi Berhasil!
               </h3>
-              <p className="text-zinc-400 mb-4">
+              <p className="text-cyan-400 mb-4">
                 Komputer berhasil terhubung ke jaringan.
               </p>
               
               <div className="card rounded-lg p-4 text-left font-mono text-sm">
                 <div className="flex justify-between mb-1">
-                  <span className="text-zinc-500">IP Address:</span>
-                  <span className="text-emerald-400">{ipAddress}</span>
+                  <span className="text-cyan-500">IP Address:</span>
+                  <span className="text-cyan-400">{ipAddress}</span>
                 </div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-zinc-500">Gateway:</span>
-                  <span className="text-emerald-400">{gateway}</span>
+                  <span className="text-cyan-300/50">Gateway:</span>
+                  <span className="text-cyan-400">{gateway}</span>
                 </div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-zinc-500">Kabel:</span>
-                  <span className="text-cyan-400">{cableType === "fiber" ? "Fiber Optik" : "Ethernet Cat6"}</span>
+                  <span className="text-cyan-300/50">Kabel:</span>
+                  <span className="text-blue-400">{cableType === "fiber" ? "Fiber Optik" : "Ethernet Cat6"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Status:</span>
-                  <span className="text-emerald-400">Terhubung</span>
+                  <span className="text-cyan-300/50">Status:</span>
+                  <span className="text-cyan-400">Terhubung</span>
                 </div>
               </div>
             </div>
 
             <button
               onClick={handleFinish}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-lg transition-colors"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold py-3 rounded-lg transition-all duration-200"
             >
               Selesai - Lab Virtual Siap!
             </button>
@@ -670,25 +670,25 @@ export default function NetworkModal({
               <h3 className="text-2xl font-bold text-red-400 mb-2">
                 Koneksi Gagal!
               </h3>
-              <p className="text-zinc-400 mb-4">
+              <p className="text-cyan-400 mb-4">
                 {connectionError || "Terjadi kesalahan saat menghubungkan ke jaringan."}
               </p>
               
               <div className="card rounded-lg p-4 text-left font-mono text-sm border-red-500/30">
                 <div className="flex justify-between mb-1">
-                  <span className="text-zinc-500">IP Address:</span>
+                  <span className="text-cyan-500">IP Address:</span>
                   <span className="text-red-400">{ipAddress}</span>
                 </div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-zinc-500">Gateway:</span>
-                  <span className="text-zinc-400">{gateway}</span>
+                  <span className="text-cyan-500">Gateway:</span>
+                  <span className="text-cyan-400">{gateway}</span>
                 </div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-zinc-500">Subnet:</span>
-                  <span className="text-zinc-400">{subnetMask}</span>
+                  <span className="text-cyan-500">Subnet:</span>
+                  <span className="text-cyan-400">{subnetMask}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Status:</span>
+                  <span className="text-cyan-500">Status:</span>
                   <span className="text-red-400">Tidak Terhubung</span>
                 </div>
               </div>
@@ -706,7 +706,7 @@ export default function NetworkModal({
             <div className="flex gap-3">
               <button
                 onClick={() => { setStep("configure"); setConnectionError(null); setPingTest("idle"); setDnsTest("idle"); }}
-                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-3 rounded-lg transition-colors"
+                className="flex-1 bg-cyan-800 hover:bg-cyan-700 text-cyan-300 font-semibold py-3 rounded-lg transition-colors"
               >
                 ← Konfigurasi Ulang
               </button>

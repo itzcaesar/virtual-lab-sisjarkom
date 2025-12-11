@@ -460,17 +460,17 @@ export default function Stage({
 
   return (
     <>
-      <div className="relative w-full flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col">
+      <div className="relative w-full flex-1 bg-[#0d1b2a]/60 backdrop-blur-sm border border-blue-900/50 rounded-lg p-4 flex flex-col">
         {/* Progress Bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono text-zinc-400">Progres Instalasi</span>
+            <span className="text-xs font-mono text-blue-300">Progres Instalasi</span>
             <div className="flex items-center gap-4">
-              <span className="text-xs font-mono text-emerald-400 font-bold">{progress}%</span>
+              <span className="text-xs font-mono text-blue-400 font-bold">{progress}%</span>
               {(modules.length > 0 || progress > 0) && (
                 <motion.button
                   onClick={handleReset}
-                  className="px-3 py-1 bg-zinc-800 border border-zinc-700 rounded text-xs font-mono text-red-400 hover:text-red-300 hover:border-red-500/50 transition-all flex items-center gap-1"
+                  className="px-3 py-1 bg-blue-950/30 border border-blue-800/50 rounded text-xs font-mono text-red-400 hover:text-red-300 hover:border-red-500 transition-all flex items-center gap-1"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -479,9 +479,9 @@ export default function Stage({
               )}
             </div>
           </div>
-          <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-[#0a1628] rounded-full overflow-hidden border border-cyan-500/20">
             <motion.div
-              className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500"
+              className="h-full bg-gradient-to-r from-blue-500 to-cyan-400"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5, ease: "easeOut" }}
@@ -495,49 +495,49 @@ export default function Stage({
           <div className="flex gap-2">
             <motion.button
               onClick={() => addModule("pc")}
-              className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-emerald-500 transition-all"
+              className="flex items-center gap-2 px-3 py-2 bg-blue-950/30 border border-cyan-500/30 rounded hover:border-purple-500 hover:bg-blue-900/30 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <HardDrive className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs font-mono text-emerald-400">PC</span>
-              <Plus className="w-3 h-3" />
+              <HardDrive className="w-4 h-4 text-purple-400" />
+              <span className="text-xs font-mono text-purple-400">PC</span>
+              <Plus className="w-3 h-3 text-purple-300" />
             </motion.button>
 
             <motion.button
               onClick={() => addModule("monitor")}
-              className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-cyan-500 transition-all"
+              className="flex items-center gap-2 px-3 py-2 bg-blue-950/30 border border-cyan-500/30 rounded hover:border-cyan-500 hover:bg-blue-900/30 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <MonitorIcon className="w-4 h-4 text-cyan-400" />
               <span className="text-xs font-mono text-cyan-400">Monitor</span>
-              <Plus className="w-3 h-3" />
+              <Plus className="w-3 h-3 text-cyan-300" />
             </motion.button>
 
             <motion.button
               onClick={() => addModule("router")}
-              className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-blue-500 transition-all"
+              className="flex items-center gap-2 px-3 py-2 bg-blue-950/30 border border-cyan-500/30 rounded hover:border-emerald-500 hover:bg-blue-900/30 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Wifi className="w-4 h-4 text-blue-400" />
-              <span className="text-xs font-mono text-blue-400">Router</span>
-              <Plus className="w-3 h-3" />
+              <Wifi className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-mono text-emerald-400">Router</span>
+              <Plus className="w-3 h-3 text-emerald-300" />
             </motion.button>
 
-            <div className="h-8 w-px bg-zinc-700 mx-2"></div>
+            <div className="h-8 w-px bg-cyan-500/30 mx-2"></div>
 
             <motion.button
               onClick={() => setDeleteMode(!deleteMode)}
-              className={`flex items-center gap-2 px-3 py-2 bg-zinc-800 border rounded transition-all ${
-                deleteMode ? "border-red-500 bg-red-950/30" : "border-zinc-700"
+              className={`flex items-center gap-2 px-3 py-2 bg-blue-950/30 border rounded transition-all ${
+                deleteMode ? "border-red-500 bg-red-950/30" : "border-cyan-500/30 hover:bg-blue-900/30"
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <span className="text-lg">🗑️</span>
-              <span className={`text-xs font-mono ${deleteMode ? "text-red-400" : "text-zinc-400"}`}>
+              <span className={`text-xs font-mono ${deleteMode ? "text-red-400" : "text-yellow-400"}`}>
                 {deleteMode ? "Hapus AKTIF" : "Hapus"}
               </span>
             </motion.button>
@@ -546,12 +546,12 @@ export default function Stage({
               {gameState.hardwareInstalled && (
                 <motion.button
                   onClick={() => setShowBenchmark(true)}
-                  className="flex items-center justify-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-yellow-500 transition-all w-[140px] h-[36px]"
+                  className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-950/30 border border-cyan-500/30 rounded hover:border-cyan-400 hover:bg-blue-900/30 transition-all duration-200 w-[140px] h-[36px]"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Zap className="w-4 h-4 text-yellow-400" />
-                  <span className="text-xs font-mono text-yellow-400">Benchmark</span>
+                  <Zap className="w-4 h-4 text-cyan-400" />
+                  <span className="text-xs font-mono text-cyan-400">Benchmark</span>
                 </motion.button>
               )}
 
@@ -559,12 +559,12 @@ export default function Stage({
                 <div className="relative">
                   <motion.button
                     onClick={() => handleOpenVM()}
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded hover:border-purple-500 transition-all w-[140px] h-[36px]"
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-950/30 border border-cyan-500/30 rounded hover:border-cyan-400 hover:bg-blue-900/30 transition-all duration-200 w-[140px] h-[36px]"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <MonitorIcon className="w-4 h-4 text-purple-400" />
-                    <span className="text-xs font-mono text-purple-400 whitespace-nowrap">
+                    <MonitorIcon className="w-4 h-4 text-cyan-400" />
+                    <span className="text-xs font-mono text-cyan-400 whitespace-nowrap">
                       Buka VM {getConfiguredPCs().length > 1 ? `(${getConfiguredPCs().length})` : ""}
                     </span>
                   </motion.button>
@@ -576,10 +576,10 @@ export default function Stage({
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-full right-0 mt-2 w-48 bg-zinc-900 border border-zinc-700 rounded-lg overflow-hidden z-50"
+                      className="absolute top-full right-0 mt-2 w-48 bg-[#0d1b2a]/95 backdrop-blur-xl border border-cyan-500/30 rounded-lg overflow-hidden z-50"
                     >
-                      <div className="p-2 border-b border-zinc-700">
-                        <p className="text-xs font-mono text-zinc-400">Pilih PC untuk buka VM:</p>
+                      <div className="p-2 border-b border-cyan-500/20">
+                        <p className="text-xs font-mono text-cyan-300">Pilih PC untuk buka VM:</p>
                       </div>
                       {getConfiguredPCs().map((pc) => {
                         const osType = pcConfigurations[pc.id]?.os;
@@ -587,12 +587,12 @@ export default function Stage({
                           <motion.button
                             key={pc.id}
                             onClick={() => selectVMAndOpen(pc.id)}
-                            className="w-full p-2 flex items-center gap-2 hover:bg-zinc-800 transition-all text-left"
+                            className="w-full p-2 flex items-center gap-2 hover:bg-cyan-800 transition-all text-left"
                             whileHover={{ x: 5 }}
                           >
                             <HardDrive className="w-4 h-4 text-emerald-400" />
                             <div className="flex-1">
-                              <p className="text-xs font-mono text-zinc-300">{pc.label}</p>
+                              <p className="text-xs font-mono text-cyan-300">{pc.label}</p>
                               <p className={`text-[10px] ${osType === "windows" ? "text-blue-400" : "text-orange-400"}`}>
                                 {osType === "windows" ? "🪟 Windows" : `🐧 Linux`}
                               </p>
@@ -602,7 +602,7 @@ export default function Stage({
                       })}
                       <motion.button
                         onClick={() => setShowVMSelector(false)}
-                        className="w-full p-2 text-xs font-mono text-zinc-500 hover:bg-zinc-800 transition-all border-t border-zinc-700"
+                        className="w-full p-2 text-xs font-mono text-cyan-400/70 hover:bg-blue-900/30 transition-all duration-200 border-t border-cyan-500/20"
                       >
                         Batal
                       </motion.button>
@@ -616,19 +616,19 @@ export default function Stage({
 
           {/* Canvas Presets */}
           <div className="flex gap-2 items-center">
-            <span className="text-xs font-mono text-zinc-500">Preset:</span>
+            <span className="text-xs font-mono text-blue-300/70">Preset:</span>
             {canvasPresets.map((preset, idx) => (
               <motion.button
                 key={idx}
                 onClick={() => loadCanvasPreset(idx)}
-                className="px-3 py-1 bg-zinc-800 border border-zinc-700 rounded hover:border-cyan-500 transition-all text-xs font-mono text-zinc-400 hover:text-cyan-400"
+                className="px-3 py-1 bg-blue-950/30 border border-blue-800/50 rounded hover:border-cyan-500 hover:bg-blue-900/30 transition-all text-xs font-mono text-blue-300 hover:text-cyan-400"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 {preset.name}
               </motion.button>
             ))}
-            <div className="ml-auto text-xs font-mono text-zinc-500">
+            <div className="ml-auto text-xs font-mono text-blue-300/70">
               💡 {deleteMode ? "Klik modul untuk hapus" : "Klik kanan untuk hubungkan"}
             </div>
           </div>
@@ -659,7 +659,7 @@ export default function Stage({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              <div className="bg-zinc-900 border-2 border-emerald-500/50 rounded-full px-6 py-3 shadow-lg shadow-emerald-500/20">
+              <div className="bg-blue-950/80 backdrop-blur-sm border-2 border-cyan-500/50 rounded-full px-6 py-3 shadow-lg shadow-cyan-500/20">
                 <p className="text-emerald-400 font-bold font-mono flex items-center gap-2">
                   <span className="text-2xl">🎉</span>
                   <span>Lab Virtual Selesai Dikonfigurasi!</span>

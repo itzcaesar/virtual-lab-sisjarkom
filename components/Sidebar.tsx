@@ -116,14 +116,14 @@ export default function Sidebar({ gameState }: SidebarProps) {
   }, [gameState.pcSpecs, gameState.cpuModel, gameState.ramSize, gameState.storage, gameState.gpu]);
 
   return (
-    <aside className="w-80 bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6 h-screen overflow-hidden">
+    <aside className="w-80 bg-[#0d1b2a]/95 backdrop-blur-md border-l border-cyan-500/20 p-6 flex flex-col gap-6 h-screen overflow-hidden">
       {/* Progres Setup */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-zinc-800 border border-zinc-700 rounded-lg p-4"
+        className="bg-blue-950/30 border border-cyan-500/30 rounded-lg p-4"
       >
-        <h3 className="text-sm font-bold text-purple-400 mb-3 font-mono flex items-center gap-2">
+        <h3 className="text-sm font-bold text-cyan-400 mb-3 font-mono flex items-center gap-2">
           <BookOpen className="w-4 h-4" />
           PROGRES SETUP
         </h3>
@@ -131,12 +131,12 @@ export default function Sidebar({ gameState }: SidebarProps) {
         {/* Progress Bar */}
         <div className="mb-3">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-zinc-500">{completedSteps}/3 Langkah</span>
-            <span className="text-xs text-purple-400">{Math.round(progressPercent)}%</span>
+            <span className="text-xs text-cyan-300/70">{completedSteps}/3 Langkah</span>
+            <span className="text-xs text-cyan-400">{Math.round(progressPercent)}%</span>
           </div>
-          <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-[#0a1628] rounded-full h-2 overflow-hidden border border-cyan-500/20">
             <motion.div
-              className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+              className="h-full bg-gradient-to-r from-blue-500 to-cyan-400"
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 0.5, ease: "easeOut" }}
@@ -151,21 +151,21 @@ export default function Sidebar({ gameState }: SidebarProps) {
               {step.completed ? (
                 <CheckCircle className="w-4 h-4 text-emerald-400" />
               ) : (
-                <Circle className="w-4 h-4 text-zinc-600" />
+                <Circle className="w-4 h-4 text-cyan-500/30" />
               )}
-              <span className={step.completed ? "text-emerald-400" : "text-zinc-500"}>
+              <span className={step.completed ? "text-cyan-400" : "text-cyan-400/50"}>
                 {step.label}
               </span>
               {index < progressSteps.length - 1 && !step.completed && progressSteps[index - 1]?.completed !== false && (
-                <ArrowRight className="w-3 h-3 text-zinc-600 ml-auto" />
+                <ArrowRight className="w-3 h-3 text-cyan-500/50 ml-auto" />
               )}
             </div>
           ))}
         </div>
 
         {/* Status Message */}
-        <div className="mt-3 pt-3 border-t border-zinc-700">
-          <p className="text-xs text-zinc-400">
+        <div className="mt-3 pt-3 border-t border-cyan-500/20">
+          <p className="text-xs text-cyan-400/70">
             {completedSteps === 0 && "Klik PC Tower untuk memulai instalasi hardware"}
             {completedSteps === 1 && "Klik Monitor untuk menginstal sistem operasi"}
             {completedSteps === 2 && "Klik Router untuk mengatur koneksi jaringan"}
@@ -177,9 +177,10 @@ export default function Sidebar({ gameState }: SidebarProps) {
       {/* Metrik Performa */}
       {gameState.performanceMetrics && (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-zinc-800 border border-zinc-700 rounded-lg p-4"
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4"
         >
           <h3 className="text-sm font-bold text-cyan-400 mb-3 font-mono flex items-center gap-2">
             <Zap className="w-4 h-4" />
@@ -190,17 +191,17 @@ export default function Sidebar({ gameState }: SidebarProps) {
             {/* Skor Keseluruhan */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-xs text-zinc-500">Keseluruhan</span>
+                <span className="text-xs text-cyan-400/60">Keseluruhan</span>
                 <span className={`text-sm font-bold ${getPerformanceTier(gameState.performanceMetrics.overall).color}`}>
                   {gameState.performanceMetrics.overall}/100
                 </span>
               </div>
-              <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-[#0a1628] rounded-full h-2 overflow-hidden border border-cyan-500/20">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500"
+                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-400"
                   initial={{ width: 0 }}
                   animate={{ width: `${gameState.performanceMetrics.overall}%` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
                 />
               </div>
               <p className={`text-xs mt-1 ${getPerformanceTier(gameState.performanceMetrics.overall).color}`}>
@@ -213,40 +214,40 @@ export default function Sidebar({ gameState }: SidebarProps) {
               {aggregatedSpecs && (
                 <>
                   {aggregatedSpecs.pcCount > 1 && (
-                    <div className="text-xs text-zinc-400 mb-2 pb-2 border-b border-zinc-700">
+                    <div className="text-xs text-cyan-400/70 mb-2 pb-2 border-b border-cyan-500/20">
                       Total dari {aggregatedSpecs.pcCount} PC
                     </div>
                   )}
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-500">CPU:</span>
-                    <span className="text-emerald-400 font-mono">
+                    <span className="text-cyan-400">CPU:</span>
+                    <span className="text-cyan-400 font-mono">
                       {aggregatedSpecs.totalCores} Cores / {aggregatedSpecs.totalThreads} Threads
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-500">RAM:</span>
+                    <span className="text-cyan-400">RAM:</span>
                     <span className="text-cyan-400 font-mono">
                       {aggregatedSpecs.totalRAM}GB {aggregatedSpecs.ramType}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-500">Penyimpanan:</span>
-                    <span className="text-blue-400 font-mono">
+                    <span className="text-cyan-400">Penyimpanan:</span>
+                    <span className="text-cyan-400 font-mono">
                       {aggregatedSpecs.totalStorage >= 1024 
                         ? `${(aggregatedSpecs.totalStorage / 1024).toFixed(1)}TB` 
                         : `${aggregatedSpecs.totalStorage}GB`} {aggregatedSpecs.storageType}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-500">GPU:</span>
-                    <span className="text-purple-400 font-mono">
+                    <span className="text-cyan-400">GPU:</span>
+                    <span className="text-cyan-400 font-mono">
                       {aggregatedSpecs.totalGPUCores} cores / {aggregatedSpecs.totalVRAM}GB VRAM
                     </span>
                   </div>
                   {gameState.psu && (
                     <div className="flex justify-between items-center">
-                      <span className="text-zinc-500">PSU:</span>
-                      <span className="text-yellow-400 font-mono">{gameState.psu}</span>
+                      <span className="text-cyan-400">PSU:</span>
+                      <span className="text-cyan-400 font-mono">{gameState.psu}</span>
                     </div>
                   )}
                 </>
@@ -255,18 +256,18 @@ export default function Sidebar({ gameState }: SidebarProps) {
 
             {/* Dampak Performa */}
             {gameState.networkConnected && (
-              <div className="border-t border-zinc-700 pt-2 space-y-1 text-xs font-mono">
+              <div className="border-t border-cyan-500/20 pt-2 space-y-1 text-xs font-mono">
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Boot VM:</span>
+                  <span className="text-cyan-400/60">Boot VM:</span>
                   <span className="text-emerald-400">{gameState.performanceMetrics.vmBootTime}ms</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Browser:</span>
-                  <span className="text-cyan-400">{gameState.performanceMetrics.browserLoadTime}ms</span>
+                  <span className="text-cyan-400/60">Browser:</span>
+                  <span className="text-purple-400">{gameState.performanceMetrics.browserLoadTime}ms</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Aplikasi:</span>
-                  <span className="text-blue-400">{gameState.performanceMetrics.appResponseTime}ms</span>
+                  <span className="text-cyan-400/60">Aplikasi:</span>
+                  <span className="text-yellow-400">{gameState.performanceMetrics.appResponseTime}ms</span>
                 </div>
               </div>
             )}
@@ -279,14 +280,14 @@ export default function Sidebar({ gameState }: SidebarProps) {
         <h2 className="text-xl font-bold text-cyan-400 mb-4 font-mono flex-shrink-0">
           [ LOG INFO ]
         </h2>
-        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 font-mono text-xs space-y-1 flex-1 overflow-y-auto">
+        <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 font-mono text-xs space-y-1 flex-1 overflow-y-auto scrollbar-hide">
           {gameState.logs.slice(-50).map((log, index) => (
             <motion.div
               key={index}
-              className="text-zinc-400"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
+              className="text-cyan-300/80"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
               {log}
             </motion.div>

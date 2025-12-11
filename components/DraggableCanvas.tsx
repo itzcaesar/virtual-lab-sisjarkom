@@ -151,7 +151,7 @@ export default function DraggableCanvas({
       case "router":
         return "border-blue-500 bg-blue-950/50";
       default:
-        return "border-zinc-500 bg-zinc-950/50";
+        return "border-cyan-500/30 bg-blue-950/30";
     }
   };
 
@@ -179,7 +179,7 @@ export default function DraggableCanvas({
   return (
     <div
       ref={canvasRef}
-      className={`relative w-full h-full bg-zinc-900/50 rounded-lg overflow-hidden ${
+      className={`relative w-full h-full bg-[#0a1628]/30 rounded-lg overflow-hidden ${
         isPanning ? "cursor-grabbing" : spaceHeld ? "cursor-grab" : "cursor-default"
       }`}
       onMouseDown={handleCanvasMouseDown}
@@ -193,7 +193,7 @@ export default function DraggableCanvas({
         className="absolute inset-0 opacity-30 canvas-bg pointer-events-none"
         style={{
           backgroundImage: `
-            radial-gradient(circle at 1px 1px, rgba(16, 185, 129, 0.3) 1px, transparent 0)
+            radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.3) 1px, transparent 0)
           `,
           backgroundSize: "40px 40px",
           backgroundPosition: `${panOffset.x % 40}px ${panOffset.y % 40}px`,
@@ -202,10 +202,10 @@ export default function DraggableCanvas({
       />
 
       {/* Vignette Effect */}
-      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-zinc-900/80 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-[#0a1628]/80 pointer-events-none" />
 
       {/* Pan Instructions */}
-      <div className="absolute top-2 right-2 card rounded px-2 py-1 text-[10px] font-mono text-zinc-500 z-10 pointer-events-none">
+      <div className="absolute top-2 right-2 card rounded px-2 py-1 text-[10px] font-mono text-cyan-500 z-10 pointer-events-none">
         {spaceHeld ? "🖱️ Seret untuk geser" : "Tahan SPASI + seret untuk geser"}
       </div>
 
@@ -213,7 +213,7 @@ export default function DraggableCanvas({
       {(panOffset.x !== 0 || panOffset.y !== 0) && (
         <button
           onClick={resetPan}
-          className="absolute top-2 left-2 px-2 py-1 card rounded text-xs font-mono text-zinc-400 hover:text-white z-10"
+          className="absolute top-2 left-2 px-2 py-1 card rounded text-xs font-mono text-cyan-400 hover:text-white z-10"
         >
           Reset Tampilan
         </button>
@@ -420,10 +420,10 @@ export default function DraggableCanvas({
                   {/* Settings icon on hover when configured - indicates reconfigurable */}
                   {module.configured && (
                     <motion.div
-                      className="absolute -bottom-1 -right-1 bg-zinc-700 rounded-full p-0.5 opacity-0 group-hover:opacity-100"
+                      className="absolute -bottom-1 -right-1 bg-cyan-700 rounded-full p-0.5 opacity-0 group-hover:opacity-100"
                       whileHover={{ scale: 1.1 }}
                     >
-                      <Settings className="w-3 h-3 text-zinc-300" />
+                      <Settings className="w-3 h-3 text-cyan-300" />
                     </motion.div>
                   )}
 
@@ -443,7 +443,7 @@ export default function DraggableCanvas({
                 {/* Connection Points */}
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
                   <motion.button
-                    className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-zinc-900"
+                    className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-[#0a1628]"
                     whileHover={{ scale: 1.5 }}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -469,7 +469,7 @@ export default function DraggableCanvas({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <div className="text-center text-zinc-500 font-mono text-sm">
+          <div className="text-center text-cyan-500 font-mono text-sm">
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
@@ -477,8 +477,8 @@ export default function DraggableCanvas({
               <Cable className="w-12 h-12 mx-auto mb-4 opacity-50" />
             </motion.div>
             <p>Drag modules dari topbar untuk memulai</p>
-            <p className="text-xs mt-2 text-zinc-600">Klik pada dot untuk menghubungkan kabel</p>
-            <p className="text-xs mt-1 text-zinc-600">Drag canvas kosong dan tahan SPACE untuk pan</p>
+            <p className="text-xs mt-2 text-cyan-600">Klik pada dot untuk menghubungkan kabel</p>
+            <p className="text-xs mt-1 text-cyan-600">Drag canvas kosong dan tahan SPACE untuk pan</p>
           </div>
         </motion.div>
       )}
@@ -496,7 +496,7 @@ export default function DraggableCanvas({
       )}
 
       {/* Canvas Info */}
-      <div className="absolute bottom-2 right-2 text-xs font-mono text-zinc-600 card px-2 py-1 rounded">
+      <div className="absolute bottom-2 right-2 text-xs font-mono text-cyan-300/70 card px-2 py-1 rounded">
         {modules.length} modul • {cables.length} kabel
       </div>
     </div>

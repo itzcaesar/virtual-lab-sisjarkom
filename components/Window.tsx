@@ -123,10 +123,10 @@ export default function Window({
   };
 
   const headerColors: Record<string, string> = {
-    cyan: "from-cyan-950 to-zinc-900",
-    emerald: "from-emerald-950 to-zinc-900",
-    blue: "from-blue-950 to-zinc-900",
-    purple: "from-purple-950 to-zinc-900",
+    cyan: "from-cyan-950 to-cyan-900",
+    emerald: "from-emerald-950 to-cyan-900",
+    blue: "from-blue-950 to-cyan-900",
+    purple: "from-purple-950 to-cyan-900",
   };
 
   if (isMinimized) {
@@ -145,7 +145,7 @@ export default function Window({
   return (
     <motion.div
       ref={windowRef}
-      className={`fixed bg-zinc-900/95 rounded-lg border-2 ${colorClasses[color]} shadow-2xl overflow-hidden`}
+      className={`fixed bg-cyan-900/95 rounded-lg border-2 ${colorClasses[color]} shadow-2xl overflow-hidden`}
       style={{
         left: position.x,
         top: position.y,
@@ -175,8 +175,8 @@ export default function Window({
                 e.stopPropagation();
                 onPinToggle();
               }}
-              className={`w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-700/50 transition-colors ${
-                isPinned ? "text-yellow-400" : "text-zinc-400"
+              className={`w-7 h-7 flex items-center justify-center rounded hover:bg-cyan-700/50 transition-colors ${
+                isPinned ? "text-yellow-400" : "text-cyan-400"
               }`}
               title={isPinned ? "Unpin" : "Pin"}
             >
@@ -185,19 +185,19 @@ export default function Window({
           )}
           <button
             onClick={() => setIsMinimized(true)}
-            className="w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-700/50 transition-colors text-zinc-400"
+            className="w-7 h-7 flex items-center justify-center rounded hover:bg-cyan-700/50 transition-colors text-cyan-400"
           >
             <Minus className="w-4 h-4" />
           </button>
           <button
             onClick={toggleMaximize}
-            className="w-7 h-7 flex items-center justify-center rounded hover:bg-zinc-700/50 transition-colors text-zinc-400"
+            className="w-7 h-7 flex items-center justify-center rounded hover:bg-cyan-700/50 transition-colors text-cyan-400"
           >
             {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
           <button
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded hover:bg-red-500/80 transition-colors text-zinc-400 hover:text-white"
+            className="w-7 h-7 flex items-center justify-center rounded hover:bg-red-500/80 transition-colors text-cyan-400 hover:text-white"
           >
             <X className="w-4 h-4" />
           </button>
@@ -215,7 +215,7 @@ export default function Window({
           className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
           onMouseDown={handleResizeMouseDown}
         >
-          <svg className="w-4 h-4 text-zinc-600" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-cyan-600" viewBox="0 0 24 24">
             <path fill="currentColor" d="M22 22H20V20H22V22M22 18H20V16H22V18M18 22H16V20H18V22M18 18H16V16H18V18M14 22H12V20H14V22M22 14H20V12H22V14Z" />
           </svg>
         </div>

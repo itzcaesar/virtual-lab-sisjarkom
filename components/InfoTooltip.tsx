@@ -54,12 +54,12 @@ export default function InfoTooltip({ title, content, position = "top" }: InfoTo
                 <h4 className="text-sm font-bold text-cyan-400">{title}</h4>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-zinc-500 hover:text-white transition-colors"
+                  className="text-cyan-400/70 hover:text-cyan-300 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-xs text-zinc-300 leading-relaxed">{content}</p>
+              <p className="text-xs text-cyan-300/90 leading-relaxed">{content}</p>
             </motion.div>
           </>
         )}

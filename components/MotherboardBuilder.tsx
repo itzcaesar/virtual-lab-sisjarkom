@@ -54,7 +54,7 @@ export default function MotherboardBuilder({
       storage: "256GB NVMe SSD - 3000MB/s - 5W",
       gpu: "Integrated Graphics - Shared Memory - 0W",
       psu: "450W 80+ Bronze",
-      color: "zinc"
+      color: "cyan"
     },
     {
       name: "Build Menengah",
@@ -268,19 +268,19 @@ export default function MotherboardBuilder({
   };
 
   const getSocketColor = (socket: Socket) => {
-    if (socket.installed) return "border-emerald-500 bg-emerald-950/30";
+    if (socket.installed) return "border-cyan-500 bg-blue-950/30";
     if (draggedComponent && draggedComponent.type === socket.type) return "border-cyan-400 bg-cyan-950/30 animate-pulse";
-    return "border-zinc-700 bg-zinc-900/50";
+    return "border-cyan-500/20 bg-blue-950/20";
   };
 
   const getComponentColor = (type: string) => {
     switch (type) {
-      case "cpu": return "border-emerald-500 bg-emerald-950/20";
+      case "cpu": return "border-blue-500 bg-blue-950/20";
       case "ram": return "border-cyan-500 bg-cyan-950/20";
       case "storage": return "border-blue-500 bg-blue-950/20";
-      case "gpu": return "border-purple-500 bg-purple-950/20";
-      case "psu": return "border-yellow-500 bg-yellow-950/20";
-      default: return "border-zinc-700";
+      case "gpu": return "border-cyan-500 bg-cyan-950/20";
+      case "psu": return "border-cyan-500 bg-cyan-950/20";
+      default: return "border-cyan-500/20";
     }
   };
 
@@ -329,7 +329,7 @@ export default function MotherboardBuilder({
         <div className="flex justify-between items-center">
           <button
             onClick={onBack}
-            className="bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 text-zinc-300 font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+            className="bg-blue-950/30 border border-cyan-500/30 hover:bg-blue-900/30 text-cyan-300 font-semibold px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2"
           >
             ← Kembali
           </button>
@@ -337,38 +337,38 @@ export default function MotherboardBuilder({
       )}
       
       {/* Preset Configurations - Compact */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg p-3">
+      <div className="bg-blue-950/20 border border-cyan-500/30 rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-sm font-semibold text-cyan-600 dark:text-cyan-400">Preset Cepat</h4>
-          <span className="text-xs text-zinc-600 dark:text-zinc-500">Klik untuk auto-install</span>
+          <h4 className="text-sm font-semibold text-cyan-400">Preset Cepat</h4>
+          <span className="text-xs text-cyan-300/70">Klik untuk auto-install</span>
         </div>
         <div className="flex gap-2">
           {presetConfigs.map((preset, idx) => (
             <motion.button
               key={idx}
               onClick={() => loadPreset(preset)}
-              className={`flex-1 border-2 rounded-lg p-2 text-left transition-all ${
-                preset.color === 'zinc' 
-                  ? 'bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 border-zinc-400 dark:border-zinc-600 hover:border-zinc-500 dark:hover:border-zinc-500' 
+              className={`flex-1 border-2 rounded-lg p-2 text-left transition-all duration-200 ${
+                preset.color === 'cyan' 
+                  ? 'bg-gradient-to-br from-blue-950/30 to-blue-900/30 border-cyan-500/40 hover:border-cyan-400' 
                   : preset.color === 'blue'
-                  ? 'bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-950 dark:to-cyan-950 border-blue-400 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-500'
-                  : 'bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-950 dark:to-pink-950 border-purple-400 dark:border-purple-600 hover:border-purple-500 dark:hover:border-purple-500'
+                  ? 'bg-gradient-to-br from-blue-900/40 to-cyan-950/40 border-cyan-500/50 hover:border-cyan-400'
+                  : 'bg-gradient-to-br from-blue-800/40 to-cyan-900/40 border-cyan-500/60 hover:border-cyan-300'
               }`}
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <h5 className="font-bold text-zinc-900 dark:text-white text-xs">{preset.name}</h5>
+                  <h5 className="font-bold text-cyan-300 text-xs">{preset.name}</h5>
                   <span className={`font-bold text-xs ${
-                    preset.color === 'zinc' 
-                      ? 'text-zinc-700 dark:text-zinc-300' 
+                    preset.color === 'cyan' 
+                      ? 'text-cyan-400' 
                       : preset.color === 'blue'
-                      ? 'text-blue-700 dark:text-blue-300'
-                      : 'text-purple-700 dark:text-purple-300'
+                      ? 'text-blue-400'
+                      : 'text-cyan-300'
                   }`}>{preset.price}</span>
                 </div>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">{preset.desc}</p>
+                <p className="text-xs text-cyan-300/70 font-medium">{preset.desc}</p>
               </div>
             </motion.button>
           ))}
@@ -378,15 +378,15 @@ export default function MotherboardBuilder({
       <div className="grid grid-cols-12 gap-3 items-start">
         {/* Component Catalog - Left Panel */}
         <div className="col-span-4 space-y-2 h-[500px] overflow-y-auto pr-2 scrollbar-hide">
-          <h4 className="text-xs font-semibold text-zinc-700 dark:text-zinc-400 sticky top-0 bg-white dark:bg-zinc-900 pb-1 z-10 flex items-center gap-1">
+          <h4 className="text-xs font-semibold text-cyan-400 sticky top-0 bg-[#0d1b2a]/95 backdrop-blur-sm pb-1 z-10 flex items-center gap-1">
             📦 Drag komponen ke socket →
           </h4>
             
           {/* CPU Category */}
           <div className="mb-3">
             <div className="flex items-center gap-1.5 mb-1.5">
-              <Cpu className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">CPU</p>
+              <Cpu className="w-4 h-4 text-blue-400" />
+              <p className="text-xs font-semibold text-blue-400">CPU</p>
             </div>
             <div className="space-y-1.5">
               {allCPUOptions.map((cpu, idx) => (
@@ -401,15 +401,15 @@ export default function MotherboardBuilder({
                     price: cpu.price,
                     power: cpu.power
                   })}
-                  className="text-xs p-2 rounded bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-300 dark:border-zinc-700 cursor-grab active:cursor-grabbing hover:border-emerald-500/50 transition-all"
+                  className="text-xs p-2 rounded bg-blue-950/30 border border-cyan-500/30 cursor-grab active:cursor-grabbing hover:border-cyan-400 hover:bg-blue-900/30 transition-all duration-200"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-700 dark:text-zinc-300 font-mono truncate">{cpu.name}</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 ml-1">{cpu.price}</span>
+                    <span className="text-cyan-300 font-mono truncate">{cpu.name}</span>
+                    <span className="text-blue-400 ml-1">{cpu.price}</span>
                   </div>
-                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">{cpu.power}W TDP</div>
+                  <div className="text-[10px] text-cyan-400/70 mt-0.5">{cpu.power}W TDP</div>
                 </motion.div>
               ))}
             </div>
@@ -434,15 +434,15 @@ export default function MotherboardBuilder({
                     price: ram.price,
                     power: ram.power
                   })}
-                  className="text-xs p-2 rounded bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-300 dark:border-zinc-700 cursor-grab active:cursor-grabbing hover:border-cyan-500/50 transition-all"
+                  className="text-xs p-2 rounded bg-blue-950/30 border border-cyan-500/30 cursor-grab active:cursor-grabbing hover:border-cyan-400 hover:bg-blue-900/30 transition-all duration-200"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-700 dark:text-zinc-300 font-mono truncate">{ram.name}</span>
-                    <span className="text-cyan-600 dark:text-cyan-400 ml-1">{ram.price}</span>
+                    <span className="text-cyan-300 font-mono truncate">{ram.name}</span>
+                    <span className="text-cyan-400 ml-1">{ram.price}</span>
                   </div>
-                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">{ram.power}W</div>
+                  <div className="text-[10px] text-cyan-400/70 mt-0.5">{ram.power}W</div>
                 </motion.div>
               ))}
             </div>
@@ -467,15 +467,15 @@ export default function MotherboardBuilder({
                     price: storage.price,
                     power: storage.power
                   })}
-                  className="text-xs p-2 rounded bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-300 dark:border-zinc-700 cursor-grab active:cursor-grabbing hover:border-blue-500/50 transition-all"
+                  className="text-xs p-2 rounded bg-blue-950/30 border border-cyan-500/30 cursor-grab active:cursor-grabbing hover:border-cyan-400 hover:bg-blue-900/30 transition-all duration-200"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-700 dark:text-zinc-300 font-mono truncate">{storage.name}</span>
-                    <span className="text-blue-600 dark:text-blue-400 ml-1">{storage.price}</span>
+                    <span className="text-cyan-300 font-mono truncate">{storage.name}</span>
+                    <span className="text-blue-400 ml-1">{storage.price}</span>
                   </div>
-                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">{storage.power}W</div>
+                  <div className="text-[10px] text-cyan-400/70 mt-0.5">{storage.power}W</div>
                 </motion.div>
               ))}
             </div>
@@ -500,15 +500,15 @@ export default function MotherboardBuilder({
                     price: gpu.price,
                     power: gpu.power
                   })}
-                  className="text-xs p-2 rounded bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-300 dark:border-zinc-700 cursor-grab active:cursor-grabbing hover:border-purple-500/50 transition-all"
+                  className="text-xs p-2 rounded bg-blue-950/30 border border-cyan-500/30 cursor-grab active:cursor-grabbing hover:border-cyan-400 hover:bg-blue-900/30 transition-all duration-200"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-700 dark:text-zinc-300 font-mono truncate">{gpu.name}</span>
-                    <span className="text-purple-600 dark:text-purple-400 ml-1">{gpu.price}</span>
+                    <span className="text-cyan-300 font-mono truncate">{gpu.name}</span>
+                    <span className="text-cyan-400 ml-1">{gpu.price}</span>
                   </div>
-                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">{gpu.power}W</div>
+                  <div className="text-[10px] text-cyan-400/70 mt-0.5">{gpu.power}W</div>
                 </motion.div>
               ))}
             </div>
@@ -532,15 +532,15 @@ export default function MotherboardBuilder({
                     specs: `${psu.name} - ${psu.efficiency}`,
                     price: psu.price
                   })}
-                  className="text-xs p-2 rounded bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-300 dark:border-zinc-700 cursor-grab active:cursor-grabbing hover:border-yellow-500/50 transition-all"
+                  className="text-xs p-2 rounded bg-blue-950/30 border border-cyan-500/30 cursor-grab active:cursor-grabbing hover:border-cyan-400 hover:bg-blue-900/30 transition-all duration-200"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-700 dark:text-zinc-300 font-mono truncate">{psu.name}</span>
-                    <span className="text-yellow-600 dark:text-yellow-400 ml-1">{psu.price}</span>
+                    <span className="text-cyan-300 font-mono truncate">{psu.name}</span>
+                    <span className="text-cyan-400 ml-1">{psu.price}</span>
                   </div>
-                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">{psu.efficiency} Certified</div>
+                  <div className="text-[10px] text-cyan-400/70 mt-0.5">{psu.efficiency} Certified</div>
                 </motion.div>
               ))}
             </div>
@@ -552,11 +552,11 @@ export default function MotherboardBuilder({
           {/* Installed Components Summary */}
           {Object.keys(socketContents).length > 0 && (
             <motion.div 
-              className="bg-white dark:bg-zinc-900 rounded-lg p-2 border border-emerald-500/50 dark:border-emerald-500/30 flex-shrink-0"
+              className="bg-blue-950/30 rounded-lg p-2 border border-cyan-500/30 flex-shrink-0"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <h5 className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1.5 flex items-center gap-1.5">
+              <h5 className="text-xs font-semibold text-cyan-400 mb-1.5 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4" />
                 Komponen Terpasang
               </h5>
@@ -565,11 +565,11 @@ export default function MotherboardBuilder({
                   if (!component) return null;
                   const Icon = getComponentIcon(component.type);
                   return (
-                    <div key={socketId} className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800/50 rounded p-1.5">
-                      <Icon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+                    <div key={socketId} className="flex items-center gap-1.5 bg-[#0a1628]/50 border border-cyan-500/20 rounded p-1.5">
+                      <Icon className="w-4 h-4 text-cyan-400" />
                       <div className="overflow-hidden">
-                        <p className="text-[10px] text-zinc-700 dark:text-zinc-300 font-mono truncate">{component.name}</p>
-                        <p className="text-[9px] text-zinc-500">{socketId.replace("-", " ").replace("slot", "")}</p>
+                        <p className="text-[10px] text-cyan-300 font-mono truncate">{component.name}</p>
+                        <p className="text-[9px] text-cyan-400/50">{socketId.replace("-", " ").replace("slot", "")}</p>
                       </div>
                     </div>
                   );
@@ -579,7 +579,7 @@ export default function MotherboardBuilder({
           )}
 
           <div 
-            className="relative w-full flex-1 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-950/30 dark:to-cyan-950/30 border-2 border-zinc-300 dark:border-zinc-700 rounded-lg overflow-hidden"
+            className="relative w-full flex-1 bg-gradient-to-br from-blue-950/20 to-cyan-950/20 border-2 border-cyan-500/30 rounded-lg overflow-hidden"
             onWheel={handleCanvasWheel}
             onMouseDown={handleCanvasMouseDown}
             onMouseMove={handleCanvasMouseMove}
@@ -618,14 +618,14 @@ export default function MotherboardBuilder({
             {/* Decorative PCB Elements */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
               {/* Mounting holes */}
-              <circle cx="5%" cy="5%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-zinc-400 dark:text-zinc-600 opacity-40" />
-              <circle cx="95%" cy="5%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-zinc-400 dark:text-zinc-600 opacity-40" />
-              <circle cx="5%" cy="95%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-zinc-400 dark:text-zinc-600 opacity-40" />
-              <circle cx="95%" cy="95%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-zinc-400 dark:text-zinc-600 opacity-40" />
+              <circle cx="5%" cy="5%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
+              <circle cx="95%" cy="5%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
+              <circle cx="5%" cy="95%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
+              <circle cx="95%" cy="95%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
               
               {/* Decorative corner brackets */}
-              <path d="M 20 20 L 20 40 M 20 20 L 40 20" stroke="currentColor" strokeWidth="1.5" className="text-zinc-400 dark:text-zinc-600 opacity-30" />
-              <path d="M 380 20 L 380 40 M 380 20 L 360 20" stroke="currentColor" strokeWidth="1.5" className="text-zinc-400 dark:text-zinc-600 opacity-30" transform="translate(480, 0)" />
+              <path d="M 20 20 L 20 40 M 20 20 L 40 20" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400 dark:text-cyan-600 opacity-30" />
+              <path d="M 380 20 L 380 40 M 380 20 L 360 20" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400 dark:text-cyan-600 opacity-30" transform="translate(480, 0)" />
             </svg>
 
             {/* Enhanced Circuit traces - Tidy routing */}
@@ -704,12 +704,12 @@ export default function MotherboardBuilder({
                   key={socket.id}
                   onDragOver={(e) => handleDragOver(e, socket)}
                   onDrop={(e) => handleDrop(e, socket)}
-                  className={`absolute border-2 rounded-lg transition-all ${
+                  className={`absolute border-2 rounded-lg transition-all duration-200 ${
                     socket.installed 
-                      ? "border-solid border-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" 
+                      ? "border-solid border-cyan-500 bg-blue-950/40" 
                       : draggedComponent && draggedComponent.type === socket.type 
-                        ? "border-dashed border-cyan-500 bg-cyan-100 dark:bg-cyan-950/30 animate-pulse" 
-                        : "border-dashed border-zinc-400 dark:border-zinc-700 bg-white dark:bg-zinc-900/50"
+                        ? "border-dashed border-cyan-400 bg-cyan-950/30 animate-pulse" 
+                        : "border-dashed border-cyan-500/30 bg-blue-950/20"
                   }`}
                   style={{
                     top: socket.position.top,
@@ -737,27 +737,27 @@ export default function MotherboardBuilder({
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       >
                         <div className="relative">
-                          <Icon className="w-10 h-10 text-emerald-600 dark:text-emerald-400 mx-auto" />
+                          <Icon className="w-10 h-10 text-cyan-400 mx-auto" />
                           <motion.div 
                             className="absolute -top-1 -right-1"
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.2 }}
                           >
-                            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                            <CheckCircle2 className="w-5 h-5 text-cyan-400" />
                           </motion.div>
                         </div>
-                        <p className="text-xs font-mono text-emerald-600 dark:text-emerald-400 leading-tight max-w-full mx-auto truncate mt-1.5">
+                        <p className="text-xs font-mono text-cyan-400 leading-tight max-w-full mx-auto truncate mt-1.5">
                           {installedComponent.name.split(" ").slice(0, 2).join(" ")}
                         </p>
                       </motion.div>
                     ) : (
                       <div className="text-center">
-                        <Icon className="w-10 h-10 text-zinc-400 dark:text-zinc-600 mx-auto opacity-50" />
-                        <p className="text-xs font-mono text-zinc-600 dark:text-zinc-500 leading-tight mt-1.5">
+                        <Icon className="w-10 h-10 text-cyan-400/50 mx-auto opacity-50" />
+                        <p className="text-xs font-mono text-cyan-300/70 leading-tight mt-1.5">
                           {socket.label.split(" ")[0]}
                         </p>
-                        <p className="text-[10px] font-mono text-zinc-500 dark:text-zinc-600">
+                        <p className="text-[10px] font-mono text-cyan-400/50">
                           Drop {socket.type.toUpperCase()}
                         </p>
                       </div>
@@ -782,13 +782,13 @@ export default function MotherboardBuilder({
             
             {/* Motherboard Label - Float outside canvas */}
             <div className="absolute bottom-2 right-2 text-right pointer-events-none">
-              <p className="text-[10px] font-mono text-zinc-600">ATX Motherboard</p>
-              <p className="text-[10px] font-mono text-zinc-700">Model: VL-MB-2024</p>
+              <p className="text-[10px] font-mono text-cyan-400/70">ATX Motherboard</p>
+              <p className="text-[10px] font-mono text-cyan-300/70">Model: VL-MB-2024</p>
             </div>
 
             {/* Progress Indicator - Float outside canvas */}
-            <div className="absolute top-2 right-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-2 py-1 pointer-events-none">
-              <p className="text-[10px] text-zinc-700 dark:text-zinc-400 font-mono">
+            <div className="absolute top-2 right-2 bg-blue-950/80 backdrop-blur-sm border border-cyan-500/30 rounded-lg px-2 py-1 pointer-events-none">
+              <p className="text-[10px] text-cyan-300 font-mono">
                 Progres: {installedComponents.size}/{components.length}
               </p>
             </div>
@@ -796,10 +796,10 @@ export default function MotherboardBuilder({
             {/* Power Requirement Indicator - Float outside canvas */}
             {Object.keys(socketContents).length > 0 && (
               <motion.div 
-                className={`absolute top-2 left-2 border-2 rounded-lg px-2 py-1.5 pointer-events-none ${
+                className={`absolute top-2 left-2 border-2 rounded-lg px-2 py-1.5 pointer-events-none backdrop-blur-sm ${
                   socketContents["psu-connector"] && isPSUSufficient()
-                    ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500"
-                    : "bg-yellow-50 dark:bg-yellow-950/30 border-yellow-500"
+                    ? "bg-blue-950/80 border-cyan-500"
+                    : "bg-blue-950/80 border-yellow-500"
                 }`}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -807,23 +807,23 @@ export default function MotherboardBuilder({
                 <div className="flex items-center gap-1.5 mb-1">
                   <Zap className={`w-4 h-4 ${
                     socketContents["psu-connector"] && isPSUSufficient()
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : "text-yellow-600 dark:text-yellow-400"
+                      ? "text-cyan-400"
+                      : "text-yellow-400"
                   }`} />
-                  <p className="text-xs font-bold text-zinc-900 dark:text-white">Daya Sistem</p>
+                  <p className="text-xs font-bold text-cyan-300">Daya Sistem</p>
                 </div>
                 <div className="space-y-0.5 text-[10px] font-mono">
-                  <p className="text-zinc-700 dark:text-zinc-300">
+                  <p className="text-cyan-300/90">
                     Total: <span className="font-bold">{calculateTotalPower()}W</span>
                   </p>
-                  <p className="text-zinc-700 dark:text-zinc-300">
+                  <p className="text-cyan-300/90">
                     Rekomendasi: <span className="font-bold">{getRecommendedPSU()}W+</span>
                   </p>
                   {socketContents["psu-connector"] ? (
                     <p className={`font-bold ${
                       isPSUSufficient()
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-red-600 dark:text-red-400"
+                        ? "text-cyan-400"
+                        : "text-red-400"
                     }`}>
                       PSU: {socketContents["psu-connector"].name}
                     </p>
@@ -840,29 +840,29 @@ export default function MotherboardBuilder({
             <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1.5">
               <button
                 onClick={() => setCanvasZoom(Math.min(canvasZoom + 0.2, 3))}
-                className="bg-zinc-800 hover:bg-zinc-700 text-white px-2 py-0.5 rounded text-[10px] border border-zinc-600"
+                className="bg-blue-950/80 hover:bg-blue-900/80 text-cyan-300 px-2 py-0.5 rounded text-[10px] border border-cyan-500/30 backdrop-blur-sm"
               >
                 🔍+
               </button>
               <button
                 onClick={() => setCanvasZoom(Math.max(canvasZoom - 0.2, 0.5))}
-                className="bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white px-2 py-0.5 rounded text-[10px] border border-zinc-300 dark:border-zinc-600"
+                className="bg-blue-950/80 hover:bg-blue-900/80 text-cyan-300 px-2 py-0.5 rounded text-[10px] border border-cyan-500/30 backdrop-blur-sm"
               >
                 🔍-
               </button>
               <button
                 onClick={resetCanvasView}
-                className="bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white px-2 py-0.5 rounded text-[10px] border border-zinc-300 dark:border-zinc-600"
+                className="bg-blue-950/80 hover:bg-blue-900/80 text-cyan-300 px-2 py-0.5 rounded text-[10px] border border-cyan-500/30 backdrop-blur-sm"
               >
                 ↺ Reset
               </button>
-              <span className="bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400 px-2 py-0.5 rounded text-[10px] border border-zinc-300 dark:border-zinc-600">
+              <span className="bg-blue-950/80 text-cyan-300 px-2 py-0.5 rounded text-[10px] border border-cyan-500/30 backdrop-blur-sm">
                 {Math.round(canvasZoom * 100)}%
               </span>
             </div>
           </div>
           
-          <p className="text-xs text-center text-zinc-600 dark:text-zinc-500 mt-2 font-mono">
+          <p className="text-xs text-center text-cyan-300/70 mt-2 font-mono">
             💡 Tip: Pastikan komponen dipasang di socket yang benar!
           </p>
         </div>

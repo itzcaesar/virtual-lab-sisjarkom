@@ -120,25 +120,25 @@ export default function HardwareModal({
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className={`bg-zinc-900 border-2 border-emerald-500/50 rounded-2xl ${
+        className={`bg-[#0d1b2a]/95 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl ${
           step === "build" ? "max-w-6xl max-h-[90vh] overflow-y-auto" : "max-w-2xl"
-        } w-full p-6 relative shadow-2xl shadow-emerald-500/20 transition-all`}
-        initial={{ scale: 0.8, y: 50 }}
+        } w-full p-6 relative shadow-2xl shadow-cyan-500/20 transition-all`}
+        initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.8, y: 50 }}
-        transition={{ type: "spring", damping: 25 }}
+        exit={{ scale: 0.95, y: 20 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-cyan-400 hover:text-white transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
 
-        <h2 className="text-3xl font-bold text-emerald-400 mb-2">
+        <h2 className="text-3xl font-bold text-cyan-400 mb-2">
           Fase 1: Instalasi Hardware
         </h2>
-        <p className="text-zinc-400 text-sm mb-6 font-mono">
+        <p className="text-cyan-300/70 text-sm mb-6 font-mono">
           Sistem Komputer // {step === "build" ? "Rakit Komponen" : "Pilih Komponen"}
         </p>
 
@@ -148,55 +148,55 @@ export default function HardwareModal({
             animate={{ opacity: 1 }}
             className="space-y-6"
           >
-            <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 flex items-start gap-3">
+            <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 flex items-start gap-3">
               <Info className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-zinc-300">
+              <div className="text-sm text-cyan-300">
                 <p className="font-semibold mb-2">Tentang Komponen Hardware:</p>
-                <ul className="space-y-2 text-zinc-400">
+                <ul className="space-y-2 text-cyan-300/70">
                   <li>
-                    <strong className="text-emerald-400">CPU:</strong> Otak komputer untuk pemrosesan
+                    <strong className="text-cyan-400">CPU:</strong> Otak komputer untuk pemrosesan
                   </li>
                   <li>
-                    <strong className="text-emerald-400">RAM:</strong> Memori untuk multitasking
+                    <strong className="text-cyan-400">RAM:</strong> Memori untuk multitasking
                   </li>
                   <li>
-                    <strong className="text-emerald-400">Penyimpanan:</strong> Tempat menyimpan data
+                    <strong className="text-cyan-400">Penyimpanan:</strong> Tempat menyimpan data
                   </li>
                   <li>
-                    <strong className="text-emerald-400">GPU:</strong> Prosesor grafis
+                    <strong className="text-cyan-400">GPU:</strong> Prosesor grafis
                   </li>
                   <li>
-                    <strong className="text-emerald-400">PSU:</strong> Sumber daya listrik
+                    <strong className="text-cyan-400">PSU:</strong> Sumber daya listrik
                   </li>
                 </ul>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-center">
-                <Cpu className="w-12 h-12 text-emerald-400 mx-auto mb-2" />
-                <p className="text-sm font-mono text-zinc-300">Prosesor</p>
-                <p className="text-xs text-zinc-500">4 pilihan</p>
+              <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-center">
+                <Cpu className="w-12 h-12 text-blue-400 mx-auto mb-2" />
+                <p className="text-sm font-mono text-cyan-300">Prosesor</p>
+                <p className="text-xs text-cyan-400/50">4 pilihan</p>
               </div>
-              <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-center">
+              <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-center">
                 <MemoryStick className="w-12 h-12 text-cyan-400 mx-auto mb-2" />
-                <p className="text-sm font-mono text-zinc-300">Memori</p>
-                <p className="text-xs text-zinc-500">4 pilihan</p>
+                <p className="text-sm font-mono text-cyan-300">Memori</p>
+                <p className="text-xs text-cyan-400/50">4 pilihan</p>
               </div>
-              <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-center">
+              <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-center">
                 <HardDrive className="w-12 h-12 text-blue-400 mx-auto mb-2" />
-                <p className="text-sm font-mono text-zinc-300">Penyimpanan</p>
-                <p className="text-xs text-zinc-500">4 pilihan</p>
+                <p className="text-sm font-mono text-cyan-300">Penyimpanan</p>
+                <p className="text-xs text-cyan-400/50">4 pilihan</p>
               </div>
-              <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-center">
-                <Monitor className="w-12 h-12 text-purple-400 mx-auto mb-2" />
-                <p className="text-sm font-mono text-zinc-300">Grafis</p>
-                <p className="text-xs text-zinc-500">4 pilihan</p>
+              <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-center">
+                <Monitor className="w-12 h-12 text-cyan-400 mx-auto mb-2" />
+                <p className="text-sm font-mono text-cyan-300">Grafis</p>
+                <p className="text-xs text-cyan-400/50">4 pilihan</p>
               </div>
-              <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-center">
-                <Zap className="w-12 h-12 text-yellow-400 mx-auto mb-2" />
-                <p className="text-sm font-mono text-zinc-300">Power Supply</p>
-                <p className="text-xs text-zinc-500">5 pilihan</p>
+              <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-center">
+                <Zap className="w-12 h-12 text-cyan-400 mx-auto mb-2" />
+                <p className="text-sm font-mono text-cyan-300">Power Supply</p>
+                <p className="text-xs text-cyan-400/50">5 pilihan</p>
               </div>
             </div>
 
@@ -206,7 +206,7 @@ export default function HardwareModal({
                 addLog("Membuka workstation perakitan PC...");
                 addLog("Siap untuk merakit komponen ke motherboard.");
               }}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-lg transition-colors"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold py-3 rounded-lg transition-all duration-200"
             >
               Mulai Rakit PC →
             </button>
@@ -239,11 +239,11 @@ export default function HardwareModal({
             className="flex flex-col items-center justify-center py-12"
           >
             <motion.div
-              className="w-24 h-24 border-6 border-emerald-500 border-t-transparent rounded-full"
+              className="w-24 h-24 border-6 border-cyan-500 border-t-transparent rounded-full"
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
-            <p className="mt-8 text-zinc-300 font-mono text-xl">Menginstal komponen...</p>
+            <p className="mt-8 text-cyan-300 font-mono text-xl">Menginstal komponen...</p>
           </motion.div>
         )}
 
@@ -253,27 +253,27 @@ export default function HardwareModal({
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-6"
           >
-            <div className="bg-emerald-950/30 border border-emerald-500/50 rounded-lg p-10 text-center">
+            <div className="bg-blue-950/30 border border-cyan-500/30 rounded-lg p-10 text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", delay: 0.2 }}
+                transition={{ duration: 0.3, delay: 0.2, ease: "easeOut" }}
               >
-                <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-5xl">✓</span>
                 </div>
               </motion.div>
-              <h3 className="text-4xl font-bold text-emerald-400 mb-3">
+              <h3 className="text-4xl font-bold text-cyan-400 mb-3">
                 Instalasi Selesai!
               </h3>
-              <p className="text-zinc-400 text-lg">
+              <p className="text-cyan-300/70 text-lg">
                 CPU dan RAM berhasil terpasang dan siap digunakan.
               </p>
             </div>
 
             <button
               onClick={handleFinish}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-4 text-lg rounded-lg transition-colors"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold py-4 text-lg rounded-lg transition-all duration-200"
             >
               Lanjutkan ke Fase Berikutnya
             </button>

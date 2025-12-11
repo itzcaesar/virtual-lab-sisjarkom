@@ -22,10 +22,10 @@ export default function Router({ connected, onClick, disabled }: RouterProps) {
       <motion.div
         className={`w-32 h-32 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all ${
           connected
-            ? "bg-emerald-950/30 border-emerald-500/50 shadow-lg shadow-emerald-500/20"
+            ? "bg-blue-950/30 border-cyan-500/50 shadow-lg shadow-cyan-500/20"
             : disabled
-            ? "bg-zinc-900/50 border-zinc-700/30 cursor-not-allowed opacity-50"
-            : "bg-zinc-900/50 border-zinc-600 hover:border-emerald-500/70 glass-hover cursor-pointer"
+            ? "bg-cyan-900/50 border-cyan-700/30 cursor-not-allowed opacity-50"
+            : "bg-cyan-900/50 border-cyan-600 hover:border-cyan-500/70 glass-hover cursor-pointer"
         }`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ 
@@ -44,9 +44,9 @@ export default function Router({ connected, onClick, disabled }: RouterProps) {
         }}
       >
         {connected ? (
-          <Wifi className="w-12 h-12 text-emerald-400" />
+          <Wifi className="w-12 h-12 text-cyan-400" />
         ) : (
-          <WifiOff className="w-12 h-12 text-zinc-500" />
+          <WifiOff className="w-12 h-12 text-cyan-500/30" />
         )}
         
         {connected && (
@@ -59,7 +59,7 @@ export default function Router({ connected, onClick, disabled }: RouterProps) {
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="w-2 h-2 bg-emerald-500 rounded-full"
+                className="w-2 h-2 bg-cyan-500 rounded-full"
                 animate={{ opacity: [0.3, 1, 0.3] }}
                 transition={{
                   duration: 1.5,
@@ -72,13 +72,13 @@ export default function Router({ connected, onClick, disabled }: RouterProps) {
         )}
       </motion.div>
       
-      <p className="mt-3 text-sm font-mono text-zinc-400">
+      <p className="mt-3 text-sm font-mono text-cyan-400">
         {connected ? "Network OK" : "Router"}
       </p>
       
       {!disabled && !connected && (
         <motion.div
-          className="absolute -top-2 -right-2 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-xs font-bold"
+          className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center text-xs font-bold"
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ duration: 1, repeat: Infinity }}
         >

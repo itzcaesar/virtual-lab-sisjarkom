@@ -194,10 +194,10 @@ export default function LinuxVM({
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className={`bg-slate-900 border-2 border-green-500/50 rounded-lg shadow-2xl overflow-hidden ${
+        className={`bg-gradient-to-br from-[#0d1b2a] to-[#0a1628] border-2 border-cyan-500/30 rounded-lg shadow-2xl shadow-cyan-500/10 overflow-hidden ${
           isMaximized ? "w-full h-full" : "w-[90%] h-[90%] max-w-6xl"
         }`}
-        initial={{ scale: 0.9, y: 20 }}
+        initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         layout
@@ -298,7 +298,7 @@ export default function LinuxVM({
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         />
-                        <p className="text-zinc-600 font-mono text-sm">
+                        <p className="text-cyan-300 font-mono text-sm">
                           Memuat... ({performanceMetrics?.browserLoadTime || 1000}ms)
                         </p>
                       </div>
@@ -312,13 +312,13 @@ export default function LinuxVM({
                           <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                             DuckDuckGo
                           </h1>
-                          <div className="bg-zinc-100 rounded-full p-4 text-zinc-600">
+                          <div className="bg-blue-950/50 border border-cyan-500/30 rounded-full p-4 text-cyan-400">
                             🔍 Privacy, simplified.
                           </div>
                           <input
                             type="text"
                             placeholder="Cari web tanpa dilacak..."
-                            className="w-full mt-6 px-6 py-4 border-2 border-zinc-300 rounded-full focus:border-green-500 focus:outline-none text-lg text-zinc-900"
+                            className="w-full mt-6 px-6 py-4 border-2 border-cyan-500/30 bg-blue-950/20 rounded-full focus:border-cyan-400 focus:outline-none text-lg text-cyan-300"
                           />
                         </div>
                       </>
@@ -337,7 +337,7 @@ export default function LinuxVM({
                         <input
                           type="text"
                           placeholder="Cari Google atau ketik URL"
-                          className="w-full px-6 py-4 border-2 border-zinc-300 rounded-full focus:border-blue-500 focus:outline-none text-lg shadow-lg text-zinc-900"
+                          className="w-full px-6 py-4 border-2 border-cyan-500/30 bg-blue-950/20 rounded-full focus:border-cyan-400 focus:outline-none text-lg shadow-lg text-cyan-300"
                         />
                       </div>
                     )}
@@ -345,12 +345,12 @@ export default function LinuxVM({
                     {browserURL.includes("github") && (
                       <div className="text-center mb-8">
                         <h1 className="text-5xl font-bold mb-4">GitHub</h1>
-                        <p className="text-xl text-zinc-600 mb-6">Tempat dunia membangun perangkat lunak</p>
+                        <p className="text-xl text-cyan-300/80 mb-6">Tempat dunia membangun perangkat lunak</p>
                         <div className="flex gap-4 justify-center">
-                          <button className="px-6 py-3 bg-zinc-900 text-white rounded-lg font-semibold">
+                          <button className="px-6 py-3 bg-blue-950/80 border border-cyan-500/30 text-cyan-300 rounded-lg font-semibold">
                             Masuk
                           </button>
-                          <button className="px-6 py-3 border-2 border-zinc-900 text-zinc-900 rounded-lg font-semibold">
+                          <button className="px-6 py-3 border-2 border-cyan-900 text-cyan-900 rounded-lg font-semibold">
                             Daftar
                           </button>
                         </div>
@@ -371,7 +371,7 @@ export default function LinuxVM({
                       </div>
                     </div>
 
-                    <div className="mt-6 text-sm text-zinc-600">
+                    <div className="mt-6 text-sm text-cyan-600">
                       <p className="font-mono">
                         $ curl -I {browserURL}<br />
                         HTTP/2 200<br />
@@ -398,7 +398,7 @@ export default function LinuxVM({
                     ? "text-green-400" 
                     : line.includes("Error") || line.includes("error")
                     ? "text-red-400"
-                    : "text-zinc-300"
+                    : "text-cyan-300"
                 }`}
               >
                 {line}
@@ -419,7 +419,7 @@ export default function LinuxVM({
                   }
                 }}
                 autoFocus
-                className="flex-1 bg-transparent text-zinc-300 outline-none caret-green-400"
+                className="flex-1 bg-transparent text-cyan-300 outline-none caret-green-400"
                 spellCheck={false}
               />
               <motion.div

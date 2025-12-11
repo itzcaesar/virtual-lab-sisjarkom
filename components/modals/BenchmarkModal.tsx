@@ -92,7 +92,7 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
       score: 0,
       maxScore: calculateCPUScore(),
       description: `${cpuInfo.cores} Cores / ${cpuInfo.threads} Threads @ ${cpuInfo.frequency}`,
-      color: "emerald",
+      color: "blue",
       latency: 0,
       temperature: 0,
     },
@@ -104,7 +104,7 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
       score: 0,
       maxScore: calculateCPUScore() * 1.5,
       description: "Parallel processing test",
-      color: "emerald",
+      color: "blue",
       latency: 0,
       temperature: 0,
     },
@@ -283,23 +283,24 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
       onClick={onClose}
     >
       <motion.div
-        className="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
-        initial={{ scale: 0.9, y: 20 }}
+        className="bg-[#0d1b2a]/95 backdrop-blur-xl border-2 border-cyan-500/30 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl shadow-cyan-500/10"
+        initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
+        exit={{ scale: 0.95, y: 20 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-zinc-900 border-b border-zinc-800 p-6 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-[#0d1b2a]/95 backdrop-blur-xl border-b border-cyan-500/20 p-6 flex items-center justify-between z-10">
           <div className="flex items-center gap-3">
-            <Zap className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-2xl font-bold text-white font-mono">System Benchmark</h2>
+            <Zap className="w-6 h-6 text-cyan-400" />
+            <h2 className="text-2xl font-bold text-cyan-400 font-mono">System Benchmark</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-blue-950/30 rounded-lg transition-all duration-200"
           >
-            <X className="w-5 h-5 text-zinc-400" />
+            <X className="w-5 h-5 text-cyan-400/70" />
           </button>
         </div>
 
@@ -311,10 +312,10 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-zinc-800 border border-zinc-700 rounded-lg p-6 text-center"
+                className="bg-blue-950/30 border border-cyan-500/30 rounded-lg p-6 text-center"
               >
-                <p className="text-sm text-zinc-400 mb-2">Overall Performance Score</p>
-                <div className="text-6xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                <p className="text-sm text-cyan-300/70 mb-2">Overall Performance Score</p>
+                <div className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2">
                   {overallScore}
                 </div>
                 <p className={`text-xl font-semibold ${getOverallRating(overallScore).color}`}>
@@ -328,64 +329,64 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="bg-zinc-800 border border-zinc-700 rounded-lg p-4"
+                  className="bg-blue-950/30 border border-cyan-500/30 rounded-lg p-4"
                 >
                   <div className="flex items-center gap-2 mb-4">
-                    <Award className="w-5 h-5 text-yellow-400" />
-                    <h3 className="font-semibold text-white font-mono">Performance Metrics</h3>
+                    <Award className="w-5 h-5 text-cyan-400" />
+                    <h3 className="font-semibold text-cyan-300 font-mono">Performance Metrics</h3>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-zinc-900 rounded-lg p-3">
+                    <div className="bg-[#0a1628]/50 border border-cyan-500/10 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-1">
-                        <CheckCircle className="w-4 h-4 text-emerald-400" />
-                        <span className="text-xs text-zinc-400">Tests Passed</span>
+                        <CheckCircle className="w-4 h-4 text-cyan-400" />
+                        <span className="text-xs text-cyan-300/70">Tests Passed</span>
                       </div>
-                      <p className="text-xl font-bold text-white font-mono">
+                      <p className="text-xl font-bold text-cyan-300 font-mono">
                         {metrics.passedTests}/{metrics.totalTests}
                       </p>
                     </div>
 
-                    <div className="bg-zinc-900 rounded-lg p-3">
+                    <div className="bg-[#0a1628]/50 border border-cyan-500/10 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <Clock className="w-4 h-4 text-cyan-400" />
-                        <span className="text-xs text-zinc-400">Runtime</span>
+                        <span className="text-xs text-cyan-300/70">Runtime</span>
                       </div>
-                      <p className="text-xl font-bold text-white font-mono">
+                      <p className="text-xl font-bold text-cyan-300 font-mono">
                         {metrics.runTime}s
                       </p>
                     </div>
 
-                    <div className="bg-zinc-900 rounded-lg p-3">
+                    <div className="bg-[#0a1628]/50 border border-cyan-500/10 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-1">
-                        <TrendingUp className="w-4 h-4 text-emerald-400" />
-                        <span className="text-xs text-zinc-400">Avg FPS (GPU)</span>
+                        <TrendingUp className="w-4 h-4 text-cyan-400" />
+                        <span className="text-xs text-cyan-300/70">Avg FPS (GPU)</span>
                       </div>
-                      <p className={`text-xl font-bold font-mono ${metrics.avgFPS >= 120 ? 'text-emerald-400' : metrics.avgFPS >= 60 ? 'text-cyan-400' : 'text-yellow-400'}`}>
+                      <p className={`text-xl font-bold font-mono ${metrics.avgFPS >= 120 ? 'text-cyan-400' : metrics.avgFPS >= 60 ? 'text-blue-400' : 'text-yellow-400'}`}>
                         {metrics.avgFPS}
                       </p>
                     </div>
 
-                    <div className="bg-zinc-900 rounded-lg p-3">
+                    <div className="bg-[#0a1628]/50 border border-cyan-500/10 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <Clock className="w-4 h-4 text-cyan-400" />
-                        <span className="text-xs text-zinc-400">Avg Latency</span>
+                        <span className="text-xs text-cyan-300/70">Avg Latency</span>
                       </div>
-                      <p className={`text-xl font-bold font-mono ${metrics.avgLatency <= 3 ? 'text-emerald-400' : metrics.avgLatency <= 6 ? 'text-cyan-400' : 'text-yellow-400'}`}>
+                      <p className={`text-xl font-bold font-mono ${metrics.avgLatency <= 3 ? 'text-cyan-400' : metrics.avgLatency <= 6 ? 'text-blue-400' : 'text-yellow-400'}`}>
                         {metrics.avgLatency}ms
                       </p>
                     </div>
 
-                    <div className="bg-zinc-900 rounded-lg p-3 col-span-2">
+                    <div className="bg-[#0a1628]/50 border border-cyan-500/10 rounded-lg p-3 col-span-2">
                       <div className="flex items-center gap-2 mb-1">
                         <Thermometer className="w-4 h-4 text-orange-400" />
-                        <span className="text-xs text-zinc-400">Peak Temperature</span>
+                        <span className="text-xs text-cyan-300/70">Peak Temperature</span>
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <p className={`text-xl font-bold font-mono ${metrics.peakTemp <= 65 ? 'text-emerald-400' : metrics.peakTemp <= 75 ? 'text-yellow-400' : 'text-orange-400'}`}>
+                        <p className={`text-xl font-bold font-mono ${metrics.peakTemp <= 65 ? 'text-cyan-400' : metrics.peakTemp <= 75 ? 'text-yellow-400' : 'text-orange-400'}`}>
                           {metrics.peakTemp}°C
                         </p>
-                        <span className="text-xs text-zinc-500">
+                        <span className="text-xs text-cyan-400/50">
                           {metrics.peakTemp <= 65 ? '(Optimal)' : metrics.peakTemp <= 75 ? '(Good)' : metrics.peakTemp <= 85 ? '(Warm)' : '(Hot)'}
                         </span>
                       </div>
@@ -409,8 +410,8 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`bg-zinc-800 border rounded-lg p-4 ${
-                    isActive ? "border-yellow-500" : "border-zinc-700"
+                  className={`bg-blue-950/30 border rounded-lg p-4 transition-all duration-200 ${
+                    isActive ? "border-cyan-500 shadow-lg shadow-cyan-500/20" : "border-cyan-500/20"
                   }`}
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -419,19 +420,19 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
                         <Icon className={`w-5 h-5 text-${test.color}-400`} />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-white font-mono">{test.name}</h3>
-                        <p className="text-xs text-zinc-400">{test.description}</p>
+                        <h3 className="font-semibold text-cyan-300 font-mono">{test.name}</h3>
+                        <p className="text-xs text-cyan-300/70">{test.description}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {test.status === "completed" && (
-                        <CheckCircle className="w-5 h-5 text-emerald-400" />
+                        <CheckCircle className="w-5 h-5 text-cyan-400" />
                       )}
                       {test.status === "running" && (
-                        <Loader2 className="w-5 h-5 text-yellow-400 animate-spin" />
+                        <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
                       )}
                       {test.status === "pending" && (
-                        <div className="w-5 h-5 rounded-full border-2 border-zinc-600" />
+                        <div className="w-5 h-5 rounded-full border-2 border-cyan-500/30" />
                       )}
                     </div>
                   </div>
@@ -441,14 +442,20 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
                     <div className="space-y-2">
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-xs text-zinc-500">Score</span>
+                          <span className="text-xs text-cyan-400/50">Score</span>
                           <span className={`text-sm font-bold font-mono ${getScoreColor(test.score, test.maxScore)}`}>
                             {test.score.toLocaleString()} / {test.maxScore.toLocaleString()}
                           </span>
                         </div>
-                        <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-[#0a1628] rounded-full h-2 overflow-hidden border border-cyan-500/20">
                           <motion.div
-                            className={`h-full bg-gradient-to-r from-${test.color}-500 to-${test.color}-400`}
+                            className={`h-full ${
+                              test.color === 'emerald' ? 'bg-gradient-to-r from-blue-500 to-cyan-500' :
+                              test.color === 'cyan' ? 'bg-gradient-to-r from-cyan-500 to-blue-400' :
+                              test.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-cyan-400' :
+                              test.color === 'purple' ? 'bg-gradient-to-r from-cyan-500 to-blue-500' :
+                              'bg-gradient-to-r from-cyan-500 to-blue-400'
+                            }`}
                             initial={{ width: 0 }}
                             animate={{ width: `${percentage}%` }}
                             transition={{ duration: 0.3 }}
@@ -459,29 +466,29 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
                       {/* Performance Metrics */}
                       {(test.fps !== undefined || test.latency !== undefined || test.temperature !== undefined) && (
                         <div className="flex gap-3 text-xs">
-                          {test.fps !== undefined && (
+                          {test.fps !== undefined && test.fps > 0 && (
                             <div className="flex items-center gap-1">
-                              <TrendingUp className="w-3 h-3 text-emerald-400" />
-                              <span className="text-zinc-400">FPS:</span>
-                              <span className={`font-mono font-semibold ${test.fps >= 120 ? 'text-emerald-400' : test.fps >= 60 ? 'text-cyan-400' : 'text-yellow-400'}`}>
+                              <TrendingUp className="w-3 h-3 text-cyan-400" />
+                              <span className="text-cyan-400/70">FPS:</span>
+                              <span className={`font-mono font-semibold ${test.fps >= 120 ? 'text-cyan-400' : test.fps >= 60 ? 'text-blue-400' : 'text-yellow-400'}`}>
                                 {test.fps}
                               </span>
                             </div>
                           )}
-                          {test.latency !== undefined && (
+                          {test.latency !== undefined && test.latency > 0 && (
                             <div className="flex items-center gap-1">
                               <Clock className="w-3 h-3 text-cyan-400" />
-                              <span className="text-zinc-400">Latency:</span>
-                              <span className={`font-mono font-semibold ${test.latency <= 3 ? 'text-emerald-400' : test.latency <= 6 ? 'text-cyan-400' : 'text-yellow-400'}`}>
+                              <span className="text-cyan-400/70">Latency:</span>
+                              <span className={`font-mono font-semibold ${test.latency <= 3 ? 'text-cyan-400' : test.latency <= 6 ? 'text-blue-400' : 'text-yellow-400'}`}>
                                 {test.latency}ms
                               </span>
                             </div>
                           )}
-                          {test.temperature !== undefined && (
+                          {test.temperature !== undefined && test.temperature > 0 && (
                             <div className="flex items-center gap-1">
                               <Thermometer className="w-3 h-3 text-orange-400" />
-                              <span className="text-zinc-400">Temp:</span>
-                              <span className={`font-mono font-semibold ${test.temperature <= 65 ? 'text-emerald-400' : test.temperature <= 75 ? 'text-yellow-400' : 'text-orange-400'}`}>
+                              <span className="text-cyan-400/70">Temp:</span>
+                              <span className={`font-mono font-semibold ${test.temperature <= 65 ? 'text-cyan-400' : test.temperature <= 75 ? 'text-yellow-400' : 'text-orange-400'}`}>
                                 {test.temperature}°C
                               </span>
                             </div>
@@ -499,10 +506,10 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
           <motion.button
             onClick={runBenchmark}
             disabled={isRunning}
-            className={`w-full py-4 rounded-lg font-semibold font-mono transition-all flex items-center justify-center gap-2 ${
+            className={`w-full py-4 rounded-lg font-semibold font-mono transition-all duration-200 flex items-center justify-center gap-2 ${
               isRunning
-                ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                : "bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white"
+                ? "bg-blue-950/30 text-cyan-400/50 cursor-not-allowed border-2 border-cyan-500/20"
+                : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white border-2 border-cyan-500/30"
             }`}
             whileHover={!isRunning ? { scale: 1.02 } : {}}
             whileTap={!isRunning ? { scale: 0.98 } : {}}
@@ -526,8 +533,8 @@ export default function BenchmarkModal({ onClose, hardware }: BenchmarkModalProp
           </motion.button>
 
           {/* Info */}
-          <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4">
-            <p className="text-xs text-zinc-400 text-center">
+          <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4">
+            <p className="text-xs text-cyan-300/70 text-center">
               💡 Benchmark akan menguji performa CPU, RAM, Storage, dan GPU berdasarkan spesifikasi hardware yang terpasang
             </p>
           </div>

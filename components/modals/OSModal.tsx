@@ -68,15 +68,15 @@ export default function OSModal({ onClose, onComplete, addLog }: OSModalProps) {
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-zinc-900 border-2 border-cyan-500/50 rounded-2xl max-w-2xl w-full p-8 relative shadow-2xl shadow-cyan-500/20"
-        initial={{ scale: 0.8, y: 50 }}
+        className="bg-[#0d1b2a]/95 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl max-w-2xl w-full p-8 relative shadow-2xl shadow-cyan-500/20"
+        initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.8, y: 50 }}
-        transition={{ type: "spring", damping: 25 }}
+        exit={{ scale: 0.95, y: 20 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-cyan-400 hover:text-white transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
@@ -84,15 +84,15 @@ export default function OSModal({ onClose, onComplete, addLog }: OSModalProps) {
         <h2 className="text-3xl font-bold text-cyan-400 mb-2">
           Fase 2: Instalasi Sistem Operasi
         </h2>
-        <p className="text-zinc-400 text-sm mb-6 font-mono">
+        <p className="text-cyan-300/70 text-sm mb-6 font-mono">
           Sistem Operasi // Pilih OS yang diinginkan
         </p>
 
-        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 flex items-start gap-3 mb-6">
+        <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 flex items-start gap-3 mb-6">
           <Info className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-zinc-300">
+          <div className="text-sm text-cyan-300">
             <p className="font-semibold mb-2">Tentang Sistem Operasi:</p>
-            <p className="text-zinc-400">
+            <p className="text-cyan-400">
               OS adalah software yang mengelola hardware dan menyediakan layanan untuk
               program aplikasi. OS mengatur CPU, RAM, dan perangkat lainnya yang telah
               diinstal di fase sebelumnya.
@@ -112,16 +112,16 @@ export default function OSModal({ onClose, onComplete, addLog }: OSModalProps) {
               {/* Windows Option */}
               <motion.button
                 onClick={() => handleSelectOS("windows")}
-                className="bg-zinc-800 border border-zinc-700 rounded-lg p-6 text-center group hover:border-blue-500/70 hover:bg-blue-950/30 transition-all"
+                className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-6 text-center group hover:border-blue-400/70 hover:bg-blue-900/30 transition-all duration-200"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
                 <Monitor className="w-16 h-16 text-blue-400 mx-auto mb-3" />
                 <h3 className="text-xl font-bold text-blue-400 mb-2">Windows</h3>
-                <p className="text-xs text-zinc-400 mb-3">
+                <p className="text-xs text-cyan-300/70 mb-3">
                   Interface grafis yang ramah pengguna dengan dukungan aplikasi luas.
                 </p>
-                <ul className="text-xs text-zinc-500 text-left space-y-1">
+                <ul className="text-xs text-cyan-400/50 text-left space-y-1">
                   <li>• Desktop GUI</li>
                   <li>• Software Kompatibel</li>
                   <li>• Mudah Digunakan</li>
@@ -131,21 +131,21 @@ export default function OSModal({ onClose, onComplete, addLog }: OSModalProps) {
               {/* Linux Option */}
               <motion.button
                 onClick={() => handleSelectOS("linux")}
-                className="bg-zinc-800 border border-zinc-700 rounded-lg p-6 text-center group hover:border-green-500/70 hover:bg-green-950/30 transition-all"
+                className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-6 text-center group hover:border-cyan-400/70 hover:bg-blue-900/30 transition-all duration-200"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
-                <Terminal className="w-16 h-16 text-green-400 mx-auto mb-3" />
-                <h3 className="text-xl font-bold text-green-400 mb-2">Linux</h3>
-                <p className="text-xs text-zinc-400 mb-3">
+                <Terminal className="w-16 h-16 text-cyan-400 mx-auto mb-3" />
+                <h3 className="text-xl font-bold text-cyan-400 mb-2">Linux</h3>
+                <p className="text-xs text-cyan-300/70 mb-3">
                   Open-source dengan kontrol penuh melalui terminal dan akses kernel.
                 </p>
-                <ul className="text-xs text-zinc-500 text-left space-y-1">
+                <ul className="text-xs text-cyan-400/50 text-left space-y-1">
                   <li>• Antarmuka Baris Perintah</li>
                   <li>• Sumber Terbuka</li>
                   <li>• Kontrol Penuh</li>
                 </ul>
-                <ChevronRight className="w-5 h-5 text-green-400 mx-auto mt-2" />
+                <ChevronRight className="w-5 h-5 text-cyan-400 mx-auto mt-2" />
               </motion.button>
               </div>
             </motion.div>
@@ -161,11 +161,11 @@ export default function OSModal({ onClose, onComplete, addLog }: OSModalProps) {
               <div className="mb-4 flex items-center gap-2">
                 <button
                   onClick={() => setStep("select")}
-                  className="text-zinc-400 hover:text-white transition-colors"
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
                   ← Kembali
                 </button>
-                <h3 className="text-lg font-bold text-green-400">
+                <h3 className="text-lg font-bold text-cyan-400">
                   Pilih Distribusi Linux
                 </h3>
               </div>
@@ -175,18 +175,18 @@ export default function OSModal({ onClose, onComplete, addLog }: OSModalProps) {
                   <motion.button
                     key={distro.id}
                     onClick={() => handleSelectDistro(distro.name)}
-                    className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-left group hover:border-emerald-500/70 transition-all"
+                    className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-left group hover:border-cyan-400/70 hover:bg-blue-900/30 transition-all duration-200"
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-2xl">{distro.logo}</span>
-                      <Terminal className="w-6 h-6 text-emerald-400" />
+                      <Terminal className="w-6 h-6 text-cyan-400" />
                     </div>
-                    <h4 className="text-sm font-bold text-white mb-1">
+                    <h4 className="text-sm font-bold text-cyan-300 mb-1">
                       {distro.name}
                     </h4>
-                    <p className="text-xs text-zinc-400">{distro.desc}</p>
+                    <p className="text-xs text-cyan-300/70">{distro.desc}</p>
                   </motion.button>
                 ))}
               </div>
@@ -203,7 +203,7 @@ export default function OSModal({ onClose, onComplete, addLog }: OSModalProps) {
               <div className="mb-4 flex items-center gap-2">
                 <button
                   onClick={() => setStep("select")}
-                  className="text-zinc-400 hover:text-white transition-colors"
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
                   ← Kembali
                 </button>
@@ -217,7 +217,7 @@ export default function OSModal({ onClose, onComplete, addLog }: OSModalProps) {
                   <motion.button
                     key={edition.id}
                     onClick={() => handleSelectWindowsEdition(edition.name)}
-                    className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-left group hover:border-blue-500/70 transition-all"
+                    className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-left group hover:border-blue-400/70 hover:bg-blue-900/30 transition-all duration-200"
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
@@ -225,10 +225,10 @@ export default function OSModal({ onClose, onComplete, addLog }: OSModalProps) {
                       <span className="text-2xl">{edition.icon}</span>
                       <Monitor className="w-6 h-6 text-blue-400" />
                     </div>
-                    <h4 className="text-sm font-bold text-white mb-1">
+                    <h4 className="text-sm font-bold text-cyan-300 mb-1">
                       {edition.name}
                     </h4>
-                    <p className="text-xs text-zinc-400">{edition.desc}</p>
+                    <p className="text-xs text-cyan-300/70">{edition.desc}</p>
                   </motion.button>
                 ))}
               </div>

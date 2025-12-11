@@ -17,6 +17,7 @@ import { Monitor, Info, X, Users, GraduationCap, Smartphone, ChevronDown, Chevro
 import Stage from "@/components/Stage";
 import Sidebar from "@/components/Sidebar";
 import WikiPanel from "@/components/WikiPanel";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 // Utility imports
 import { calculatePerformance, getPerformanceTier, type PerformanceMetrics } from "@/lib/performance";
@@ -97,8 +98,8 @@ export interface GameState {
 
 /** Project development team */
 const developers = [
-  { name: "Alessandro Fathi Z", nim: "707022500026" },
   { name: "Muhammad Caesar Rifqi", nim: "707022500036" },
+  { name: "Alessandro Fathi Z", nim: "707022500026" },
   { name: "Melischa Ramadhannia P", nim: "707022500056" },
   { name: "Wulan Noveliza Sriyanto", nim: "707022500063" },
   { name: "Dian Hijratulaini", nim: "707022500118" },
@@ -115,35 +116,36 @@ const developers = [
  */
 function MobileNotSupported() {
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 max-w-md text-center"
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="bg-[#0d1b2a]/95 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl p-8 max-w-md text-center shadow-2xl shadow-cyan-500/10"
       >
         <motion.div
           animate={{ rotate: [0, -10, 10, -10, 0] }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <Smartphone className="w-20 h-20 text-yellow-500 mx-auto mb-6" />
+          <Smartphone className="w-20 h-20 text-cyan-400 mx-auto mb-6" />
         </motion.div>
-        <h1 className="text-2xl font-bold text-white mb-4">
+        <h1 className="text-2xl font-bold text-cyan-400 mb-4">
           Perangkat Tidak Didukung
         </h1>
-        <p className="text-zinc-400 mb-6">
+        <p className="text-cyan-300/70 mb-6">
           Virtual Lab memerlukan layar yang lebih besar untuk pengalaman terbaik. 
           Silakan buka aplikasi ini menggunakan komputer desktop atau laptop.
         </p>
-        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-left">
-          <p className="text-sm text-zinc-500 mb-2">Persyaratan minimum:</p>
-          <ul className="text-sm text-zinc-400 space-y-1">
+        <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-left">
+          <p className="text-sm text-cyan-400 mb-2">Persyaratan minimum:</p>
+          <ul className="text-sm text-cyan-300/70 space-y-1">
             <li>• Layar minimal 1024px lebar</li>
             <li>• Browser modern (Chrome, Firefox, Edge)</li>
             <li>• Keyboard dan mouse untuk interaksi</li>
           </ul>
         </div>
-        <div className="mt-6 pt-6 border-t border-zinc-800">
-          <p className="text-xs text-zinc-500 font-mono">
+        <div className="mt-6 pt-6 border-t border-cyan-500/20">
+          <p className="text-xs text-cyan-400/50 font-mono">
             Virtual Lab SISJARKOM - Telkom University
           </p>
         </div>
@@ -164,14 +166,14 @@ function CollapsiblePCSpec({ pcId, spec, ipAddress }: { pcId: string; spec: PCSp
   const [isOpen, setIsOpen] = useState(true);
   
   return (
-    <div className="bg-zinc-800/50 dark:bg-zinc-800/50 border border-zinc-300 dark:border-zinc-700 rounded-lg overflow-hidden shadow-sm">
+    <div className="bg-cyan-800/50 dark:bg-cyan-800/50 border border-cyan-300 dark:border-cyan-700 rounded-lg overflow-hidden shadow-sm">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-3 hover:bg-zinc-200 dark:hover:bg-zinc-700/50 transition-colors"
+        className="w-full flex items-center justify-between p-3 hover:bg-cyan-200 dark:hover:bg-cyan-700/50 transition-colors"
       >
         <div className="flex items-center gap-2">
           <span className="text-lg">📟</span>
-          <span className="text-sm font-bold text-zinc-800 dark:text-zinc-300 font-mono">{pcId.toUpperCase()}</span>
+          <span className="text-sm font-bold text-cyan-800 dark:text-cyan-300 font-mono">{pcId.toUpperCase()}</span>
           {spec.osInstalled && (
             <span className="text-xs px-2 py-0.5 bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 rounded-full font-semibold">
               {spec.osInstalled.toUpperCase()}
@@ -179,9 +181,9 @@ function CollapsiblePCSpec({ pcId, spec, ipAddress }: { pcId: string; spec: PCSp
           )}
         </div>
         {isOpen ? (
-          <ChevronUp className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+          <ChevronUp className="w-4 h-4 text-cyan-400" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+          <ChevronDown className="w-4 h-4 text-cyan-400" />
         )}
       </button>
       
@@ -195,31 +197,31 @@ function CollapsiblePCSpec({ pcId, spec, ipAddress }: { pcId: string; spec: PCSp
             className="overflow-hidden"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 pt-0 text-xs font-mono">
-              <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded p-3">
-                <span className="text-zinc-600 dark:text-zinc-500 block mb-1.5 font-semibold">CPU</span>
+              <div className="bg-[#0a1628]/50 border border-cyan-500/20 rounded p-3">
+                <span className="text-cyan-400/80 block mb-1.5 font-semibold">CPU</span>
                 <span className="text-emerald-600 dark:text-emerald-400 block leading-relaxed">{spec.cpuModel || "N/A"}</span>
               </div>
-              <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded p-3">
-                <span className="text-zinc-600 dark:text-zinc-500 block mb-1.5 font-semibold">RAM</span>
+              <div className="bg-[#0a1628]/50 border border-cyan-500/20 rounded p-3">
+                <span className="text-cyan-400/80 block mb-1.5 font-semibold">RAM</span>
                 <span className="text-emerald-600 dark:text-emerald-400 block leading-relaxed">{spec.ramSize || "N/A"}</span>
               </div>
-              <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded p-3">
-                <span className="text-zinc-600 dark:text-zinc-500 block mb-1.5 font-semibold">Penyimpanan</span>
+              <div className="bg-[#0a1628]/50 border border-cyan-500/20 rounded p-3">
+                <span className="text-cyan-400/80 block mb-1.5 font-semibold">Penyimpanan</span>
                 <span className="text-emerald-600 dark:text-emerald-400 block leading-relaxed">{spec.storage || "N/A"}</span>
               </div>
-              <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded p-3">
-                <span className="text-zinc-600 dark:text-zinc-500 block mb-1.5 font-semibold">GPU</span>
+              <div className="bg-[#0a1628]/50 border border-cyan-500/20 rounded p-3">
+                <span className="text-cyan-400/80 block mb-1.5 font-semibold">GPU</span>
                 <span className="text-emerald-600 dark:text-emerald-400 block leading-relaxed">{spec.gpu || "N/A"}</span>
               </div>
               {spec.linuxDistro && (
-                <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded p-3">
-                  <span className="text-zinc-600 dark:text-zinc-500 block mb-1.5 font-semibold">Distro</span>
+                <div className="bg-[#0a1628]/50 border border-cyan-500/20 rounded p-3">
+                  <span className="text-cyan-400/80 block mb-1.5 font-semibold">Distro</span>
                   <span className="text-cyan-600 dark:text-cyan-400 block leading-relaxed">{spec.linuxDistro}</span>
                 </div>
               )}
               {ipAddress && (
-                <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded p-3">
-                  <span className="text-zinc-600 dark:text-zinc-500 block mb-1.5 font-semibold">Alamat IP</span>
+                <div className="bg-[#0a1628]/50 border border-cyan-500/20 rounded p-3">
+                  <span className="text-cyan-400/80 block mb-1.5 font-semibold">Alamat IP</span>
                   <span className="text-emerald-600 dark:text-emerald-400 block leading-relaxed">{ipAddress}</span>
                 </div>
               )}
@@ -569,11 +571,14 @@ export default function Home() {
   }
 
   return (
-    <main id="main-container" className="min-h-screen bg-zinc-950 text-zinc-100 flex">
+    <main id="main-container" className="min-h-screen bg-[#0a1628] text-cyan-100 flex relative">
+      {/* Animated Background Effect */}
+      <AnimatedBackground />
+      
       {/* Left Sidebar - System Specs */}
       {gameState.hardwareInstalled && (
-        <aside className="w-80 bg-zinc-900 border-r border-zinc-800 p-6 flex flex-col gap-6 h-screen overflow-y-auto scrollbar-hide">
-          <h3 className="text-sm font-bold text-emerald-400 mb-2 font-mono flex items-center gap-2">
+        <aside className="w-80 bg-[#0d1b2a]/90 backdrop-blur-md border-r border-cyan-500/30 p-6 flex flex-col gap-6 h-screen overflow-y-auto scrollbar-hide relative z-10 transition-all duration-300">
+          <h3 className="text-sm font-bold text-cyan-400 mb-2 font-mono flex items-center gap-2">
             <span>💻</span> SPESIFIKASI SISTEM
           </h3>
           <div className="space-y-3">
@@ -587,33 +592,33 @@ export default function Home() {
                 />
               ))
             ) : (
-              <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
+              <div className="bg-cyan-800 border border-cyan-700 rounded-lg p-4">
                 <div className="space-y-3 text-xs font-mono">
                   <div className="flex flex-col">
-                    <span className="text-zinc-500">CPU</span>
+                    <span className="text-cyan-500">CPU</span>
                     <span className="text-emerald-400">{gameState.cpuModel || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-zinc-500">RAM</span>
+                    <span className="text-cyan-500">RAM</span>
                     <span className="text-emerald-400">{gameState.ramSize || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-zinc-500">Penyimpanan</span>
+                    <span className="text-cyan-500">Penyimpanan</span>
                     <span className="text-emerald-400">{gameState.storage || "N/A"}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-zinc-500">GPU</span>
+                    <span className="text-cyan-500">GPU</span>
                     <span className="text-emerald-400">{gameState.gpu || "N/A"}</span>
                   </div>
                   {gameState.osInstalled && (
                     <div className="flex flex-col">
-                      <span className="text-zinc-500">Sistem Operasi</span>
+                      <span className="text-cyan-500">Sistem Operasi</span>
                       <span className="text-cyan-400">{gameState.osInstalled.toUpperCase()}{gameState.linuxDistro ? ` (${gameState.linuxDistro})` : ""}</span>
                     </div>
                   )}
                   {gameState.ipAddress && (
                     <div className="flex flex-col">
-                      <span className="text-zinc-500">Alamat IP</span>
+                      <span className="text-cyan-500">Alamat IP</span>
                       <span className="text-emerald-400">{gameState.ipAddress}</span>
                     </div>
                   )}
@@ -625,34 +630,31 @@ export default function Home() {
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 py-8 flex flex-col">
+      <div className="flex-1 py-8 flex flex-col relative z-10">
         <header className="mb-8 px-8 flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-3">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent flex items-center gap-3">
               <Monitor 
-                className="w-9 h-9 rainbow-icon" 
-                style={{ 
-                  filter: "drop-shadow(0 0 10px currentColor)",
-                }}
+                className="w-9 h-9 text-cyan-400"
               />
               Virtual Lab
             </h1>
-            <p className="text-zinc-400 mt-2 font-mono text-sm">
-              Simulasi Teknisi Lab // Hardware → OS → Jaringan
+            <p className="text-cyan-300 mt-2 font-mono text-sm tracking-wider">
+              [BLUEPRINT v2.1] // Hardware → OS → Network
             </p>
           </div>
           
           <div className="flex gap-3">
             <button
               onClick={toggleInfo}
-              className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm font-mono text-zinc-300 hover:text-white hover:border-emerald-500/50 transition-all flex items-center gap-2"
+              className="px-4 py-2 bg-blue-900/50 border border-cyan-500/50 rounded text-sm font-mono text-cyan-300 hover:text-white hover:border-cyan-400 hover:bg-blue-800/50 transition-all flex items-center gap-2 backdrop-blur-sm"
             >
               <Info className="w-4 h-4" /> Tentang
             </button>
             
             <button
               onClick={toggleWiki}
-              className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm font-mono text-zinc-300 hover:text-white hover:border-cyan-500/50 transition-all flex items-center gap-2"
+              className="px-4 py-2 bg-blue-900/50 border border-cyan-500/50 rounded text-sm font-mono text-cyan-300 hover:text-white hover:border-cyan-400 hover:bg-blue-800/50 transition-all flex items-center gap-2 backdrop-blur-sm"
             >
               📚 Wiki & Panduan
             </button>
@@ -660,7 +662,7 @@ export default function Home() {
             {gameState.currentPhase === "complete" && (
               <button
                 onClick={resetLab}
-                className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm font-mono text-zinc-300 hover:text-white hover:border-emerald-500/50 transition-all"
+                className="px-4 py-2 bg-blue-900/50 border border-cyan-500/50 rounded text-sm font-mono text-cyan-300 hover:text-white hover:border-cyan-400 hover:bg-blue-800/50 transition-all backdrop-blur-sm"
               >
                 🔄 Reset Lab
               </button>
@@ -705,80 +707,216 @@ export default function Home() {
       <AnimatePresence>
         {gameState.infoOpen && (
           <motion.div
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={toggleInfo}
           >
+            {/* Animated background particles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <motion.div
+                className="absolute top-20 left-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.5, 0.3],
+                }}
+                transition={{ duration: 4, repeat: Infinity }}
+              />
+              <motion.div
+                className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"
+                animate={{
+                  scale: [1.2, 1, 1.2],
+                  opacity: [0.3, 0.5, 0.3],
+                }}
+                transition={{ duration: 5, repeat: Infinity }}
+              />
+              <motion.div
+                className="absolute top-1/2 left-1/2 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.2, 0.4, 0.2],
+                }}
+                transition={{ duration: 6, repeat: Infinity }}
+              />
+            </div>
+
             <motion.div
-              className="bg-zinc-900 border border-zinc-800 rounded-xl max-w-lg w-full p-6"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-[#0d1b2a]/95 backdrop-blur-xl border border-cyan-500/30 rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl shadow-cyan-500/10"
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-emerald-400 font-mono flex items-center gap-2">
-                  <Info className="w-5 h-5" />
-                  Tentang Proyek
-                </h2>
-                <button
-                  onClick={toggleInfo}
-                  className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
+              
+              {/* Header with gradient */}
+              <div className="relative border-b border-cyan-500/20 p-6 bg-gradient-to-r from-blue-950/50 via-blue-900/30 to-blue-950/50">
+                <motion.div
+                  className="flex items-center justify-between"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                 >
-                  <X className="w-5 h-5 text-zinc-400" />
-                </button>
+                  <div className="flex items-center gap-3">
+                    <motion.div
+                      className="p-2.5 bg-cyan-500/10 rounded-lg border border-cyan-500/30"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Info className="w-6 h-6 text-cyan-400" />
+                    </motion.div>
+                    <div>
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent font-mono">
+                        Tentang Proyek
+                      </h2>
+                      <p className="text-xs text-cyan-500/70 mt-0.5">Virtual Lab SISJARKOM</p>
+                    </div>
+                  </div>
+                  <motion.button
+                    onClick={toggleInfo}
+                    className="p-2.5 hover:bg-cyan-500/10 rounded-lg transition-all duration-200 border border-transparent hover:border-cyan-500/30"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <X className="w-5 h-5 text-cyan-400" />
+                  </motion.button>
+                </motion.div>
               </div>
 
-              {/* Informasi Proyek */}
-              <div className="space-y-4">
-                <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <GraduationCap className="w-5 h-5 text-cyan-400" />
-                    <h3 className="font-bold text-cyan-400">Tugas Akhir</h3>
+              {/* Content */}
+              <div className="relative p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+                {/* Tugas Akhir Card */}
+                <motion.div
+                  className="relative bg-blue-950/30 border border-cyan-500/20 rounded-lg p-5 overflow-hidden group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  whileHover={{ borderColor: "rgba(34, 211, 238, 0.4)" }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <div className="relative flex items-start gap-3">
+                    <motion.div
+                      className="p-2 bg-cyan-500/10 rounded-lg border border-cyan-500/20"
+                      whileHover={{ rotate: [0, -10, 10, 0] }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <GraduationCap className="w-6 h-6 text-cyan-400" />
+                    </motion.div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-cyan-400 mb-2 flex items-center gap-2">
+                        Tugas Akhir
+                        <span className="text-xs px-2 py-0.5 bg-cyan-500/20 text-cyan-300 rounded-full">2025</span>
+                      </h3>
+                      <p className="text-cyan-300 text-sm leading-relaxed">
+                        Proyek ini merupakan <span className="text-emerald-400 font-semibold">Tugas Akhir</span> untuk mata kuliah{" "}
+                        <span className="text-cyan-400 font-semibold">Sistem Jaringan Komputer (SISJARKOM)</span>
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-zinc-300 text-sm">
-                    Proyek ini merupakan <span className="text-emerald-400 font-semibold">Tugas Akhir</span> untuk mata kuliah{" "}
-                    <span className="text-cyan-400 font-semibold">Sistem Jaringan Komputer (SISJARKOM)</span>
-                  </p>
-                </div>
+                </motion.div>
 
-                <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-                  <p className="text-zinc-300 text-sm">
-                    <span className="text-zinc-500">Institusi:</span>{" "}
-                    <span className="text-emerald-400 font-semibold">Telkom University</span>
-                  </p>
-                  <p className="text-zinc-300 text-sm mt-1">
-                    <span className="text-zinc-500">Program Studi:</span>{" "}
-                    <span className="text-cyan-400 font-semibold">D4 Teknologi Rekayasa Multimedia</span>
-                  </p>
-                </div>
-
-                {/* Tim Pengembang */}
-                <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users className="w-5 h-5 text-purple-400" />
-                    <h3 className="font-bold text-purple-400">Tim Pengembang</h3>
+                {/* University Info Card */}
+                <motion.div
+                  className="relative bg-blue-950/30 border border-cyan-500/20 rounded-lg p-5 overflow-hidden group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1, ease: "easeOut" }}
+                  whileHover={{ borderColor: "rgba(34, 211, 238, 0.4)" }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <p className="text-cyan-300 text-sm">
+                        <span className="text-cyan-500">Institusi:</span>{" "}
+                        <span className="text-emerald-400 font-bold">Telkom University</span>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                      <p className="text-cyan-300 text-sm">
+                        <span className="text-cyan-500">Program Studi:</span>{" "}
+                        <span className="text-cyan-400 font-bold">D4 Teknologi Rekayasa Multimedia</span>
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    {developers.map((dev, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-sm">
-                        <span className="text-zinc-300">{dev.name}</span>
-                        <span className="text-zinc-500 font-mono text-xs">{dev.nim}</span>
+                </motion.div>
+
+                {/* Tim Pengembang Card */}
+                <motion.div
+                  className="relative bg-blue-950/30 border border-cyan-500/20 rounded-lg p-5 overflow-hidden"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2, ease: "easeOut" }}
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl" />
+                  <div className="relative">
+                    <div className="flex items-center gap-2 mb-4">
+                      <motion.div
+                        className="p-2 bg-purple-500/10 rounded-lg border border-purple-500/20"
+                        whileHover={{ scale: 1.1 }}
+                      >
+                        <Users className="w-5 h-5 text-purple-400" />
+                      </motion.div>
+                      <h3 className="font-bold text-purple-400">Tim Pengembang</h3>
+                      <div className="ml-auto px-3 py-1 bg-purple-500/10 rounded-full border border-purple-500/20">
+                        <span className="text-xs text-purple-300 font-semibold">{developers.length} Anggota</span>
                       </div>
-                    ))}
+                    </div>
+                    <div className="space-y-2">
+                      {developers.map((dev, idx) => (
+                        <motion.div
+                          key={idx}
+                          className="flex justify-between items-center p-3 rounded-lg bg-cyan-900/30 border border-cyan-700/30 hover:bg-cyan-900/50 hover:border-purple-500/30 transition-all group"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.5 + idx * 0.05 }}
+                          whileHover={{ x: 5 }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center text-xs font-bold text-purple-300">
+                              {idx + 1}
+                            </div>
+                            <span className="text-cyan-300 group-hover:text-white transition-colors">{dev.name}</span>
+                          </div>
+                          <span className="text-cyan-500 font-mono text-xs bg-cyan-800/50 px-2 py-1 rounded border border-cyan-700/50">
+                            {dev.nim}
+                          </span>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
 
-              {/* Footer */}
-              <div className="mt-6 pt-4 border-t border-zinc-800 text-center">
-                <p className="text-zinc-500 text-xs font-mono">
-                  © 2025 Virtual Lab SISJARKOM - Telkom University
-                </p>
-              </div>
+              {/* Footer with gradient */}
+              <motion.div
+                className="relative border-t border-cyan-500/20 p-4 bg-gradient-to-r from-blue-950/50 via-blue-900/30 to-blue-950/50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2, delay: 0.3 }}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400" />
+                  </motion.div>
+                  <p className="text-cyan-500/70 text-xs font-mono">
+                    © 2025 Virtual Lab SISJARKOM - Telkom University
+                  </p>
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-cyan-400 to-purple-400" />
+                  </motion.div>
+                </div>
+              </motion.div>
             </motion.div>
           </motion.div>
         )}

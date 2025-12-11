@@ -30,8 +30,8 @@ export default function Monitor({ osType, onClick, disabled }: MonitorProps) {
             : isLinux
             ? "bg-green-950/30 border-green-500/50 shadow-lg shadow-green-500/20"
             : disabled
-            ? "bg-zinc-900/50 border-zinc-700/30 cursor-not-allowed opacity-50"
-            : "bg-zinc-900/50 border-zinc-600 hover:border-cyan-500/70 glass-hover cursor-pointer"
+            ? "bg-cyan-900/50 border-cyan-700/30 cursor-not-allowed opacity-50"
+            : "bg-cyan-900/50 border-cyan-600 hover:border-cyan-500/70 glass-hover cursor-pointer"
         }`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ 
@@ -50,18 +50,18 @@ export default function Monitor({ osType, onClick, disabled }: MonitorProps) {
         }}
       >
         {isLinux ? (
-          <Terminal className="w-12 h-12 text-green-400" />
+          <Terminal className="w-12 h-12 text-emerald-400" />
         ) : (
           <MonitorIcon
             className={`w-12 h-12 ${
-              isWindows ? "text-blue-400" : "text-zinc-500"
+              isWindows ? "text-blue-400" : "text-cyan-500/30"
             }`}
           />
         )}
         
         {osType && (
           <motion.div
-            className="text-xs font-mono px-2 py-1 rounded bg-zinc-800/80 border border-zinc-700"
+            className="text-xs font-mono px-2 py-1 rounded bg-cyan-800/80 border border-cyan-700"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
@@ -71,7 +71,7 @@ export default function Monitor({ osType, onClick, disabled }: MonitorProps) {
         )}
       </motion.div>
       
-      <p className="mt-3 text-sm font-mono text-zinc-400">
+      <p className="mt-3 text-sm font-mono text-cyan-400">
         {osType ? `OS: ${osType}` : "Monitor"}
       </p>
       

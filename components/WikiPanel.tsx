@@ -523,67 +523,176 @@ export default function WikiPanel({ currentPhase, onClose }: WikiPanelProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <motion.div
-        className="bg-zinc-900 border-2 border-cyan-500/50 rounded-2xl max-w-5xl w-full h-[80vh] relative shadow-2xl flex overflow-hidden"
-        initial={{ scale: 0.8, y: 50 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.8, y: 50 }}
-        transition={{ type: "spring", damping: 25 }}
-      >
-        {/* Sidebar */}
-        <div className="w-64 border-r border-zinc-800 bg-zinc-950/50 p-4 flex flex-col">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-cyan-400 flex items-center gap-2">
-              <BookOpen className="w-5 h-5" />
-              Wiki & Panduan
-            </h2>
-            <p className="text-xs text-zinc-500 mt-1">Pelajari setiap fase</p>
-          </div>
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute top-10 left-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.4, 0.2],
+            x: [0, 50, 0],
+            y: [0, 30, 0],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-10 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.3, 0.5, 0.3],
+            x: [0, -40, 0],
+            y: [0, -20, 0],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-1/3 right-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.4, 1],
+            opacity: [0.2, 0.3, 0.2],
+          }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
 
-          <div className="space-y-2 flex-1 overflow-y-auto">
-            {sections.map((section) => (
-              <button
+      <motion.div
+        className="relative bg-gradient-to-br from-[#0d1b2a] via-[#0d1b2a] to-[#0a1628] border-2 border-cyan-500/30 rounded-2xl max-w-5xl w-full h-[85vh] shadow-2xl shadow-cyan-500/10 flex overflow-hidden"
+        initial={{ scale: 0.95, y: 20, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.95, y: 20, opacity: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+        
+        {/* Animated border glow */}
+        <motion.div
+          className="absolute inset-0 rounded-2xl"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.1), transparent)",
+          }}
+          animate={{
+            x: ["-100%", "100%"],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+
+        {/* Sidebar */}
+        <div className="relative w-64 border-r border-cyan-500/20 bg-gradient-to-b from-[#0a1628]/80 to-[#0d1b2a]/80 backdrop-blur-sm p-4 flex flex-col">
+          <motion.div 
+            className="mb-6"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <motion.div
+                className="p-2 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg border border-cyan-500/30"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+              >
+                <BookOpen className="w-5 h-5 text-cyan-400" />
+              </motion.div>
+              <div>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                  Wiki & Panduan
+                </h2>
+              </div>
+            </div>
+            <p className="text-xs text-cyan-300/70 ml-1">Pelajari setiap fase</p>
+          </motion.div>
+
+          <div className="space-y-2 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-cyan-500/20 scrollbar-track-transparent">
+            {sections.map((section, idx) => (
+              <motion.button
                 key={section.id}
                 onClick={() => {
                   setSelectedSection(section.id);
                   setSelectedTopic(null);
                 }}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative overflow-hidden group ${
                   selectedSection === section.id
-                    ? "bg-cyan-500/20 border border-cyan-500/50 text-cyan-400"
-                    : "hover:bg-zinc-800 text-zinc-400"
+                    ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/40 text-cyan-400 shadow-lg shadow-cyan-500/10"
+                    : "hover:bg-blue-950/30 text-cyan-300/70 hover:text-cyan-300 border border-transparent hover:border-cyan-500/20"
                 }`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 + idx * 0.05 }}
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <section.icon className="w-4 h-4" />
-                <span className="text-sm font-medium">{section.name}</span>
-              </button>
+                {selectedSection === section.id && (
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-transparent"
+                    layoutId="activeSection"
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  />
+                )}
+                <motion.div
+                  className="relative"
+                  whileHover={{ rotate: [0, -10, 10, 0] }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <section.icon className="w-4 h-4" />
+                </motion.div>
+                <span className="text-sm font-medium relative">{section.name}</span>
+                {selectedSection === section.id && (
+                  <motion.div
+                    className="ml-auto w-2 h-2 rounded-full bg-cyan-400"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  />
+                )}
+              </motion.button>
             ))}
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col">
+        <div className="relative flex-1 flex flex-col">
           {/* Header */}
-          <div className="border-b border-zinc-800 p-6 flex items-center justify-between">
-            <div>
-              <h3 className="text-2xl font-bold text-white">
-                {sections.find((s) => s.id === selectedSection)?.name}
-              </h3>
-              <p className="text-sm text-zinc-400 mt-1">
-                {currentTopics.length} topik
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-zinc-400 hover:text-white transition-colors"
+          <div className="relative border-b border-cyan-500/20 p-6 flex items-center justify-between bg-gradient-to-r from-cyan-900/50 via-cyan-800/30 to-cyan-900/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
             >
-              <X className="w-6 h-6" />
-            </button>
+              <div className="flex items-center gap-3 mb-1">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                  {sections.find((s) => s.id === selectedSection)?.name}
+                </h3>
+                <motion.div
+                  className="px-3 py-1 bg-cyan-500/10 rounded-full border border-cyan-500/30"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <span className="text-xs font-bold text-cyan-400">
+                    {currentTopics.length} topik
+                  </span>
+                </motion.div>
+              </div>
+              <p className="text-sm text-cyan-300/70">
+                Klik topik untuk mempelajari lebih detail
+              </p>
+            </motion.div>
+            <motion.button
+              onClick={onClose}
+              className="p-2.5 hover:bg-blue-950/30 rounded-xl transition-all duration-200 border border-transparent hover:border-cyan-500/30"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <X className="w-6 h-6 text-cyan-400/70 hover:text-cyan-400 transition-colors" />
+            </motion.button>
           </div>
 
           {/* Topics & Detail */}
@@ -596,34 +705,61 @@ export default function WikiPanel({ currentPhase, onClose }: WikiPanelProps) {
                 className="flex-1 p-6 overflow-y-auto"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {currentTopics.map((topic) => {
+                  {currentTopics.map((topic, idx) => {
                     const Icon = topic.icon;
                     return (
                       <motion.button
                         key={topic.id}
                         onClick={() => setSelectedTopic(topic.id)}
-                        className="card p-4 rounded-lg text-left hover:border-cyan-500/50 transition-all group"
-                        whileHover={{ scale: 1.02 }}
+                        className="relative bg-gradient-to-br from-blue-950/40 to-blue-900/30 border border-cyan-500/30 p-4 rounded-xl text-left hover:border-cyan-500/60 transition-all duration-200 group overflow-hidden"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        whileHover={{ scale: 1.03, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <div className="flex items-start justify-between">
+                        {/* Hover gradient effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        
+                        <div className="relative flex items-start justify-between">
                           <div className="flex items-start gap-3 flex-1">
-                            <div className="p-2 bg-cyan-500/10 rounded-lg">
+                            <motion.div
+                              className="p-2.5 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-lg border border-cyan-500/20"
+                              whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+                              transition={{ duration: 0.3 }}
+                            >
                               <Icon className="w-5 h-5 text-cyan-400" />
-                            </div>
+                            </motion.div>
                             <div className="flex-1">
-                              <h4 className="text-white font-semibold mb-1 group-hover:text-cyan-400 transition-colors">
+                              <h4 className="text-white font-semibold mb-1.5 group-hover:text-cyan-400 transition-colors">
                                 {topic.title}
                               </h4>
-                              <p className="text-xs text-zinc-400 line-clamp-2">
+                              <p className="text-xs text-cyan-300/80 line-clamp-2 mb-2 leading-relaxed">
                                 {topic.content}
                               </p>
-                              <p className="text-xs text-cyan-500 mt-2">
-                                {topic.tips.length} tips
-                              </p>
+                              <div className="flex items-center gap-2">
+                                <div className="px-2 py-1 bg-cyan-500/10 rounded-md border border-cyan-500/20">
+                                  <span className="text-xs text-cyan-400 font-semibold">
+                                    {topic.tips.length} tips
+                                  </span>
+                                </div>
+                                <motion.div
+                                  className="text-xs text-cyan-400/70 group-hover:text-cyan-400 transition-colors"
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: 0.3 + idx * 0.05 }}
+                                >
+                                  Pelajari →
+                                </motion.div>
+                              </div>
                             </div>
                           </div>
-                          <ChevronRight className="w-5 h-5 text-zinc-600 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
+                          <motion.div
+                            whileHover={{ x: 5 }}
+                            transition={{ type: "spring", stiffness: 400 }}
+                          >
+                            <ChevronRight className="w-5 h-5 text-cyan-400/50 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
+                          </motion.div>
                         </div>
                       </motion.button>
                     );
@@ -641,45 +777,106 @@ export default function WikiPanel({ currentPhase, onClose }: WikiPanelProps) {
                   exit={{ x: 20, opacity: 0 }}
                   className="flex-1 p-6 overflow-y-auto"
                 >
-                  <button
+                  <motion.button
                     onClick={() => setSelectedTopic(null)}
-                    className="text-cyan-400 hover:text-cyan-300 text-sm mb-4 flex items-center gap-2"
+                    className="px-4 py-2 bg-blue-950/30 hover:bg-blue-900/30 text-cyan-400 hover:text-cyan-300 text-sm mb-6 flex items-center gap-2 rounded-lg border border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-200"
+                    whileHover={{ x: -5 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <ChevronRight className="w-4 h-4 rotate-180" />
                     Kembali ke daftar topik
-                  </button>
+                  </motion.button>
 
-                  <div className="card rounded-lg p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 bg-cyan-500/20 rounded-lg">
-                        <currentTopic.icon className="w-8 h-8 text-cyan-400" />
-                      </div>
-                      <h4 className="text-2xl font-bold text-white">
-                        {currentTopic.title}
-                      </h4>
+                  <motion.div
+                    className="relative bg-gradient-to-br from-blue-950/40 to-blue-900/30 border border-cyan-500/30 rounded-xl p-6 overflow-hidden"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    {/* Background decorative elements */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/5 rounded-full blur-2xl" />
+                    
+                    <div className="relative">
+                      {/* Header */}
+                      <motion.div 
+                        className="flex items-center gap-4 mb-6 pb-6 border-b border-cyan-500/20"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <motion.div
+                          className="p-3 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl border border-cyan-500/30"
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          transition={{ type: "spring", stiffness: 400 }}
+                        >
+                          <currentTopic.icon className="w-8 h-8 text-cyan-400" />
+                        </motion.div>
+                        <div>
+                          <h4 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-1">
+                            {currentTopic.title}
+                          </h4>
+                          <p className="text-xs text-cyan-300/70">Panduan lengkap dan tips praktis</p>
+                        </div>
+                      </motion.div>
+
+                      {/* Content */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-5 mb-6">
+                          <p className="text-cyan-300/90 leading-relaxed">
+                            {currentTopic.content}
+                          </p>
+                        </div>
+
+                        {/* Tips Section */}
+                        <div className="bg-gradient-to-br from-yellow-500/5 to-orange-500/5 border border-yellow-500/20 rounded-lg p-5">
+                          <div className="flex items-center gap-2 mb-4">
+                            <motion.div
+                              animate={{ 
+                                rotate: [0, -10, 10, -10, 0],
+                                scale: [1, 1.1, 1, 1.1, 1],
+                              }}
+                              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                            >
+                              <Zap className="w-5 h-5 text-yellow-400" />
+                            </motion.div>
+                            <h5 className="text-base font-bold text-yellow-400">
+                              Tips & Praktik Terbaik
+                            </h5>
+                            <div className="ml-auto px-2 py-1 bg-yellow-500/10 rounded-md border border-yellow-500/20">
+                              <span className="text-xs text-yellow-400 font-semibold">
+                                {currentTopic.tips.length} tips
+                              </span>
+                            </div>
+                          </div>
+                          <ul className="space-y-3">
+                            {currentTopic.tips.map((tip, idx) => (
+                              <motion.li
+                                key={idx}
+                                className="flex items-start gap-3 text-sm text-cyan-300/70 p-3 rounded-lg bg-blue-950/30 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-200"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.4 + idx * 0.05 }}
+                                whileHover={{ x: 5 }}
+                              >
+                                <motion.span 
+                                  className="text-cyan-400 font-bold mt-0.5 text-lg"
+                                  whileHover={{ scale: 1.2, rotate: 90 }}
+                                >
+                                  •
+                                </motion.span>
+                                <span className="flex-1">{tip}</span>
+                              </motion.li>
+                            ))}
+                          </ul>
+                        </div>
+                      </motion.div>
                     </div>
-
-                    <p className="text-zinc-300 leading-relaxed mb-6">
-                      {currentTopic.content}
-                    </p>
-
-                    <div className="border-t border-zinc-700 pt-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Zap className="w-4 h-4 text-yellow-400" />
-                        <h5 className="text-sm font-semibold text-yellow-400">
-                          Tips & Praktik Terbaik
-                        </h5>
-                      </div>
-                      <ul className="space-y-2">
-                        {currentTopic.tips.map((tip, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-zinc-400">
-                            <span className="text-cyan-400 font-bold mt-0.5">•</span>
-                            <span>{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>

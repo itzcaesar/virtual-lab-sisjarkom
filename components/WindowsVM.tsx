@@ -83,16 +83,17 @@ export default function WindowsVM({
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className={`bg-gradient-to-br from-blue-950 to-slate-900 border-2 border-blue-500/50 rounded-lg shadow-2xl overflow-hidden ${
+        className={`bg-gradient-to-br from-[#0d1b2a] to-[#0a1628] border-2 border-cyan-500/30 rounded-lg shadow-2xl shadow-cyan-500/10 overflow-hidden ${
           isMaximized ? "w-full h-full" : "w-[90%] h-[90%] max-w-6xl"
         }`}
-        initial={{ scale: 0.9, y: 20 }}
+        initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
+        exit={{ scale: 0.95, y: 20 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         layout
       >
         {/* Title Bar */}
-        <div className="bg-blue-600 h-10 flex items-center justify-between px-4 select-none">
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 h-10 flex items-center justify-between px-4 select-none">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-white/30 rounded" />
             <span className="text-white text-sm font-semibold">{edition} - Mesin Virtual</span>
@@ -190,7 +191,7 @@ export default function WindowsVM({
                 dragMomentum={false}
               >
                 {/* Browser Title Bar */}
-                <div className="bg-zinc-200 h-10 flex items-center justify-between px-2 border-b">
+                <div className="bg-cyan-200 h-10 flex items-center justify-between px-2 border-b">
                   <div className="flex items-center gap-2 flex-1">
                     <Chrome className="w-5 h-5 text-blue-600" />
                     <input
@@ -229,7 +230,7 @@ export default function WindowsVM({
                               onChange={(e) => setSearchQuery(e.target.value)}
                               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                               placeholder="Cari di Google..."
-                              className="flex-1 border border-zinc-300 rounded-full px-4 py-2 text-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="flex-1 border border-cyan-300 rounded-full px-4 py-2 text-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <button 
                               onClick={handleSearch}
@@ -243,13 +244,13 @@ export default function WindowsVM({
                         <div className="flex justify-center gap-4 mt-6">
                           <button 
                             onClick={() => { setBrowserUrl("https://youtube.com"); handleBrowserNavigate("https://youtube.com"); }}
-                            className="px-4 py-2 text-sm bg-zinc-100 hover:bg-zinc-200 rounded"
+                            className="px-4 py-2 text-sm bg-cyan-100 hover:bg-cyan-200 rounded"
                           >
                             🎬 YouTube
                           </button>
                           <button 
                             onClick={() => { setBrowserUrl("https://github.com"); handleBrowserNavigate("https://github.com"); }}
-                            className="px-4 py-2 text-sm bg-zinc-100 hover:bg-zinc-200 rounded"
+                            className="px-4 py-2 text-sm bg-cyan-100 hover:bg-cyan-200 rounded"
                           >
                             💻 GitHub
                           </button>
@@ -263,35 +264,35 @@ export default function WindowsVM({
                       </div>
                     </div>
                   ) : browserContent === "youtube" ? (
-                    <div className="bg-zinc-900 min-h-full p-4">
+                    <div className="bg-cyan-900 min-h-full p-4">
                       <div className="flex items-center gap-4 mb-4">
                         <div className="text-red-500 text-2xl font-bold">▶ YouTube</div>
-                        <input className="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-4 py-2 text-zinc-100 text-sm placeholder-zinc-400" placeholder="Cari video..." />
+                        <input className="flex-1 bg-cyan-800 border border-cyan-700 rounded-full px-4 py-2 text-cyan-100 text-sm placeholder-cyan-400" placeholder="Cari video..." />
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         {["Tech Tutorial", "Music Video", "Gaming Stream", "News", "Coding Tips", "Cat Videos"].map((title, i) => (
-                          <div key={i} className="bg-zinc-800 rounded-lg overflow-hidden">
-                            <div className="aspect-video bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-4xl">
+                          <div key={i} className="bg-cyan-800 rounded-lg overflow-hidden">
+                            <div className="aspect-video bg-gradient-to-br from-cyan-700 to-cyan-800 flex items-center justify-center text-4xl">
                               {["📺", "🎵", "🎮", "📰", "💻", "🐱"][i]}
                             </div>
                             <div className="p-2">
-                              <p className="text-zinc-100 text-sm font-semibold truncate">{title}</p>
-                              <p className="text-zinc-300 text-xs">Kanal Virtual • 10rb tayangan</p>
+                              <p className="text-cyan-100 text-sm font-semibold truncate">{title}</p>
+                              <p className="text-cyan-300 text-xs">Kanal Virtual • 10rb tayangan</p>
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
                   ) : browserContent === "github" ? (
-                    <div className="bg-zinc-900 min-h-full p-6">
+                    <div className="bg-cyan-900 min-h-full p-6">
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="text-zinc-100 text-2xl">🐙</div>
-                        <span className="text-zinc-100 text-xl font-bold">GitHub</span>
+                        <div className="text-cyan-100 text-2xl">🐙</div>
+                        <span className="text-cyan-100 text-xl font-bold">GitHub</span>
                       </div>
-                      <div className="bg-zinc-800 rounded-lg p-4 mb-4">
-                        <h3 className="text-zinc-100 font-bold mb-2">📁 virtual-lab-sisjarkom</h3>
-                        <p className="text-zinc-300 text-sm mb-3">Simulasi lab virtual interaktif untuk sistem jaringan komputer</p>
-                        <div className="flex gap-4 text-xs text-zinc-500">
+                      <div className="bg-cyan-800 rounded-lg p-4 mb-4">
+                        <h3 className="text-cyan-100 font-bold mb-2">📁 virtual-lab-sisjarkom</h3>
+                        <p className="text-cyan-300 text-sm mb-3">Simulasi lab virtual interaktif untuk sistem jaringan komputer</p>
+                        <div className="flex gap-4 text-xs text-cyan-500">
                           <span>⭐ 42 bintang</span>
                           <span>🔀 12 fork</span>
                           <span>🟢 TypeScript</span>
@@ -299,21 +300,21 @@ export default function WindowsVM({
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         {["Next.js", "React", "TypeScript", "Tailwind CSS"].map((tech, i) => (
-                          <div key={i} className="bg-zinc-800 rounded p-3 text-center">
-                            <span className="text-zinc-100 text-sm">{tech}</span>
+                          <div key={i} className="bg-cyan-800 rounded p-3 text-center">
+                            <span className="text-cyan-100 text-sm">{tech}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   ) : browserContent === "search-results" ? (
                     <div className="p-6">
-                      <p className="text-zinc-500 text-sm mb-4">Hasil untuk "{searchQuery}"</p>
+                      <p className="text-cyan-500 text-sm mb-4">Hasil untuk "{searchQuery}"</p>
                       <div className="space-y-4">
                         {[1, 2, 3].map((i) => (
                           <div key={i} className="border-b pb-4">
                             <a href="#" className="text-blue-600 hover:underline text-lg">Hasil Pencarian {i}: {searchQuery}</a>
                             <p className="text-green-700 text-sm">www.contoh{i}.com</p>
-                            <p className="text-zinc-600 text-sm">Ini adalah hasil pencarian simulasi untuk pencarian Anda tentang {searchQuery}...</p>
+                            <p className="text-cyan-600 text-sm">Ini adalah hasil pencarian simulasi untuk pencarian Anda tentang {searchQuery}...</p>
                           </div>
                         ))}
                       </div>
@@ -321,8 +322,8 @@ export default function WindowsVM({
                   ) : (
                     <div className="p-8 text-center">
                       <div className="text-6xl mb-4">🌐</div>
-                      <h2 className="text-xl font-bold text-zinc-800 mb-2">{browserUrl}</h2>
-                      <p className="text-zinc-500">Halaman berhasil dimuat</p>
+                      <h2 className="text-xl font-bold text-cyan-800 mb-2">{browserUrl}</h2>
+                      <p className="text-cyan-500">Halaman berhasil dimuat</p>
                     </div>
                   )}
                 </div>
