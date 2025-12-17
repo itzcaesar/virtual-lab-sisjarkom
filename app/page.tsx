@@ -98,11 +98,11 @@ export interface GameState {
 
 /** Project development team */
 const developers = [
-  { name: "Muhammad Caesar Rifqi", nim: "707022500036" },
-  { name: "Alessandro Fathi Z", nim: "707022500026" },
-  { name: "Melischa Ramadhannia P", nim: "707022500056" },
-  { name: "Wulan Noveliza Sriyanto", nim: "707022500063" },
-  { name: "Dian Hijratulaini", nim: "707022500118" },
+  { name: "Muhammad Caesar Rifqi - Developer", nim: "707022500036" },
+  { name: "Alessandro Fathi Z - Gooner", nim: "707022500026" },
+  { name: "Melischa Ramadhannia P - Researcher", nim: "707022500056" },
+  { name: "Wulan Noveliza Sriyanto - Researcher", nim: "707022500063" },
+  { name: "Dian Hijratulaini - Researcher", nim: "707022500118" },
 ];
 
 // ============================================================================
@@ -139,7 +139,7 @@ function MobileNotSupported() {
         <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-left">
           <p className="text-sm text-cyan-400 mb-2">Persyaratan minimum:</p>
           <ul className="text-sm text-cyan-300/70 space-y-1">
-            <li>• Layar minimal 1024px lebar</li>
+            <li>• Layar minimal 864px lebar</li>
             <li>• Browser modern (Chrome, Firefox, Edge)</li>
             <li>• Keyboard dan mouse untuk interaksi</li>
           </ul>
@@ -271,7 +271,7 @@ export default function Home() {
    */
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+      setIsMobile(window.innerWidth < 864);
     };
     
     checkMobile();

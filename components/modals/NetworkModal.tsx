@@ -62,7 +62,7 @@ export default function NetworkModal({
 
   // Cable speeds
   const cableTypes = [
-    { id: "ethernet", name: "Ethernet Cat6", speed: "1 Gbps", latency: "1-2ms", icon: "🔌", color: "emerald" },
+    { id: "ethernet", name: "Ethernet Cat8", speed: "1 Gbps", latency: "1-2ms", icon: "🔌", color: "emerald" },
     { id: "fiber", name: "Fiber Optik", speed: "10 Gbps", latency: "<1ms", icon: "💡", color: "cyan" },
   ];
 
