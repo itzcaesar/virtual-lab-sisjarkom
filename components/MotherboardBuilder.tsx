@@ -6,7 +6,7 @@ import { Cpu, MemoryStick, HardDrive, Monitor as MonitorIcon, Info, CheckCircle2
 
 interface ComponentItem {
   id: string;
-  type: "cpu" | "ram" | "storage" | "gpu" | "psu";
+  type: "cpu" | "ram" | "storage" | "gpu" | "psu" | "cooler";
   name: string;
   specs: string;
   price: string;
@@ -15,7 +15,7 @@ interface ComponentItem {
 
 interface Socket {
   id: string;
-  type: "cpu" | "ram" | "storage" | "gpu" | "psu";
+  type: "cpu" | "ram" | "storage" | "gpu" | "psu" | "cooler";
   label: string;
   position: { top: string; left: string };
   size: { width: number; height: number };
@@ -28,6 +28,7 @@ interface MotherboardBuilderProps {
   selectedStorage: string;
   selectedGPU: string;
   selectedPSU: string;
+  selectedCooler?: string;
   onComplete: (success: boolean) => void;
   onComponentInstalled: (type: string, name: string) => void;
   onBack?: () => void;
@@ -39,6 +40,7 @@ export default function MotherboardBuilder({
   selectedStorage,
   selectedGPU,
   selectedPSU,
+  selectedCooler = "",
   onComplete,
   onComponentInstalled,
   onBack,
@@ -87,34 +89,41 @@ export default function MotherboardBuilder({
     { name: "AMD Ryzen 7 5800X", cores: "8 Cores", speed: "3.8GHz", power: 105, price: "$$" },
     { name: "Intel Core i9-13900K", cores: "24 Cores", speed: "3.0GHz", power: 253, price: "$$$" },
   ];
-  
+
   const allRAMOptions = [
     { name: "8GB DDR4", speed: "2666MHz", power: 10, price: "$" },
     { name: "16GB DDR4", speed: "3200MHz", power: 15, price: "$$" },
     { name: "32GB DDR4", speed: "3600MHz", power: 20, price: "$$$" },
     { name: "16GB DDR5", speed: "4800MHz", power: 18, price: "$$$" },
   ];
-  
+
   const allStorageOptions = [
     { name: "256GB NVMe SSD", type: "NVMe", speed: "3000MB/s", power: 5, price: "$" },
     { name: "512GB NVMe SSD", type: "NVMe", speed: "3500MB/s", power: 7, price: "$$" },
     { name: "1TB NVMe SSD", type: "NVMe", speed: "7000MB/s", power: 10, price: "$$$" },
     { name: "2TB SATA SSD", type: "SATA", speed: "550MB/s", power: 8, price: "$$" },
   ];
-  
+
   const allGPUOptions = [
     { name: "Integrated Graphics", memory: "Shared", power: 0, price: "$" },
     { name: "NVIDIA GTX 1660 Super", memory: "6GB GDDR6", power: 125, price: "$$" },
     { name: "NVIDIA RTX 3060", memory: "12GB GDDR6", power: 170, price: "$$" },
     { name: "NVIDIA RTX 4070", memory: "12GB GDDR6X", power: 200, price: "$$$" },
   ];
-  
+
   const allPSUOptions = [
     { name: "450W 80+ Bronze", wattage: 450, efficiency: "Bronze", price: "$" },
     { name: "550W 80+ Bronze", wattage: 550, efficiency: "Bronze", price: "$$" },
     { name: "650W 80+ Gold", wattage: 650, efficiency: "Gold", price: "$$" },
     { name: "750W 80+ Gold", wattage: 750, efficiency: "Gold", price: "$$$" },
     { name: "850W 80+ Platinum", wattage: 850, efficiency: "Platinum", price: "$$$" },
+  ];
+
+  const allCoolerOptions = [
+    { name: "Stock Air Cooler", type: "Air", noise: "25dB", power: 5, price: "$" },
+    { name: "Tower Air Cooler", type: "Air", noise: "20dB", power: 10, price: "$$" },
+    { name: "240mm AIO Liquid", type: "Liquid", noise: "28dB", power: 15, price: "$$" },
+    { name: "360mm AIO Liquid", type: "Liquid", noise: "32dB", power: 25, price: "$$$" },
   ];
 
   // Extract power from specs (format: "Name - Specs - XXW")
@@ -128,6 +137,7 @@ export default function MotherboardBuilder({
     { id: "ram", type: "ram", name: selectedRAM.split(" - ")[0], specs: selectedRAM, price: "$", power: extractPower(selectedRAM) },
     { id: "storage", type: "storage", name: selectedStorage.split(" - ")[0], specs: selectedStorage, price: "$", power: extractPower(selectedStorage) },
     { id: "gpu", type: "gpu", name: selectedGPU.split(" - ")[0], specs: selectedGPU, price: "$", power: extractPower(selectedGPU) },
+    { id: "cooler", type: "cooler", name: selectedCooler.split(" - ")[0], specs: selectedCooler, price: "$", power: 10 },
     { id: "psu", type: "psu", name: selectedPSU, specs: selectedPSU, price: "$" },
   ];
 
@@ -138,6 +148,7 @@ export default function MotherboardBuilder({
       ram: { id: "ram", type: "ram" as const, name: preset.ram.split(" - ")[0], specs: preset.ram, price: "$", power: extractPower(preset.ram) },
       storage: { id: "storage", type: "storage" as const, name: preset.storage.split(" - ")[0], specs: preset.storage, price: "$", power: extractPower(preset.storage) },
       gpu: { id: "gpu", type: "gpu" as const, name: preset.gpu.split(" - ")[0], specs: preset.gpu, price: "$", power: extractPower(preset.gpu) },
+      cooler: { id: "cooler", type: "cooler" as const, name: "Stock Cooler", specs: "Standard", price: "$", power: 5 },
       psu: { id: "psu", type: "psu" as const, name: preset.psu, specs: preset.psu, price: "$" },
     };
 
@@ -152,6 +163,7 @@ export default function MotherboardBuilder({
       "pcie-slot": presetComponents.gpu,
       "sata-port": presetComponents.storage,
       "psu-connector": presetComponents.psu,
+      "cpu-cooler-socket": presetComponents.cooler,
     };
     setSocketContents(newSocketContents);
 
@@ -166,6 +178,7 @@ export default function MotherboardBuilder({
 
   const [sockets, setSockets] = useState<Socket[]>([
     { id: "cpu-socket", type: "cpu", label: "CPU Socket (LGA 1700)", position: { top: "30%", left: "25%" }, size: { width: 120, height: 120 }, installed: false },
+    { id: "cpu-cooler-socket", type: "cooler", label: "Cooler Mount", position: { top: "30%", left: "45%" }, size: { width: 80, height: 80 }, installed: false },
     { id: "ram-slot-1", type: "ram", label: "RAM Slot 1", position: { top: "25%", left: "70%" }, size: { width: 60, height: 100 }, installed: false },
     { id: "ram-slot-2", type: "ram", label: "RAM Slot 2", position: { top: "25%", left: "85%" }, size: { width: 60, height: 100 }, installed: false },
     { id: "pcie-slot", type: "gpu", label: "PCIe x16 Slot", position: { top: "70%", left: "35%" }, size: { width: 180, height: 80 }, installed: false },
@@ -175,7 +188,7 @@ export default function MotherboardBuilder({
 
   const [draggedComponent, setDraggedComponent] = useState<ComponentItem | null>(null);
   const [installedComponents, setInstalledComponents] = useState<Set<string>>(new Set());
-  
+
   // Track which component is installed in which socket
   const [socketContents, setSocketContents] = useState<Record<string, ComponentItem | null>>({});
 
@@ -228,9 +241,9 @@ export default function MotherboardBuilder({
 
   const handleDrop = (e: React.DragEvent, socket: Socket) => {
     e.preventDefault();
-    
+
     if (!draggedComponent) return;
-    
+
     // Check if component type matches socket type
     if (draggedComponent.type !== socket.type) {
       return; // Invalid placement
@@ -241,19 +254,28 @@ export default function MotherboardBuilder({
       return;
     }
 
+    // Special verification for cooler: Must install CPU first
+    if (socket.type === "cooler") {
+      const cpuSocket = sockets.find(s => s.type === "cpu");
+      if (!cpuSocket?.installed) {
+        // Optionally notify user
+        return;
+      }
+    }
+
     // Install component (create new unique ID for unlimited components)
     const uniqueId = `${draggedComponent.id}-${Date.now()}`;
-    
-    setSockets(sockets.map(s => 
+
+    setSockets(sockets.map(s =>
       s.id === socket.id ? { ...s, installed: true } : s
     ));
-    
+
     // Store which component is in which socket
     setSocketContents(prev => ({
       ...prev,
       [socket.id]: draggedComponent
     }));
-    
+
     setInstalledComponents(prev => new Set(prev).add(uniqueId));
     onComponentInstalled(draggedComponent.type, draggedComponent.name);
     setDraggedComponent(null);
@@ -279,7 +301,9 @@ export default function MotherboardBuilder({
       case "ram": return "border-cyan-500 bg-cyan-950/20";
       case "storage": return "border-blue-500 bg-blue-950/20";
       case "gpu": return "border-cyan-500 bg-cyan-950/20";
+      case "gpu": return "border-cyan-500 bg-cyan-950/20";
       case "psu": return "border-cyan-500 bg-cyan-950/20";
+      case "cooler": return "border-blue-400 bg-blue-950/20";
       default: return "border-cyan-500/20";
     }
   };
@@ -291,6 +315,7 @@ export default function MotherboardBuilder({
       case "storage": return HardDrive;
       case "gpu": return MonitorIcon;
       case "psu": return Zap;
+      case "cooler": return CheckCircle2; // Fallback or distinct icon
       default: return Cpu;
     }
   };
@@ -335,7 +360,7 @@ export default function MotherboardBuilder({
           </button>
         </div>
       )}
-      
+
       {/* Preset Configurations - Compact */}
       <div className="bg-blue-950/20 border border-cyan-500/30 rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
@@ -347,26 +372,24 @@ export default function MotherboardBuilder({
             <motion.button
               key={idx}
               onClick={() => loadPreset(preset)}
-              className={`flex-1 border-2 rounded-lg p-2 text-left transition-all duration-200 ${
-                preset.color === 'cyan' 
-                  ? 'bg-gradient-to-br from-blue-950/30 to-blue-900/30 border-cyan-500/40 hover:border-cyan-400' 
-                  : preset.color === 'blue'
+              className={`flex-1 border-2 rounded-lg p-2 text-left transition-all duration-200 ${preset.color === 'cyan'
+                ? 'bg-gradient-to-br from-blue-950/30 to-blue-900/30 border-cyan-500/40 hover:border-cyan-400'
+                : preset.color === 'blue'
                   ? 'bg-gradient-to-br from-blue-900/40 to-cyan-950/40 border-cyan-500/50 hover:border-cyan-400'
                   : 'bg-gradient-to-br from-blue-800/40 to-cyan-900/40 border-cyan-500/60 hover:border-cyan-300'
-              }`}
+                }`}
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <h5 className="font-bold text-cyan-300 text-xs">{preset.name}</h5>
-                  <span className={`font-bold text-xs ${
-                    preset.color === 'cyan' 
-                      ? 'text-cyan-400' 
-                      : preset.color === 'blue'
+                  <span className={`font-bold text-xs ${preset.color === 'cyan'
+                    ? 'text-cyan-400'
+                    : preset.color === 'blue'
                       ? 'text-blue-400'
                       : 'text-cyan-300'
-                  }`}>{preset.price}</span>
+                    }`}>{preset.price}</span>
                 </div>
                 <p className="text-xs text-cyan-300/70 font-medium">{preset.desc}</p>
               </div>
@@ -381,7 +404,7 @@ export default function MotherboardBuilder({
           <h4 className="text-xs font-semibold text-cyan-400 sticky top-0 bg-[#0d1b2a]/95 backdrop-blur-sm pb-1 z-10 flex items-center gap-1">
             📦 Drag komponen ke socket →
           </h4>
-            
+
           {/* CPU Category */}
           <div className="mb-3">
             <div className="flex items-center gap-1.5 mb-1.5">
@@ -390,8 +413,8 @@ export default function MotherboardBuilder({
             </div>
             <div className="space-y-1.5">
               {allCPUOptions.map((cpu, idx) => (
-                <motion.div 
-                  key={idx} 
+                <motion.div
+                  key={idx}
                   draggable={true}
                   onDragStart={() => handleDragStart({
                     id: `cpu-catalog-${idx}`,
@@ -423,8 +446,8 @@ export default function MotherboardBuilder({
             </div>
             <div className="space-y-1.5">
               {allRAMOptions.map((ram, idx) => (
-                <motion.div 
-                  key={idx} 
+                <motion.div
+                  key={idx}
                   draggable={true}
                   onDragStart={() => handleDragStart({
                     id: `ram-catalog-${idx}`,
@@ -456,8 +479,8 @@ export default function MotherboardBuilder({
             </div>
             <div className="space-y-1.5">
               {allStorageOptions.map((storage, idx) => (
-                <motion.div 
-                  key={idx} 
+                <motion.div
+                  key={idx}
                   draggable={true}
                   onDragStart={() => handleDragStart({
                     id: `storage-catalog-${idx}`,
@@ -489,8 +512,8 @@ export default function MotherboardBuilder({
             </div>
             <div className="space-y-1.5">
               {allGPUOptions.map((gpu, idx) => (
-                <motion.div 
-                  key={idx} 
+                <motion.div
+                  key={idx}
                   draggable={true}
                   onDragStart={() => handleDragStart({
                     id: `gpu-catalog-${idx}`,
@@ -522,8 +545,8 @@ export default function MotherboardBuilder({
             </div>
             <div className="space-y-1.5">
               {allPSUOptions.map((psu, idx) => (
-                <motion.div 
-                  key={idx} 
+                <motion.div
+                  key={idx}
                   draggable={true}
                   onDragStart={() => handleDragStart({
                     id: `psu-catalog-${idx}`,
@@ -545,13 +568,46 @@ export default function MotherboardBuilder({
               ))}
             </div>
           </div>
+
+          {/* Cooling Category */}
+          <div className="mb-3">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <Zap className="w-4 h-4 text-cyan-300" />
+              <p className="text-xs font-semibold text-cyan-300">Cooling</p>
+            </div>
+            <div className="space-y-1.5">
+              {allCoolerOptions.map((cooler, idx) => (
+                <motion.div
+                  key={idx}
+                  draggable={true}
+                  onDragStart={() => handleDragStart({
+                    id: `cooler-catalog-${idx}`,
+                    type: "cooler",
+                    name: cooler.name,
+                    specs: `${cooler.name}`,
+                    price: cooler.price,
+                    power: cooler.power
+                  })}
+                  className="text-xs p-2 rounded bg-blue-950/30 border border-cyan-500/30 cursor-grab active:cursor-grabbing hover:border-cyan-400 hover:bg-blue-900/30 transition-all duration-200"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-cyan-300 font-mono truncate">{cooler.name}</span>
+                    <span className="text-blue-400 ml-1">{cooler.price}</span>
+                  </div>
+                  <div className="text-[10px] text-cyan-400/70 mt-0.5">{cooler.noise}</div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Motherboard */}
         <div className="col-span-8 flex flex-col gap-2 h-[500px]">
           {/* Installed Components Summary */}
           {Object.keys(socketContents).length > 0 && (
-            <motion.div 
+            <motion.div
               className="bg-blue-950/30 rounded-lg p-2 border border-cyan-500/30 flex-shrink-0"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -578,7 +634,7 @@ export default function MotherboardBuilder({
             </motion.div>
           )}
 
-          <div 
+          <div
             className="relative w-full flex-1 bg-gradient-to-br from-blue-950/20 to-cyan-950/20 border-2 border-cyan-500/30 rounded-lg overflow-hidden"
             onWheel={handleCanvasWheel}
             onMouseDown={handleCanvasMouseDown}
@@ -588,7 +644,7 @@ export default function MotherboardBuilder({
             style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
           >
             {/* Canvas transform container */}
-            <div 
+            <div
               style={{
                 transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${canvasZoom})`,
                 transformOrigin: 'center',
@@ -598,188 +654,187 @@ export default function MotherboardBuilder({
                 position: 'relative',
               }}
             >
-            {/* PCB Texture Background */}
-            <div className="absolute inset-0">
-              {/* Base grid pattern */}
-              <div className="absolute inset-0 opacity-15 dark:opacity-10" style={{
-                backgroundImage: `
+              {/* PCB Texture Background */}
+              <div className="absolute inset-0">
+                {/* Base grid pattern */}
+                <div className="absolute inset-0 opacity-15 dark:opacity-10" style={{
+                  backgroundImage: `
                   linear-gradient(0deg, transparent 24%, rgba(0, 0, 0, .08) 25%, rgba(0, 0, 0, .08) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, .08) 75%, rgba(0, 0, 0, .08) 76%, transparent 77%, transparent),
                   linear-gradient(90deg, transparent 24%, rgba(0, 0, 0, .08) 25%, rgba(0, 0, 0, .08) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, .08) 75%, rgba(0, 0, 0, .08) 76%, transparent 77%, transparent)
                 `,
-                backgroundSize: '50px 50px',
-              }}></div>
-              
-              {/* Subtle noise texture */}
-              <div className="absolute inset-0 opacity-5 dark:opacity-10" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-              }}></div>
-            </div>
+                  backgroundSize: '50px 50px',
+                }}></div>
 
-            {/* Decorative PCB Elements */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none">
-              {/* Mounting holes */}
-              <circle cx="5%" cy="5%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
-              <circle cx="95%" cy="5%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
-              <circle cx="5%" cy="95%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
-              <circle cx="95%" cy="95%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
-              
-              {/* Decorative corner brackets */}
-              <path d="M 20 20 L 20 40 M 20 20 L 40 20" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400 dark:text-cyan-600 opacity-30" />
-              <path d="M 380 20 L 380 40 M 380 20 L 360 20" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400 dark:text-cyan-600 opacity-30" transform="translate(480, 0)" />
-            </svg>
+                {/* Subtle noise texture */}
+                <div className="absolute inset-0 opacity-5 dark:opacity-10" style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                }}></div>
+              </div>
 
-            {/* Enhanced Circuit traces - Tidy routing */}
-            <svg className="absolute inset-0 w-full h-full opacity-50 dark:opacity-30">
-              {/* PSU to main power bus */}
-              <line x1="5%" y1="50%" x2="5%" y2="35%" stroke="#eab308" strokeWidth="3" strokeLinecap="round" />
-              
-              {/* Main power bus from left edge */}
-              <line x1="5%" y1="35%" x2="20%" y2="35%" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" />
-              
-              {/* CPU power trace */}
-              <line x1="20%" y1="35%" x2="25%" y2="35%" stroke="#10b981" strokeWidth="2" strokeLinecap="round" />
-              <line x1="25%" y1="35%" x2="25%" y2="30%" stroke="#10b981" strokeWidth="2" strokeLinecap="round" />
-              
-              {/* RAM slot 1 trace */}
-              <line x1="20%" y1="35%" x2="20%" y2="25%" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" />
-              <line x1="20%" y1="25%" x2="70%" y2="25%" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" />
-              
-              {/* RAM slot 2 trace */}
-              <line x1="70%" y1="25%" x2="85%" y2="25%" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" />
-              
-              {/* GPU power trace */}
-              <line x1="20%" y1="35%" x2="20%" y2="72%" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" />
-              <line x1="20%" y1="72%" x2="35%" y2="72%" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" />
-              
-              {/* Storage trace */}
-              <line x1="20%" y1="35%" x2="20%" y2="50%" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
-              <line x1="20%" y1="50%" x2="75%" y2="50%" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
-              <line x1="75%" y1="50%" x2="75%" y2="70%" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
-              
-              {/* Power connection dots at each socket */}
-              {/* CPU socket dot */}
-              <circle cx="25%" cy="30%" r="4" className="fill-emerald-500 dark:fill-emerald-400" opacity="0.8">
-                <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite" />
-              </circle>
-              
-              {/* RAM slot 1 dot */}
-              <circle cx="70%" cy="25%" r="4" className="fill-cyan-500 dark:fill-cyan-400" opacity="0.8">
-                <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="0.2s" repeatCount="indefinite" />
-              </circle>
-              
-              {/* RAM slot 2 dot */}
-              <circle cx="85%" cy="25%" r="4" className="fill-cyan-500 dark:fill-cyan-400" opacity="0.8">
-                <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="0.4s" repeatCount="indefinite" />
-              </circle>
-              
-              {/* GPU socket dot */}
-              <circle cx="35%" cy="72%" r="4" className="fill-purple-500 dark:fill-purple-400" opacity="0.8">
-                <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="0.6s" repeatCount="indefinite" />
-              </circle>
-              
-              {/* Storage socket dot */}
-              <circle cx="75%" cy="70%" r="4" className="fill-blue-500 dark:fill-blue-400" opacity="0.8">
-                <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="0.8s" repeatCount="indefinite" />
-              </circle>
-              
-              {/* Main power junction dot */}
-              <circle cx="20%" cy="35%" r="5" className="fill-emerald-500 dark:fill-emerald-400" opacity="0.9">
-                <animate attributeName="opacity" values="0.9;1;0.9" dur="1.5s" repeatCount="indefinite" />
-              </circle>
-              
-              {/* PSU connector dot */}
-              <circle cx="5%" cy="50%" r="5" className="fill-yellow-500 dark:fill-yellow-400" opacity="0.9">
-                <animate attributeName="opacity" values="0.9;1;0.9" dur="1s" repeatCount="indefinite" />
-              </circle>
-            </svg>
+              {/* Decorative PCB Elements */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                {/* Mounting holes */}
+                <circle cx="5%" cy="5%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
+                <circle cx="95%" cy="5%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
+                <circle cx="5%" cy="95%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
+                <circle cx="95%" cy="95%" r="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-cyan-400 dark:text-cyan-600 opacity-40" />
 
-            {/* Sockets */}
-            {sockets.map((socket) => {
-              // Get installed component from socketContents
-              const installedComponent = socketContents[socket.id] || null;
-              const Icon = getComponentIcon(socket.type);
-              
-              return (
-                <motion.div
-                  key={socket.id}
-                  onDragOver={(e) => handleDragOver(e, socket)}
-                  onDrop={(e) => handleDrop(e, socket)}
-                  className={`absolute border-2 rounded-lg transition-all duration-200 ${
-                    socket.installed 
-                      ? "border-solid border-cyan-500 bg-blue-950/40" 
-                      : draggedComponent && draggedComponent.type === socket.type 
-                        ? "border-dashed border-cyan-400 bg-cyan-950/30 animate-pulse" 
+                {/* Decorative corner brackets */}
+                <path d="M 20 20 L 20 40 M 20 20 L 40 20" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400 dark:text-cyan-600 opacity-30" />
+                <path d="M 380 20 L 380 40 M 380 20 L 360 20" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400 dark:text-cyan-600 opacity-30" transform="translate(480, 0)" />
+              </svg>
+
+              {/* Enhanced Circuit traces - Tidy routing */}
+              <svg className="absolute inset-0 w-full h-full opacity-50 dark:opacity-30">
+                {/* PSU to main power bus */}
+                <line x1="5%" y1="50%" x2="5%" y2="35%" stroke="#eab308" strokeWidth="3" strokeLinecap="round" />
+
+                {/* Main power bus from left edge */}
+                <line x1="5%" y1="35%" x2="20%" y2="35%" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" />
+
+                {/* CPU power trace */}
+                <line x1="20%" y1="35%" x2="25%" y2="35%" stroke="#10b981" strokeWidth="2" strokeLinecap="round" />
+                <line x1="25%" y1="35%" x2="25%" y2="30%" stroke="#10b981" strokeWidth="2" strokeLinecap="round" />
+
+                {/* RAM slot 1 trace */}
+                <line x1="20%" y1="35%" x2="20%" y2="25%" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" />
+                <line x1="20%" y1="25%" x2="70%" y2="25%" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" />
+
+                {/* RAM slot 2 trace */}
+                <line x1="70%" y1="25%" x2="85%" y2="25%" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" />
+
+                {/* GPU power trace */}
+                <line x1="20%" y1="35%" x2="20%" y2="72%" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" />
+                <line x1="20%" y1="72%" x2="35%" y2="72%" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" />
+
+                {/* Storage trace */}
+                <line x1="20%" y1="35%" x2="20%" y2="50%" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
+                <line x1="20%" y1="50%" x2="75%" y2="50%" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
+                <line x1="75%" y1="50%" x2="75%" y2="70%" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
+
+                {/* Power connection dots at each socket */}
+                {/* CPU socket dot */}
+                <circle cx="25%" cy="30%" r="4" className="fill-emerald-500 dark:fill-emerald-400" opacity="0.8">
+                  <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite" />
+                </circle>
+
+                {/* RAM slot 1 dot */}
+                <circle cx="70%" cy="25%" r="4" className="fill-cyan-500 dark:fill-cyan-400" opacity="0.8">
+                  <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="0.2s" repeatCount="indefinite" />
+                </circle>
+
+                {/* RAM slot 2 dot */}
+                <circle cx="85%" cy="25%" r="4" className="fill-cyan-500 dark:fill-cyan-400" opacity="0.8">
+                  <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="0.4s" repeatCount="indefinite" />
+                </circle>
+
+                {/* GPU socket dot */}
+                <circle cx="35%" cy="72%" r="4" className="fill-purple-500 dark:fill-purple-400" opacity="0.8">
+                  <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="0.6s" repeatCount="indefinite" />
+                </circle>
+
+                {/* Storage socket dot */}
+                <circle cx="75%" cy="70%" r="4" className="fill-blue-500 dark:fill-blue-400" opacity="0.8">
+                  <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="0.8s" repeatCount="indefinite" />
+                </circle>
+
+                {/* Main power junction dot */}
+                <circle cx="20%" cy="35%" r="5" className="fill-emerald-500 dark:fill-emerald-400" opacity="0.9">
+                  <animate attributeName="opacity" values="0.9;1;0.9" dur="1.5s" repeatCount="indefinite" />
+                </circle>
+
+                {/* PSU connector dot */}
+                <circle cx="5%" cy="50%" r="5" className="fill-yellow-500 dark:fill-yellow-400" opacity="0.9">
+                  <animate attributeName="opacity" values="0.9;1;0.9" dur="1s" repeatCount="indefinite" />
+                </circle>
+              </svg>
+
+              {/* Sockets */}
+              {sockets.map((socket) => {
+                // Get installed component from socketContents
+                const installedComponent = socketContents[socket.id] || null;
+                const Icon = getComponentIcon(socket.type);
+
+                return (
+                  <motion.div
+                    key={socket.id}
+                    onDragOver={(e) => handleDragOver(e, socket)}
+                    onDrop={(e) => handleDrop(e, socket)}
+                    className={`absolute border-2 rounded-lg transition-all duration-200 ${socket.installed
+                      ? "border-solid border-cyan-500 bg-blue-950/40"
+                      : draggedComponent && draggedComponent.type === socket.type
+                        ? "border-dashed border-cyan-400 bg-cyan-950/30 animate-pulse"
                         : "border-dashed border-cyan-500/30 bg-blue-950/20"
-                  }`}
-                  style={{
-                    top: socket.position.top,
-                    left: socket.position.left,
-                    width: `${socket.size.width}px`,
-                    height: `${socket.size.height}px`,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ 
-                    opacity: 1, 
-                    scale: 1,
-                    boxShadow: socket.installed 
-                      ? "0 0 20px rgba(16, 185, 129, 0.3)" 
-                      : "none"
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="absolute inset-0 flex items-center justify-center p-0.5">
-                    {installedComponent ? (
-                      <motion.div 
-                        className="text-center"
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      >
-                        <div className="relative">
-                          <Icon className="w-10 h-10 text-cyan-400 mx-auto" />
-                          <motion.div 
-                            className="absolute -top-1 -right-1"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.2 }}
-                          >
-                            <CheckCircle2 className="w-5 h-5 text-cyan-400" />
-                          </motion.div>
+                      }`}
+                    style={{
+                      top: socket.position.top,
+                      left: socket.position.left,
+                      width: `${socket.size.width}px`,
+                      height: `${socket.size.height}px`,
+                      transform: 'translate(-50%, -50%)',
+                    }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                      boxShadow: socket.installed
+                        ? "0 0 20px rgba(16, 185, 129, 0.3)"
+                        : "none"
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center p-0.5">
+                      {installedComponent ? (
+                        <motion.div
+                          className="text-center"
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        >
+                          <div className="relative">
+                            <Icon className="w-10 h-10 text-cyan-400 mx-auto" />
+                            <motion.div
+                              className="absolute -top-1 -right-1"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: 0.2 }}
+                            >
+                              <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+                            </motion.div>
+                          </div>
+                          <p className="text-xs font-mono text-cyan-400 leading-tight max-w-full mx-auto truncate mt-1.5">
+                            {installedComponent.name.split(" ").slice(0, 2).join(" ")}
+                          </p>
+                        </motion.div>
+                      ) : (
+                        <div className="text-center">
+                          <Icon className={`${socket.type === 'cooler' ? 'w-6 h-6' : 'w-10 h-10'} text-cyan-400/50 mx-auto opacity-50`} />
+                          <p className={`${socket.type === 'cooler' ? 'text-[9px]' : 'text-xs'} font-mono text-cyan-300/70 leading-tight mt-1.5`}>
+                            {socket.label.split(" ")[0]}
+                          </p>
+                          <p className={`${socket.type === 'cooler' ? 'text-[8px]' : 'text-[10px]'} font-mono text-cyan-400/50`}>
+                            Drop {socket.type.toUpperCase()}
+                          </p>
                         </div>
-                        <p className="text-xs font-mono text-cyan-400 leading-tight max-w-full mx-auto truncate mt-1.5">
-                          {installedComponent.name.split(" ").slice(0, 2).join(" ")}
-                        </p>
-                      </motion.div>
-                    ) : (
-                      <div className="text-center">
-                        <Icon className="w-10 h-10 text-cyan-400/50 mx-auto opacity-50" />
-                        <p className="text-xs font-mono text-cyan-300/70 leading-tight mt-1.5">
-                          {socket.label.split(" ")[0]}
-                        </p>
-                        <p className="text-[10px] font-mono text-cyan-400/50">
-                          Drop {socket.type.toUpperCase()}
-                        </p>
-                      </div>
+                      )}
+                    </div>
+
+                    {/* Hover glow effect */}
+                    {!socket.installed && draggedComponent?.type === socket.type && (
+                      <motion.div
+                        className="absolute inset-0 rounded-lg"
+                        animate={{
+                          boxShadow: ["0 0 10px rgba(6, 182, 212, 0.3)", "0 0 20px rgba(6, 182, 212, 0.5)", "0 0 10px rgba(6, 182, 212, 0.3)"]
+                        }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                      />
                     )}
-                  </div>
-                  
-                  {/* Hover glow effect */}
-                  {!socket.installed && draggedComponent?.type === socket.type && (
-                    <motion.div 
-                      className="absolute inset-0 rounded-lg"
-                      animate={{ 
-                        boxShadow: ["0 0 10px rgba(6, 182, 212, 0.3)", "0 0 20px rgba(6, 182, 212, 0.5)", "0 0 10px rgba(6, 182, 212, 0.3)"]
-                      }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                    />
-                  )}
-                </motion.div>
-              );
-            })}
+                  </motion.div>
+                );
+              })}
 
             </div>
-            
+
             {/* Motherboard Label - Float outside canvas */}
             <div className="absolute bottom-2 right-2 text-right pointer-events-none">
               <p className="text-[10px] font-mono text-cyan-400/70">ATX Motherboard</p>
@@ -795,21 +850,19 @@ export default function MotherboardBuilder({
 
             {/* Power Requirement Indicator - Float outside canvas */}
             {Object.keys(socketContents).length > 0 && (
-              <motion.div 
-                className={`absolute top-2 left-2 border-2 rounded-lg px-2 py-1.5 pointer-events-none backdrop-blur-sm ${
-                  socketContents["psu-connector"] && isPSUSufficient()
-                    ? "bg-blue-950/80 border-cyan-500"
-                    : "bg-blue-950/80 border-yellow-500"
-                }`}
+              <motion.div
+                className={`absolute top-2 left-2 border-2 rounded-lg px-2 py-1.5 pointer-events-none backdrop-blur-sm ${socketContents["psu-connector"] && isPSUSufficient()
+                  ? "bg-blue-950/80 border-cyan-500"
+                  : "bg-blue-950/80 border-yellow-500"
+                  }`}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
               >
                 <div className="flex items-center gap-1.5 mb-1">
-                  <Zap className={`w-4 h-4 ${
-                    socketContents["psu-connector"] && isPSUSufficient()
-                      ? "text-cyan-400"
-                      : "text-yellow-400"
-                  }`} />
+                  <Zap className={`w-4 h-4 ${socketContents["psu-connector"] && isPSUSufficient()
+                    ? "text-cyan-400"
+                    : "text-yellow-400"
+                    }`} />
                   <p className="text-xs font-bold text-cyan-300">Daya Sistem</p>
                 </div>
                 <div className="space-y-0.5 text-[10px] font-mono">
@@ -820,11 +873,10 @@ export default function MotherboardBuilder({
                     Rekomendasi: <span className="font-bold">{getRecommendedPSU()}W+</span>
                   </p>
                   {socketContents["psu-connector"] ? (
-                    <p className={`font-bold ${
-                      isPSUSufficient()
-                        ? "text-cyan-400"
-                        : "text-red-400"
-                    }`}>
+                    <p className={`font-bold ${isPSUSufficient()
+                      ? "text-cyan-400"
+                      : "text-red-400"
+                      }`}>
                       PSU: {socketContents["psu-connector"].name}
                     </p>
                   ) : (
@@ -835,7 +887,7 @@ export default function MotherboardBuilder({
                 </div>
               </motion.div>
             )}
-            
+
             {/* Canvas Controls */}
             <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1.5">
               <button
@@ -861,7 +913,7 @@ export default function MotherboardBuilder({
               </span>
             </div>
           </div>
-          
+
           <p className="text-xs text-center text-cyan-300/70 mt-2 font-mono">
             💡 Tip: Pastikan komponen dipasang di socket yang benar!
           </p>

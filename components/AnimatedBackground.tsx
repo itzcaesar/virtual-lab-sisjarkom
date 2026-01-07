@@ -6,7 +6,7 @@ export default function AnimatedBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#0a1628]">
       {/* Blueprint Grid - Major Lines */}
-      <div 
+      <div
         className="absolute inset-0 opacity-20"
         style={{
           backgroundImage: `
@@ -16,9 +16,9 @@ export default function AnimatedBackground() {
           backgroundSize: "100px 100px",
         }}
       />
-      
+
       {/* Blueprint Grid - Minor Lines */}
-      <div 
+      <div
         className="absolute inset-0 opacity-10"
         style={{
           backgroundImage: `
@@ -35,52 +35,54 @@ export default function AnimatedBackground() {
         <line x1="20" y1="20" x2="100" y2="20" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
         <line x1="20" y1="20" x2="20" y2="100" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
         <circle cx="20" cy="20" r="4" fill="#3b82f6" />
-        
+
         {/* Top Right Corner */}
         <line x1="calc(100% - 20px)" y1="20" x2="calc(100% - 100px)" y2="20" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
         <line x1="calc(100% - 20px)" y1="20" x2="calc(100% - 20px)" y2="100" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
         <circle cx="calc(100% - 20px)" cy="20" r="4" fill="#3b82f6" />
-        
+
         {/* Bottom Left Corner */}
         <line x1="20" y1="calc(100% - 20px)" x2="100" y2="calc(100% - 20px)" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
         <line x1="20" y1="calc(100% - 20px)" x2="20" y2="calc(100% - 100px)" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
         <circle cx="20" cy="calc(100% - 20px)" r="4" fill="#3b82f6" />
-        
+
         {/* Bottom Right Corner */}
         <line x1="calc(100% - 20px)" y1="calc(100% - 20px)" x2="calc(100% - 100px)" y2="calc(100% - 20px)" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
         <line x1="calc(100% - 20px)" y1="calc(100% - 20px)" x2="calc(100% - 20px)" y2="calc(100% - 100px)" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
         <circle cx="calc(100% - 20px)" cy="calc(100% - 20px)" r="4" fill="#3b82f6" />
       </svg>
 
-      {/* Subtle Blue Glow */}
+      {/* Subtle Blue Glow - Optimized */}
       <motion.div
-        className="absolute w-[800px] h-[800px] rounded-full"
+        className="absolute w-[600px] h-[600px] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, rgba(59,130,246,0) 70%)",
-          filter: "blur(100px)",
+          background: "radial-gradient(circle, rgba(59,130,246,0.05) 0%, rgba(59,130,246,0) 70%)",
+          filter: "blur(60px)", // Reduced blur radius for performance
           left: "20%",
           top: "20%",
+          willChange: "transform", // Hint for optimization
         }}
         animate={{
-          x: ["-10%", "10%", "-10%"],
-          y: ["-10%", "10%", "-10%"],
-          scale: [1, 1.1, 1],
+          x: ["-5%", "5%", "-5%"], // Reduced movement range
+          y: ["-5%", "5%", "-5%"],
+          scale: [1, 1.05, 1], // Reduced scale range
         }}
         transition={{
-          duration: 30,
+          duration: 40, // Slower animation
           repeat: Infinity,
-          ease: "easeInOut",
+          ease: "linear", // Simpler easing
         }}
       />
 
-      {/* Technical Nodes/Connection Points */}
-      {Array.from({ length: 15 }).map((_, i) => (
+      {/* Technical Nodes/Connection Points - Optimized count */}
+      {Array.from({ length: 8 }).map((_, i) => (
         <motion.div
           key={i}
           className="absolute"
           style={{
-            left: `${(i % 5) * 25 + 10}%`,
-            top: `${Math.floor(i / 5) * 33 + 15}%`,
+            left: `${(i % 4) * 30 + 10}%`,
+            top: `${Math.floor(i / 4) * 40 + 15}%`,
+            willChange: "transform, opacity", // Hint to browser for optimization
           }}
         >
           <motion.div
@@ -90,24 +92,24 @@ export default function AnimatedBackground() {
               opacity: [0.3, 0.6, 0.3],
             }}
             transition={{
-              duration: 2 + (i * 0.3),
+              duration: 3 + (i * 0.5), // Slower, less frequent updates
               repeat: Infinity,
               ease: "easeInOut",
             }}
           >
             {/* Node point */}
             <div className="w-2 h-2 bg-blue-400 rounded-full" />
-            {/* Pulse ring */}
+            {/* Pulse ring - optimized */}
             <motion.div
               className="absolute inset-0 border-2 border-blue-400 rounded-full"
               animate={{
-                scale: [1, 2.5],
+                scale: [1, 2],
                 opacity: [0.5, 0],
               }}
               transition={{
-                duration: 2,
+                duration: 3,
                 repeat: Infinity,
-                delay: i * 0.2,
+                delay: i * 0.5,
               }}
             />
           </motion.div>

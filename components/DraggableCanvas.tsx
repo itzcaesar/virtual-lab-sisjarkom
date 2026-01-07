@@ -96,7 +96,7 @@ export default function DraggableCanvas({
       setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
       return;
     }
-    
+
     // Space + Left click for panning
     if (spaceHeld && e.button === 0) {
       e.preventDefault();
@@ -106,27 +106,41 @@ export default function DraggableCanvas({
     }
   };
 
+  // Ref for throttling mouse moves
+  const requestRef = useRef<number>();
+
   const handleCanvasMouseMove = (e: React.MouseEvent) => {
-    if (isPanning) {
-      setPanOffset({
-        x: e.clientX - panStart.x,
-        y: e.clientY - panStart.y,
-      });
-      return;
-    }
+    e.persist(); // Persist synthetic event if needed, though mostly not for properties used here
 
-    if (!draggingModule) return;
+    // Throttling logic
+    if (requestRef.current) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - dragOffset.x - panOffset.x;
-    const y = e.clientY - rect.top - dragOffset.y - panOffset.y;
-
-    onModuleMove(draggingModule, { x, y });
+    requestRef.current = requestAnimationFrame(() => {
+      if (isPanning) {
+        setPanOffset({
+          x: e.clientX - panStart.x,
+          y: e.clientY - panStart.y,
+        });
+      } else if (draggingModule) {
+        const rect = canvasRef.current?.getBoundingClientRect();
+        if (rect) {
+          const x = e.clientX - rect.left - dragOffset.x - panOffset.x;
+          const y = e.clientY - rect.top - dragOffset.y - panOffset.y;
+          onModuleMove(draggingModule, { x, y });
+        }
+      }
+      requestRef.current = undefined;
+    });
   };
 
   const handleMouseUp = () => {
     setDraggingModule(null);
     setIsPanning(false);
+    // Cancel any pending frame to avoid state updates after mouse up
+    if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current);
+      requestRef.current = undefined;
+    }
   };
 
   const getModuleIcon = (type: string) => {
@@ -179,9 +193,8 @@ export default function DraggableCanvas({
   return (
     <div
       ref={canvasRef}
-      className={`relative w-full h-full bg-[#0a1628]/30 rounded-lg overflow-hidden ${
-        isPanning ? "cursor-grabbing" : spaceHeld ? "cursor-grab" : "cursor-default"
-      }`}
+      className={`relative w-full h-full bg-[#0a1628]/30 rounded-lg overflow-hidden ${isPanning ? "cursor-grabbing" : spaceHeld ? "cursor-grab" : "cursor-default"
+        }`}
       onMouseDown={handleCanvasMouseDown}
       onMouseMove={handleCanvasMouseMove}
       onMouseUp={handleMouseUp}
@@ -231,17 +244,17 @@ export default function DraggableCanvas({
           {/* Animated Cable Glow Filter */}
           <defs>
             <filter id="glow-power" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
               <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
             <filter id="glow-ethernet" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
               <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
           </defs>
@@ -256,7 +269,7 @@ export default function DraggableCanvas({
 
             return (
               <g key={cable.id}>
-                {/* Cable shadow */}
+                {/* Cable shadow - simplified */}
                 <motion.line
                   x1={fromModule.position.x}
                   y1={fromModule.position.y}
@@ -265,8 +278,8 @@ export default function DraggableCanvas({
                   stroke={getCableColor(cable.type)}
                   strokeWidth="6"
                   strokeLinecap="round"
-                  opacity="0.3"
-                  filter={`url(#glow-${cable.type})`}
+                  opacity="0.15" // Reduced opacity
+                  // Removed heavy blur filter for performance
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
                   transition={{ duration: 0.5 }}
@@ -370,15 +383,13 @@ export default function DraggableCanvas({
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
                 <div
-                  className={`card rounded-lg p-4 border-2 transition-all ${
-                    deleteMode ? "border-red-500 hover:bg-red-950/50" : getModuleColor(module.type)
-                  } ${
-                    isSelected
+                  className={`card rounded-lg p-4 border-2 transition-all ${deleteMode ? "border-red-500 hover:bg-red-950/50" : getModuleColor(module.type)
+                    } ${isSelected
                       ? "ring-4 ring-yellow-400/50"
                       : isConnecting
-                      ? "ring-4 ring-orange-400/50 animate-pulse"
-                      : ""
-                  }`}
+                        ? "ring-4 ring-orange-400/50 animate-pulse"
+                        : ""
+                    }`}
                   onMouseDown={(e) => !deleteMode && handleModuleMouseDown(e, module)}
                   onClick={() => {
                     if (deleteMode && onModuleDelete) {

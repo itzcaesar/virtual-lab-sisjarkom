@@ -58,7 +58,7 @@ export default function Stage({
   // ============================================================================
   // STATE MANAGEMENT
   // ============================================================================
-  
+
   // Canvas state
   const [modules, setModules] = useState<CanvasModule[]>([]);
   const [cables, setCables] = useState<CableConnection[]>([]);
@@ -66,19 +66,30 @@ export default function Stage({
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [moduleCounter, setModuleCounter] = useState({ pc: 0, monitor: 0, router: 0 });
   const [deleteMode, setDeleteMode] = useState(false);
-  
+
   // Configuration tracking
   const [configuringModuleId, setConfiguringModuleId] = useState<string | null>(null);
-  
+
   // Multi-PC configuration tracking (maps module ID to OS type)
   const [pcConfigurations, setPcConfigurations] = useState<Record<string, { os: OSType; hardware: boolean; network: boolean }>>({});
-  
+
   // VM selector state
   const [showVMSelector, setShowVMSelector] = useState(false);
   const [activeVMModuleId, setActiveVMModuleId] = useState<string | null>(null);
-  
+
   // Benchmark modal state
   const [showBenchmark, setShowBenchmark] = useState(false);
+
+  // File Sharing State (Shared between VMs)
+  const [sharedFiles, setSharedFiles] = useState<{ name: string, size: string, source: string }[]>([
+    { name: "project_blueprint.pdf", size: "2.4 MB", source: "SERVER-1" },
+    { name: "network_config.txt", size: "4 KB", source: "SERVER-1" }
+  ]);
+
+  const handleShareFile = (file: { name: string, size: string, source: string }) => {
+    setSharedFiles(prev => [...prev, file]);
+    addLog(`File ${file.name} dishare ke network oleh ${file.source}`);
+  };
 
   // Wrapper functions that mark the SPECIFIC module as configured
   const handleCompleteHardware = (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string }) => {
@@ -99,26 +110,26 @@ export default function Stage({
   const handleCompleteOS = (os: OSType, distro?: string) => {
     // Find the PC connected to this monitor via cables
     const connectedCable = cables.find(c => c.to === configuringModuleId || c.from === configuringModuleId);
-    const connectedPCId = connectedCable ? 
+    const connectedPCId = connectedCable ?
       (modules.find(m => m.id === connectedCable.from && m.type === "pc")?.id ||
-       modules.find(m => m.id === connectedCable.to && m.type === "pc")?.id) : null;
-    
+        modules.find(m => m.id === connectedCable.to && m.type === "pc")?.id) : null;
+
     // Fallback to any configured PC or first PC
-    const pcModule = connectedPCId ? 
+    const pcModule = connectedPCId ?
       modules.find(m => m.id === connectedPCId) :
       modules.find(m => m.type === "pc" && m.configured) ||
       modules.find(m => m.type === "pc");
-    
+
     const pcIdToUse = pcModule?.id || undefined;
-    
+
     completeOS(os, distro, pcIdToUse);
-    
+
     // Mark only the specific monitor module being configured
     if (configuringModuleId) {
       setModules((prev) =>
         prev.map((m) => (m.id === configuringModuleId ? { ...m, configured: true } : m))
       );
-      
+
       // Store OS config for the associated PC
       if (pcModule) {
         setPcConfigurations(prev => ({
@@ -138,7 +149,7 @@ export default function Stage({
       );
     }
   };
-  
+
   // Get configured PCs with OS installed
   const getConfiguredPCs = () => {
     return modules.filter(m => m.type === "pc" && pcConfigurations[m.id]?.os);
@@ -214,7 +225,7 @@ export default function Stage({
       type,
       position: { x: 150 + modules.length * 50, y: 200 + modules.length * 30 },
       label: label,
-      configured: 
+      configured:
         (type === "pc" && gameState.hardwareInstalled) ||
         (type === "monitor" && !!gameState.osInstalled) ||
         (type === "router" && gameState.networkConnected),
@@ -233,7 +244,7 @@ export default function Stage({
   const handleModuleClick = (module: CanvasModule) => {
     setSelectedModule(module.id);
     setConfiguringModuleId(module.id);
-    
+
     // Open configuration based on module type - allow reconfiguration anytime
     if (module.type === "pc") {
       openPhase("hardware");
@@ -245,10 +256,10 @@ export default function Stage({
     } else if (module.type === "monitor") {
       // Find connected PC to check if hardware is installed
       const connectedCable = cables.find(c => c.to === module.id || c.from === module.id);
-      const connectedPCId = connectedCable ? 
+      const connectedPCId = connectedCable ?
         (connectedCable.to === module.id ? connectedCable.from : connectedCable.to) : null;
       const connectedPC = connectedPCId ? modules.find(m => m.id === connectedPCId && m.type === "pc") : null;
-      
+
       if (!connectedPC?.configured && !gameState.hardwareInstalled) {
         addLog(`⚠️ Install hardware terlebih dahulu sebelum mengkonfigurasi OS`);
         return;
@@ -272,16 +283,16 @@ export default function Stage({
       }
     }
   };
-  
+
   // Handle VM selection
   const handleOpenVM = (moduleId?: string) => {
     const configuredPCs = getConfiguredPCs();
-    
+
     if (configuredPCs.length === 0) {
       addLog(`⚠️ Tidak ada PC yang sudah dikonfigurasi dengan OS`);
       return;
     }
-    
+
     if (configuredPCs.length === 1 || moduleId) {
       // Single PC or specific PC selected
       const targetId = moduleId || configuredPCs[0].id;
@@ -293,13 +304,13 @@ export default function Stage({
       setShowVMSelector(true);
     }
   };
-  
+
   const selectVMAndOpen = (moduleId: string) => {
     setActiveVMModuleId(moduleId);
     setShowVMSelector(false);
     toggleVM();
   };
-  
+
   // Get the OS type for the active VM
   const getActiveVMOS = (): OSType | null => {
     if (!activeVMModuleId) return gameState.osInstalled;
@@ -320,7 +331,7 @@ export default function Stage({
   const getActiveOSEdition = (): string => {
     const specs = getActivePCSpecs();
     if (!specs) return gameState.windowsEdition || gameState.linuxDistro || "Unknown";
-    
+
     if (specs.osInstalled === "windows") {
       return specs.windowsEdition || gameState.windowsEdition || "Windows 11 Pro";
     } else if (specs.osInstalled === "linux") {
@@ -388,19 +399,19 @@ export default function Stage({
 
   const handleModuleDelete = (moduleId: string) => {
     const module = modules.find((m) => m.id === moduleId);
-    
+
     // If it's a PC being deleted, remove its specs
     if (module?.type === "pc" && gameState.pcSpecs[moduleId]) {
       removePCSpecs(moduleId);
     }
-    
+
     // Remove from pcConfigurations
     setPcConfigurations((prev) => {
       const newConfig = { ...prev };
       delete newConfig[moduleId];
       return newConfig;
     });
-    
+
     setModules((prev) => prev.filter((m) => m.id !== moduleId));
     setCables((prev) => prev.filter((c) => c.from !== moduleId && c.to !== moduleId));
     addLog(`${module?.label} dihapus dari canvas`);
@@ -413,7 +424,7 @@ export default function Stage({
       type: m.type,
       position: m.position,
       label: m.label,
-      configured: 
+      configured:
         (m.type === "pc" && gameState.hardwareInstalled) ||
         (m.type === "monitor" && !!gameState.osInstalled) ||
         (m.type === "router" && gameState.networkConnected),
@@ -453,9 +464,9 @@ export default function Stage({
   };
 
   // Calculate progress percentage
-  const progress = 
-    (gameState.hardwareInstalled ? 33 : 0) + 
-    (gameState.osInstalled ? 33 : 0) + 
+  const progress =
+    (gameState.hardwareInstalled ? 33 : 0) +
+    (gameState.osInstalled ? 33 : 0) +
     (gameState.networkConnected ? 34 : 0);
 
   return (
@@ -530,9 +541,8 @@ export default function Stage({
 
             <motion.button
               onClick={() => setDeleteMode(!deleteMode)}
-              className={`flex items-center gap-2 px-3 py-2 bg-blue-950/30 border rounded transition-all ${
-                deleteMode ? "border-red-500 bg-red-950/30" : "border-cyan-500/30 hover:bg-blue-900/30"
-              }`}
+              className={`flex items-center gap-2 px-3 py-2 bg-blue-950/30 border rounded transition-all ${deleteMode ? "border-red-500 bg-red-950/30" : "border-cyan-500/30 hover:bg-blue-900/30"
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -568,48 +578,48 @@ export default function Stage({
                       Buka VM {getConfiguredPCs().length > 1 ? `(${getConfiguredPCs().length})` : ""}
                     </span>
                   </motion.button>
-                
-                {/* VM Selector Dropdown */}
-                <AnimatePresence>
-                  {showVMSelector && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-full right-0 mt-2 w-48 bg-[#0d1b2a]/95 backdrop-blur-xl border border-cyan-500/30 rounded-lg overflow-hidden z-50"
-                    >
-                      <div className="p-2 border-b border-cyan-500/20">
-                        <p className="text-xs font-mono text-cyan-300">Pilih PC untuk buka VM:</p>
-                      </div>
-                      {getConfiguredPCs().map((pc) => {
-                        const osType = pcConfigurations[pc.id]?.os;
-                        return (
-                          <motion.button
-                            key={pc.id}
-                            onClick={() => selectVMAndOpen(pc.id)}
-                            className="w-full p-2 flex items-center gap-2 hover:bg-cyan-800 transition-all text-left"
-                            whileHover={{ x: 5 }}
-                          >
-                            <HardDrive className="w-4 h-4 text-emerald-400" />
-                            <div className="flex-1">
-                              <p className="text-xs font-mono text-cyan-300">{pc.label}</p>
-                              <p className={`text-[10px] ${osType === "windows" ? "text-blue-400" : "text-orange-400"}`}>
-                                {osType === "windows" ? "🪟 Windows" : `🐧 Linux`}
-                              </p>
-                            </div>
-                          </motion.button>
-                        );
-                      })}
-                      <motion.button
-                        onClick={() => setShowVMSelector(false)}
-                        className="w-full p-2 text-xs font-mono text-cyan-400/70 hover:bg-blue-900/30 transition-all duration-200 border-t border-cyan-500/20"
+
+                  {/* VM Selector Dropdown */}
+                  <AnimatePresence>
+                    {showVMSelector && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute top-full right-0 mt-2 w-48 bg-[#0d1b2a]/95 backdrop-blur-xl border border-cyan-500/30 rounded-lg overflow-hidden z-50"
                       >
-                        Batal
-                      </motion.button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                        <div className="p-2 border-b border-cyan-500/20">
+                          <p className="text-xs font-mono text-cyan-300">Pilih PC untuk buka VM:</p>
+                        </div>
+                        {getConfiguredPCs().map((pc) => {
+                          const osType = pcConfigurations[pc.id]?.os;
+                          return (
+                            <motion.button
+                              key={pc.id}
+                              onClick={() => selectVMAndOpen(pc.id)}
+                              className="w-full p-2 flex items-center gap-2 hover:bg-cyan-800 transition-all text-left"
+                              whileHover={{ x: 5 }}
+                            >
+                              <HardDrive className="w-4 h-4 text-emerald-400" />
+                              <div className="flex-1">
+                                <p className="text-xs font-mono text-cyan-300">{pc.label}</p>
+                                <p className={`text-[10px] ${osType === "windows" ? "text-blue-400" : "text-orange-400"}`}>
+                                  {osType === "windows" ? "🪟 Windows" : `🐧 Linux`}
+                                </p>
+                              </div>
+                            </motion.button>
+                          );
+                        })}
+                        <motion.button
+                          onClick={() => setShowVMSelector(false)}
+                          className="w-full p-2 text-xs font-mono text-cyan-400/70 hover:bg-blue-900/30 transition-all duration-200 border-t border-cyan-500/20"
+                        >
+                          Batal
+                        </motion.button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               )}
             </div>
           </div>
@@ -681,7 +691,27 @@ export default function Stage({
         )}
 
         {gameState.currentPhase === "os" && (
-          <OSModal onClose={closeModal} onComplete={handleCompleteOS} addLog={addLog} />
+          <OSModal
+            onClose={closeModal}
+            onComplete={handleCompleteOS}
+            addLog={addLog}
+            storageSize={(() => {
+              // Logic to find storage size of the connected PC
+              if (configuringModuleId) {
+                // If configuring a monitor, find the connected PC
+                const connectedCable = cables.find(c => c.to === configuringModuleId || c.from === configuringModuleId);
+                const connectedPCId = connectedCable ?
+                  (modules.find(m => m.id === connectedCable.from && m.type === "pc")?.id ||
+                    modules.find(m => m.id === connectedCable.to && m.type === "pc")?.id) : null;
+
+                if (connectedPCId && gameState.pcSpecs[connectedPCId]) {
+                  return gameState.pcSpecs[connectedPCId].storage;
+                }
+              }
+              // Fallback for single PC mode
+              return gameState.storage || "512GB NVMe SSD";
+            })()}
+          />
         )}
 
         {gameState.currentPhase === "network" && (
@@ -689,6 +719,7 @@ export default function Stage({
             onClose={closeModal}
             onComplete={handleCompleteNetwork}
             addLog={addLog}
+            isRouter={modules.find(m => m.id === configuringModuleId)?.type === "router" || false}
           />
         )}
       </AnimatePresence>
@@ -705,6 +736,9 @@ export default function Stage({
             edition={getActiveOSEdition()}
             hardware={getActivePCHardware()}
             performanceMetrics={getActivePCSpecs()?.performanceMetrics}
+            sharedFiles={sharedFiles}
+            onShareFile={handleShareFile}
+            computerName={modules.find(m => m.id === activeVMModuleId)?.label || "WINDOWS-PC"}
           />
         )}
 
@@ -718,9 +752,12 @@ export default function Stage({
             performanceMetrics={getActivePCSpecs()?.performanceMetrics || gameState.performanceMetrics}
             distro={getActiveOSEdition()}
             hardware={getActivePCHardware()}
+            sharedFiles={sharedFiles}
+            onShareFile={handleShareFile}
+            computerName={modules.find(m => m.id === activeVMModuleId)?.label || "LINUX-PC"}
           />
         )}
-        
+
         {showBenchmark && gameState.hardwareInstalled && (
           <BenchmarkModal
             onClose={() => setShowBenchmark(false)}

@@ -8,6 +8,7 @@ interface NetworkModalProps {
   onClose: () => void;
   onComplete: (config?: { ip: string; subnet: string; gateway: string; dns: string }) => void;
   addLog: (message: string) => void;
+  isRouter?: boolean;
 }
 
 // IP validation helper
@@ -25,7 +26,7 @@ const isIPInNetwork = (ip: string, gateway: string, subnet: string): boolean => 
   const ipParts = ip.split(".").map(Number);
   const gatewayParts = gateway.split(".").map(Number);
   const subnetParts = subnet.split(".").map(Number);
-  
+
   for (let i = 0; i < 4; i++) {
     if ((ipParts[i] & subnetParts[i]) !== (gatewayParts[i] & subnetParts[i])) {
       return false;
@@ -38,24 +39,31 @@ export default function NetworkModal({
   onClose,
   onComplete,
   addLog,
+  isRouter = false,
 }: NetworkModalProps) {
   const [step, setStep] = useState<"intro" | "cable" | "configure" | "test" | "connecting" | "done" | "failed">("intro");
   const [configMode, setConfigMode] = useState<"dhcp" | "manual">("dhcp");
   const [cableType, setCableType] = useState<"ethernet" | "fiber">("ethernet");
-  
+
   // Network configuration
   const [ipAddress, setIpAddress] = useState("192.168.1.100");
   const [subnetMask, setSubnetMask] = useState("255.255.255.0");
   const [gateway, setGateway] = useState("192.168.1.1");
   const [dns, setDns] = useState("8.8.8.8");
-  
+
   // Validation errors
   const [ipError, setIpError] = useState<string | null>(null);
   const [subnetError, setSubnetError] = useState<string | null>(null);
   const [gatewayError, setGatewayError] = useState<string | null>(null);
   const [dnsError, setDnsError] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  
+
+  // Router Config State
+  const [routerInterface, setRouterInterface] = useState("FastEthernet0/0");
+  const [interfaceStatus, setInterfaceStatus] = useState(false);
+  const [routingProtocol, setRoutingProtocol] = useState<"static" | "rip" | "ospf">("static");
+  const [dhcpServerEnabled, setDhcpServerEnabled] = useState(false);
+
   // Network testing
   const [pingTest, setPingTest] = useState<"idle" | "testing" | "success" | "failed">("idle");
   const [dnsTest, setDnsTest] = useState<"idle" | "testing" | "success" | "failed">("idle");
@@ -113,7 +121,7 @@ export default function NetworkModal({
       const subnetValid = validateSubnet(subnetMask);
       const gatewayValid = validateGateway(gateway);
       const dnsValid = validateDns(dns);
-      
+
       if (ipValid && subnetValid && gatewayValid && dnsValid) {
         setStep("test");
       }
@@ -122,10 +130,10 @@ export default function NetworkModal({
 
   const handleRunTests = () => {
     addLog("Menjalankan network diagnostic tests...");
-    
+
     // Check if IP is in the same network as gateway
     const inNetwork = isIPInNetwork(ipAddress, gateway, subnetMask);
-    
+
     // Ping test
     setPingTest("testing");
     setTimeout(() => {
@@ -138,12 +146,12 @@ export default function NetworkModal({
         addLog(`✓ Ping test ke gateway berhasil (${latency})`);
       }
     }, 1000);
-    
+
     // DNS test
     setTimeout(() => {
       setDnsTest("testing");
     }, 1500);
-    
+
     setTimeout(() => {
       if (!inNetwork && configMode === "manual") {
         setDnsTest("failed");
@@ -159,7 +167,7 @@ export default function NetworkModal({
   const handleConnect = () => {
     // Check if configuration is valid
     const inNetwork = isIPInNetwork(ipAddress, gateway, subnetMask);
-    
+
     if (!inNetwork && configMode === "manual") {
       setConnectionError("Konfigurasi IP tidak valid - IP tidak berada dalam jaringan yang sama dengan gateway");
       setStep("failed");
@@ -167,11 +175,11 @@ export default function NetworkModal({
       addLog(`IP ${ipAddress} tidak berada dalam subnet yang sama dengan gateway ${gateway}`);
       return;
     }
-    
+
     setStep("connecting");
     const cableName = cableType === "fiber" ? "kabel fiber optik" : "kabel ethernet";
     addLog(`Menghubungkan ${cableName}...`);
-    
+
     setTimeout(() => {
       addLog("Kabel terhubung. Konfigurasi jaringan...");
     }, 800);
@@ -211,7 +219,7 @@ export default function NetworkModal({
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-[#0d1b2a]/95 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl max-w-2xl w-full p-8 relative shadow-2xl shadow-cyan-500/20"
+        className="bg-[#0d1b2a]/95 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl max-w-2xl w-full p-6 relative shadow-2xl shadow-cyan-500/20 max-h-[90vh] overflow-y-auto"
         initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 20 }}
@@ -228,7 +236,7 @@ export default function NetworkModal({
           Fase 3: Konfigurasi Jaringan
         </h2>
         <p className="text-cyan-300/70 text-sm mb-6 font-mono">
-          Network // Koneksi ke Internet
+          {isRouter ? "Router Config // Routing & Interfaces" : "Network // Koneksi ke Internet"}
         </p>
 
         {step === "intro" && (
@@ -291,17 +299,16 @@ export default function NetworkModal({
               <p className="text-sm text-cyan-300/80 mb-4">
                 Pilih jenis kabel untuk koneksi jaringan:
               </p>
-              
+
               <div className="grid grid-cols-2 gap-3 mb-4">
                 {cableTypes.map((cable) => (
                   <button
                     key={cable.id}
                     onClick={() => setCableType(cable.id as "ethernet" | "fiber")}
-                    className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                      cableType === cable.id
-                        ? "border-cyan-500 bg-blue-950/30"
-                        : "border-cyan-500/20 hover:border-cyan-500/40 bg-blue-950/10"
-                    }`}
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 ${cableType === cable.id
+                      ? "border-cyan-500 bg-blue-950/30"
+                      : "border-cyan-500/20 hover:border-cyan-500/40 bg-blue-950/10"
+                      }`}
                   >
                     <div className="text-3xl mb-2">{cable.icon}</div>
                     <p className={`text-sm font-semibold ${cableType === cable.id ? "text-cyan-400" : "text-cyan-300"}`}>
@@ -345,38 +352,51 @@ export default function NetworkModal({
           >
             <div className="card rounded-lg p-4">
               <p className="text-sm text-cyan-300/80 mb-4">
-                Pilih mode konfigurasi jaringan untuk komputer Anda:
+                {isRouter ? "Konfigurasi Antarmuka & Routing:" : "Pilih mode konfigurasi jaringan untuk komputer Anda:"}
               </p>
-              
+
               <div className="grid grid-cols-2 gap-3 mb-6">
-                <button
-                  onClick={() => setConfigMode("dhcp")}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    configMode === "dhcp"
-                      ? "border-cyan-500 bg-blue-950/30"
-                      : "border-cyan-500/20 hover:border-cyan-500/40 bg-blue-950/10"
-                  }`}
-                >
-                  <Zap className={`w-8 h-8 mx-auto mb-2 ${configMode === "dhcp" ? "text-cyan-400" : "text-cyan-400/40"}`} />
-                  <p className="text-sm font-semibold text-cyan-300">DHCP</p>
-                  <p className="text-xs text-cyan-400/60 mt-1">Otomatis</p>
-                </button>
-                
-                <button
-                  onClick={() => setConfigMode("manual")}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    configMode === "manual"
-                      ? "border-cyan-500 bg-blue-950/30"
-                      : "border-cyan-500/20 hover:border-cyan-500/40 bg-blue-950/10"
-                  }`}
-                >
-                  <Settings className={`w-8 h-8 mx-auto mb-2 ${configMode === "manual" ? "text-cyan-400" : "text-cyan-400/40"}`} />
-                  <p className="text-sm font-semibold text-cyan-300">Manual</p>
-                  <p className="text-xs text-cyan-400/60 mt-1">Custom</p>
-                </button>
+                {!isRouter ? (
+                  <>
+                    <button
+                      onClick={() => setConfigMode("dhcp")}
+                      className={`p-4 rounded-lg border-2 transition-all ${configMode === "dhcp"
+                        ? "border-cyan-500 bg-blue-950/30"
+                        : "border-cyan-500/20 hover:border-cyan-500/40 bg-blue-950/10"
+                        }`}
+                    >
+                      <Zap className={`w-8 h-8 mx-auto mb-2 ${configMode === "dhcp" ? "text-cyan-400" : "text-cyan-400/40"}`} />
+                      <p className="text-sm font-semibold text-cyan-300">DHCP</p>
+                      <p className="text-xs text-cyan-400/60 mt-1">Otomatis</p>
+                    </button>
+
+                    <button
+                      onClick={() => setConfigMode("manual")}
+                      className={`p-4 rounded-lg border-2 transition-all ${configMode === "manual"
+                        ? "border-cyan-500 bg-blue-950/30"
+                        : "border-cyan-500/20 hover:border-cyan-500/40 bg-blue-950/10"
+                        }`}
+                    >
+                      <Settings className={`w-8 h-8 mx-auto mb-2 ${configMode === "manual" ? "text-cyan-400" : "text-cyan-400/40"}`} />
+                      <p className="text-sm font-semibold text-cyan-300">Manual</p>
+                      <p className="text-xs text-cyan-400/60 mt-1">Custom</p>
+                    </button>
+                  </>
+                ) : (
+                  /* Router Mode Selector (Simplified as just Manual for now, could add CLI mode later) */
+                  <div className="col-span-2 p-4 bg-cyan-900/20 border border-cyan-500/30 rounded-lg flex items-center gap-4">
+                    <div className="bg-cyan-500/20 p-3 rounded-full">
+                      <Settings className="w-6 h-6 text-cyan-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-cyan-300">Router Configuration Mode</h4>
+                      <p className="text-xs text-cyan-400/70">Configure interfaces, routing protocols, and services.</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {configMode === "manual" && (
+              {(configMode === "manual" || isRouter) && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
@@ -440,6 +460,91 @@ export default function NetworkModal({
                   </div>
                 </motion.div>
               )}
+
+              {isRouter && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="space-y-4 border-t border-cyan-500/20 pt-4"
+                >
+                  {/* Interface Config */}
+                  <div>
+                    <h4 className="text-cyan-400 font-bold mb-2 flex items-center gap-2 text-sm">
+                      <Cable className="w-4 h-4" /> Interface Configuration
+                    </h4>
+                    <div className="bg-black/20 p-3 rounded-lg border border-cyan-500/10 space-y-3">
+                      <div className="flex gap-4 items-center">
+                        <select
+                          value={routerInterface}
+                          onChange={(e) => setRouterInterface(e.target.value)}
+                          className="bg-blue-950/40 border border-cyan-500/30 rounded px-3 py-2 text-sm text-cyan-300 outline-none focus:border-cyan-500"
+                        >
+                          <option value="FastEthernet0/0">FastEthernet0/0 (LAN)</option>
+                          <option value="FastEthernet0/1">FastEthernet0/1 (WAN)</option>
+                          <option value="Serial0/0/0">Serial0/0/0</option>
+                        </select>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-cyan-500 uppercase font-bold">Status:</span>
+                          <button
+                            onClick={() => setInterfaceStatus(!interfaceStatus)}
+                            className={`px-3 py-1 rounded text-xs font-bold transition-colors ${interfaceStatus ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50" : "bg-red-500/20 text-red-400 border border-red-500/50"}`}
+                          >
+                            {interfaceStatus ? "NO SHUTDOWN" : "SHUTDOWN"}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-cyan-500/70 block mb-1">IP Address</label>
+                          <input
+                            value={ipAddress}
+                            onChange={(e) => setIpAddress(e.target.value)}
+                            className="w-full bg-blue-900/20 border border-cyan-500/20 rounded px-2 py-1 text-sm text-cyan-300 font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-cyan-500/70 block mb-1">Subnet Mask</label>
+                          <input
+                            value={subnetMask}
+                            onChange={(e) => setSubnetMask(e.target.value)}
+                            className="w-full bg-blue-900/20 border border-cyan-500/20 rounded px-2 py-1 text-sm text-cyan-300 font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Routing Protocol */}
+                  <div>
+                    <h4 className="text-cyan-400 font-bold mb-2 flex items-center gap-2 text-sm">
+                      <Settings className="w-4 h-4" /> Routing Protocol
+                    </h4>
+                    <div className="grid grid-cols-3 gap-3">
+                      {(['static', 'rip', 'ospf'] as const).map(p => (
+                        <button
+                          key={p}
+                          onClick={() => setRoutingProtocol(p)}
+                          className={`py-2 px-3 rounded border text-xs font-bold uppercase transition-all ${routingProtocol === p ? "bg-cyan-500/20 border-cyan-500 text-cyan-300" : "bg-blue-950/20 border-cyan-500/10 text-cyan-500/50 hover:border-cyan-500/30"}`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* DHCP Server */}
+                  <div className="flex items-center justify-between bg-cyan-900/10 p-4 rounded-lg border border-cyan-500/10">
+                    <div>
+                      <h4 className="text-cyan-300 font-bold text-sm">DHCP Server</h4>
+                      <p className="text-xs text-cyan-500/60">Assign IPs to connected devices automatically</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" checked={dhcpServerEnabled} onChange={() => setDhcpServerEnabled(!dhcpServerEnabled)} className="sr-only peer" />
+                      <div className="w-11 h-6 bg-blue-900/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                    </label>
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             <div className="flex gap-3">
@@ -468,7 +573,7 @@ export default function NetworkModal({
           >
             <div className="card rounded-lg p-4">
               <h3 className="text-sm font-semibold text-cyan-400 mb-4">Tes Diagnostik Jaringan</h3>
-              
+
               <div className="space-y-4">
                 {/* Ringkasan Konfigurasi */}
                 <div className="bg-cyan-800 rounded-lg p-3 font-mono text-xs">
@@ -496,11 +601,10 @@ export default function NetworkModal({
                 <div className="card rounded-lg p-3 border border-cyan-700">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${
-                        pingTest === "idle" ? "bg-blue-900" :
+                      <div className={`w-3 h-3 rounded-full ${pingTest === "idle" ? "bg-blue-900" :
                         pingTest === "testing" ? "bg-yellow-500 animate-pulse" :
-                        pingTest === "success" ? "bg-cyan-500" : "bg-red-500"
-                      }`} />
+                          pingTest === "success" ? "bg-cyan-500" : "bg-red-500"
+                        }`} />
                       <div>
                         <p className="text-sm font-semibold text-cyan-300">Tes Ping</p>
                         <p className="text-xs text-cyan-500">Menguji koneksi ke gateway</p>
@@ -516,11 +620,10 @@ export default function NetworkModal({
                 <div className="card rounded-lg p-3 border border-cyan-700">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${
-                        dnsTest === "idle" ? "bg-blue-900" :
+                      <div className={`w-3 h-3 rounded-full ${dnsTest === "idle" ? "bg-blue-900" :
                         dnsTest === "testing" ? "bg-yellow-500 animate-pulse" :
-                        dnsTest === "success" ? "bg-cyan-500" : "bg-red-500"
-                      }`} />
+                          dnsTest === "success" ? "bg-cyan-500" : "bg-red-500"
+                        }`} />
                       <div>
                         <p className="text-sm font-semibold text-cyan-300">Resolusi DNS</p>
                         <p className="text-xs text-cyan-500">Menguji respon server DNS</p>
@@ -541,7 +644,7 @@ export default function NetworkModal({
               >
                 Kembali
               </button>
-              
+
               {pingTest === "idle" ? (
                 <button
                   onClick={handleRunTests}
@@ -583,7 +686,7 @@ export default function NetworkModal({
               <Zap className="w-16 h-16 text-cyan-400" />
             </motion.div>
             <p className="mt-6 text-cyan-300 font-mono">Menghubungkan ke jaringan...</p>
-            
+
             <div className="mt-6 flex gap-2">
               {[0, 1, 2].map((i) => (
                 <motion.div
@@ -623,7 +726,7 @@ export default function NetworkModal({
               <p className="text-cyan-400 mb-4">
                 Komputer berhasil terhubung ke jaringan.
               </p>
-              
+
               <div className="card rounded-lg p-4 text-left font-mono text-sm">
                 <div className="flex justify-between mb-1">
                   <span className="text-cyan-500">IP Address:</span>
@@ -666,14 +769,14 @@ export default function NetworkModal({
               >
                 <AlertTriangle className="w-20 h-20 text-red-500 mx-auto mb-4" />
               </motion.div>
-              
+
               <h3 className="text-2xl font-bold text-red-400 mb-2">
                 Koneksi Gagal!
               </h3>
               <p className="text-cyan-400 mb-4">
                 {connectionError || "Terjadi kesalahan saat menghubungkan ke jaringan."}
               </p>
-              
+
               <div className="card rounded-lg p-4 text-left font-mono text-sm border-red-500/30">
                 <div className="flex justify-between mb-1">
                   <span className="text-cyan-500">IP Address:</span>

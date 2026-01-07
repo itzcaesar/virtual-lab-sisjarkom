@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Minimize2, Maximize2, Terminal as TerminalIcon } from "lucide-react";
+import { X, Minimize2, Maximize2, Terminal as TerminalIcon, Share2, FileText, Download, Server, Wifi } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 interface LinuxVMProps {
@@ -18,17 +18,23 @@ interface LinuxVMProps {
     storage: string;
     gpu: string;
   };
+  sharedFiles?: { name: string; size: string; source: string }[];
+  onShareFile?: (file: { name: string; size: string; source: string }) => void;
+  computerName?: string;
 }
 
-export default function LinuxVM({ 
-  onClose, 
-  networkConnected, 
-  onOpenBrowser, 
+export default function LinuxVM({
+  onClose,
+  networkConnected,
+  onOpenBrowser,
   browserOpen,
   ipAddress,
   performanceMetrics,
   distro,
-  hardware
+  hardware,
+  sharedFiles = [],
+  onShareFile,
+  computerName = "LINUX-PC"
 }: LinuxVMProps) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [commandHistory, setCommandHistory] = useState<string[]>([
@@ -41,15 +47,30 @@ export default function LinuxVM({
   const [currentCommand, setCurrentCommand] = useState("");
   const [browserURL, setBrowserURL] = useState("https://duckduckgo.com");
   const [isLoadingPage, setIsLoadingPage] = useState(false);
+
+
+  const [downloadedFiles, setDownloadedFiles] = useState<string[]>([]);
   const terminalEndRef = useRef<HTMLDivElement>(null);
+
+  // File Sharing App State
+  const [fileShareOpen, setFileShareOpen] = useState(false);
+  const [availablePeers, setAvailablePeers] = useState<string[]>([]);
+  const [connectedPeer, setConnectedPeer] = useState<string | null>(null);
+  const [transferProgress, setTransferProgress] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [commandHistory]);
 
+  // Focus input when clicking anywhere in the terminal
+  const handleTerminalClick = () => {
+    inputRef.current?.focus();
+  };
+
   const executeCommand = (cmd: string) => {
     const trimmedCmd = cmd.trim().toLowerCase();
-    setCommandHistory((prev) => [...prev, `user@${distro.toLowerCase()}:~$ ${cmd}`]);
+    setCommandHistory((prev) => [...prev, `user@${computerName?.toLowerCase() || distro.toLowerCase()}:~$ ${cmd}`]);
 
     switch (trimmedCmd) {
       case "help":
@@ -170,6 +191,18 @@ export default function LinuxVM({
         ]);
         break;
 
+      case "fileshare":
+        if (!networkConnected) {
+          setCommandHistory((prev) => [...prev, "Error: Network connection required for File Share."]);
+        } else {
+          setCommandHistory((prev) => [...prev, "Launching File Transfer Utility...", "Scanning for local peers..."]);
+          setTimeout(() => {
+            setFileShareOpen(true);
+            setAvailablePeers(["DESKTOP-SISJARKOM", "Gateway-Router", "Printer-Lobby"]);
+          }, 800);
+        }
+        break;
+
       case "":
         setCommandHistory((prev) => [...prev, ""]);
         break;
@@ -194,9 +227,8 @@ export default function LinuxVM({
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className={`bg-gradient-to-br from-[#0d1b2a] to-[#0a1628] border-2 border-cyan-500/30 rounded-lg shadow-2xl shadow-cyan-500/10 overflow-hidden ${
-          isMaximized ? "w-full h-full" : "w-[90%] h-[90%] max-w-6xl"
-        }`}
+        className={`bg-gradient-to-br from-[#0d1b2a] to-[#0a1628] border-2 border-cyan-500/30 rounded-lg shadow-2xl shadow-cyan-500/10 overflow-hidden ${isMaximized ? "w-full h-full" : "w-[90%] h-[90%] max-w-6xl"
+          }`}
         initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
@@ -304,7 +336,7 @@ export default function LinuxVM({
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="max-w-2xl mx-auto">
                     {browserURL.includes("duckduckgo") && (
                       <>
@@ -386,6 +418,112 @@ export default function LinuxVM({
             )}
           </AnimatePresence>
 
+
+
+          {/* File Sharing App Overlay */}
+          <AnimatePresence>
+            {fileShareOpen && (
+              <motion.div
+                className="absolute inset-8 bg-[#2d3748] rounded shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-600 font-sans"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+              >
+                {/* Header (GTK Style) */}
+                <div className="bg-[#1a202c] h-10 flex items-center justify-between px-3 border-b border-slate-600 select-none">
+                  <div className="flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-slate-300" />
+                    <span className="text-slate-200 text-sm font-semibold">Nautilus Share</span>
+                  </div>
+                  <button onClick={() => setFileShareOpen(false)} className="bg-red-500/80 hover:bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center p-0.5"><X className="w-3 h-3" /></button>
+                </div>
+
+                <div className="flex flex-1 overflow-hidden">
+                  {/* Sidebar */}
+                  <div className="w-40 bg-[#2d3748] border-r border-slate-600 p-2 flex flex-col gap-1">
+                    <div className="text-xs font-bold text-slate-400 uppercase mb-2 px-2 mt-2">Network</div>
+                    {availablePeers.map(peer => (
+                      <button
+                        key={peer}
+                        onClick={() => setConnectedPeer(peer)}
+                        className={`flex items-center gap-2 px-2 py-1.5 rounded text-sm text-left truncate ${connectedPeer === peer ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-700'}`}
+                      >
+                        <Server className="w-3 h-3" />
+                        {peer}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Main Content */}
+                  <div className="flex-1 bg-[#edf2f7] text-slate-800 p-4">
+                    {connectedPeer === "DESKTOP-SISJARKOM" ? (
+                      <div>
+                        <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-300">
+                          <span className="text-lg font-bold">Public Share</span>
+                          <span className="text-sm text-gray-500">on {connectedPeer}</span>
+                        </div>
+
+                        <div className="grid grid-cols-4 gap-4">
+                          <button
+                            onClick={() => {
+                              if (transferProgress === 0) {
+                                setTransferProgress(10);
+                                let progress = 0;
+                                const interval = setInterval(() => {
+                                  progress += 10;
+                                  setTransferProgress(progress);
+                                  if (progress >= 100) {
+                                    clearInterval(interval);
+                                    setCommandHistory(prev => [...prev, "File 'secure_payload.dat' downloaded to ~/Downloads"]);
+                                    setDownloadedFiles(prev => [...prev, 'secure_payload.dat']);
+                                  }
+                                }, 200);
+                              }
+                            }}
+                            className="flex flex-col items-center gap-2 group p-4 rounded hover:bg-blue-100 transition-colors"
+                          >
+                            <FileText className="w-12 h-12 text-gray-600 group-hover:text-blue-600" />
+                            <span className="text-sm font-medium">secure_payload.dat</span>
+                            <span className="text-xs text-gray-500">2.4 MB</span>
+                          </button>
+                        </div>
+
+                        {transferProgress > 0 && transferProgress < 100 && (
+                          <div className="mt-8 bg-white p-4 rounded shadow border border-gray-200">
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Downloading...</span>
+                              <span>{transferProgress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div className="bg-blue-600 h-2 rounded-full transition-all duration-200" style={{ width: `${transferProgress}%` }}></div>
+                            </div>
+                          </div>
+                        )}
+
+                        {transferProgress === 100 && (
+                          <div className="mt-8 bg-green-100 text-green-800 p-3 rounded flex items-center gap-2 text-sm border border-green-200">
+                            <Download className="w-4 h-4" /> Download Complete!
+                          </div>
+                        )}
+
+                      </div>
+                    ) : connectedPeer ? (
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                        <Server className="w-16 h-16 mb-4 opacity-50" />
+                        <p>No shared folders found on {connectedPeer}</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                        <Wifi className="w-16 h-16 mb-4 opacity-50" />
+                        <p>Select a device to browse files</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Terminal Output */}
           <div className="space-y-1">
             {commandHistory.map((line, index) => (
@@ -393,13 +531,12 @@ export default function LinuxVM({
                 key={index}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className={`${
-                  line.startsWith("user@") 
-                    ? "text-green-400" 
-                    : line.includes("Error") || line.includes("error")
+                className={`${line.startsWith("user@")
+                  ? "text-green-400"
+                  : line.includes("Error") || line.includes("error")
                     ? "text-red-400"
                     : "text-cyan-300"
-                }`}
+                  }`}
               >
                 {line}
               </motion.div>
@@ -430,8 +567,8 @@ export default function LinuxVM({
             </div>
             <div ref={terminalEndRef} />
           </div>
-        </div>
-      </motion.div>
-    </motion.div>
+        </div >
+      </motion.div >
+    </motion.div >
   );
 }

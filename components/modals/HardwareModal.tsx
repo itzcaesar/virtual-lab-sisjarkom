@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { X, Cpu, MemoryStick, Info, HardDrive, Monitor, Zap } from "lucide-react";
+import { X, Cpu, MemoryStick, Info, HardDrive, Monitor, Zap, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import MotherboardBuilder from "@/components/MotherboardBuilder";
 
 interface HardwareModalProps {
   onClose: () => void;
-  onComplete: (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string }) => void;
+  onComplete: (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string; cooler: string }) => void;
   addLog: (message: string) => void;
 }
 
@@ -17,7 +17,7 @@ export default function HardwareModal({
   addLog,
 }: HardwareModalProps) {
   const [step, setStep] = useState<"intro" | "build" | "installing" | "done">("intro");
-  
+
   // Hardware options
   const cpuOptions = [
     { name: "Intel Core i5-12400", cores: "6 Cores", speed: "2.5GHz", price: "$" },
@@ -25,28 +25,28 @@ export default function HardwareModal({
     { name: "AMD Ryzen 7 5800X", cores: "8 Cores", speed: "3.8GHz", price: "$$" },
     { name: "Intel Core i9-13900K", cores: "24 Cores", speed: "3.0GHz", price: "$$$" },
   ];
-  
+
   const ramOptions = [
     { name: "8GB DDR4", speed: "2666MHz", price: "$" },
     { name: "16GB DDR4", speed: "3200MHz", price: "$$" },
     { name: "32GB DDR4", speed: "3600MHz", price: "$$$" },
     { name: "16GB DDR5", speed: "4800MHz", price: "$$$" },
   ];
-  
+
   const storageOptions = [
     { name: "256GB NVMe SSD", type: "NVMe", speed: "3000MB/s", price: "$" },
     { name: "512GB NVMe SSD", type: "NVMe", speed: "3500MB/s", price: "$$" },
     { name: "1TB NVMe SSD", type: "NVMe", speed: "7000MB/s", price: "$$$" },
     { name: "2TB SATA SSD", type: "SATA", speed: "550MB/s", price: "$$" },
   ];
-  
+
   const gpuOptions = [
     { name: "NVIDIA GTX 1660", vram: "6GB GDDR5", price: "$" },
     { name: "NVIDIA RTX 3060", vram: "12GB GDDR6", price: "$$" },
     { name: "AMD RX 6700 XT", vram: "12GB GDDR6", price: "$$" },
     { name: "NVIDIA RTX 4070", vram: "12GB GDDR6X", price: "$$$" },
   ];
-  
+
   const psuOptions = [
     { name: "450W 80+ Bronze", wattage: 450, efficiency: "Bronze", price: "$" },
     { name: "550W 80+ Bronze", wattage: 550, efficiency: "Bronze", price: "$$" },
@@ -54,12 +54,13 @@ export default function HardwareModal({
     { name: "750W 80+ Gold", wattage: 750, efficiency: "Gold", price: "$$$" },
     { name: "850W 80+ Platinum", wattage: 850, efficiency: "Platinum", price: "$$$" },
   ];
-  
+
   const [selectedCPU, setSelectedCPU] = useState("");
   const [selectedRAM, setSelectedRAM] = useState("");
   const [selectedStorage, setSelectedStorage] = useState("");
   const [selectedGPU, setSelectedGPU] = useState("");
   const [selectedPSU, setSelectedPSU] = useState("");
+  const [selectedCooler, setSelectedCooler] = useState("");
 
   const handleProceedToBuild = () => {
     setStep("build");
@@ -69,13 +70,19 @@ export default function HardwareModal({
 
   const handleComponentInstalled = (type: string, name: string) => {
     addLog(`✓ ${type.toUpperCase()} berhasil dipasang: ${name}`);
+    if (type === "cpu") setSelectedCPU(name);
+    if (type === "ram") setSelectedRAM(name);
+    if (type === "storage") setSelectedStorage(name);
+    if (type === "gpu") setSelectedGPU(name);
+    if (type === "psu") setSelectedPSU(name);
+    if (type === "cooler") setSelectedCooler(name);
   };
 
   const handleBuildComplete = (success: boolean) => {
     if (success) {
       setStep("installing");
       addLog("Semua komponen terpasang! Melakukan POST (Power-On Self-Test)...");
-      
+
       setTimeout(() => {
         addLog("POST selesai. Memeriksa sistem...");
         addLog(`CPU: ${selectedCPU} - OK`);
@@ -84,7 +91,7 @@ export default function HardwareModal({
       setTimeout(() => {
         addLog(`RAM: ${selectedRAM} - OK`);
       }, 1800);
-      
+
       setTimeout(() => {
         addLog(`Storage: ${selectedStorage} - OK`);
       }, 2400);
@@ -95,6 +102,7 @@ export default function HardwareModal({
 
       setTimeout(() => {
         addLog(`PSU: ${selectedPSU} - OK`);
+        addLog(`Cooling: ${selectedCooler} - OK`);
         addLog("Semua komponen berhasil diinisialisasi!");
         setStep("done");
       }, 4000);
@@ -108,6 +116,7 @@ export default function HardwareModal({
       storage: selectedStorage,
       gpu: selectedGPU,
       psu: selectedPSU,
+      cooler: selectedCooler,
     });
     onClose();
   };
@@ -120,9 +129,8 @@ export default function HardwareModal({
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className={`bg-[#0d1b2a]/95 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl ${
-          step === "build" ? "max-w-6xl max-h-[90vh] overflow-y-auto" : "max-w-2xl"
-        } w-full p-6 relative shadow-2xl shadow-cyan-500/20 transition-all`}
+        className={`bg-[#0d1b2a]/95 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl ${step === "build" ? "max-w-6xl max-h-[90vh] overflow-y-auto" : "max-w-2xl"
+          } w-full p-6 relative shadow-2xl shadow-cyan-500/20 transition-all`}
         initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 20 }}
@@ -168,6 +176,9 @@ export default function HardwareModal({
                   <li>
                     <strong className="text-cyan-400">PSU:</strong> Sumber daya listrik
                   </li>
+                  <li>
+                    <strong className="text-cyan-400">Cooling:</strong> Sistem pendingin CPU
+                  </li>
                 </ul>
               </div>
             </div>
@@ -198,6 +209,11 @@ export default function HardwareModal({
                 <p className="text-sm font-mono text-cyan-300">Power Supply</p>
                 <p className="text-xs text-cyan-400/50">5 pilihan</p>
               </div>
+              <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-center">
+                <CheckCircle2 className="w-12 h-12 text-cyan-400 mx-auto mb-2" />
+                <p className="text-sm font-mono text-cyan-300">Pendingin</p>
+                <p className="text-xs text-cyan-400/50">4 pilihan</p>
+              </div>
             </div>
 
             <button
@@ -225,6 +241,7 @@ export default function HardwareModal({
               selectedStorage={selectedStorage}
               selectedGPU={selectedGPU}
               selectedPSU={selectedPSU}
+              selectedCooler={selectedCooler}
               onComplete={handleBuildComplete}
               onComponentInstalled={handleComponentInstalled}
               onBack={() => setStep("intro")}
