@@ -57,25 +57,25 @@ export interface GameState {
   currentPhase: Phase;
   hardwareInstalled: boolean;
   osInstalled: OSType;
-  
+
   // Operating system configuration
   linuxDistro?: string;
   windowsEdition?: string;
-  
+
   // Network configuration
   networkConnected: boolean;
   ipAddress?: string;
   subnetMask?: string;
   gateway?: string;
   dns?: string;
-  
+
   // Hardware specifications (legacy - used for single PC mode)
   cpuModel?: string;
   ramSize?: string;
   storage?: string;
   gpu?: string;
   psu?: string;
-  
+
   // UI state
   logs: string[];
   startTime: number;
@@ -83,10 +83,10 @@ export interface GameState {
   browserOpen: boolean;
   wikiOpen: boolean;
   infoOpen: boolean;
-  
+
   // Performance metrics
   performanceMetrics?: PerformanceMetrics;
-  
+
   // Multi-PC support
   pcSpecs: Record<string, PCSpecs>;
   activePCId?: string;
@@ -133,7 +133,7 @@ function MobileNotSupported() {
           Perangkat Tidak Didukung
         </h1>
         <p className="text-cyan-300/70 mb-6">
-          Virtual Lab memerlukan layar yang lebih besar untuk pengalaman terbaik. 
+          Virtual Lab memerlukan layar yang lebih besar untuk pengalaman terbaik.
           Silakan buka aplikasi ini menggunakan komputer desktop atau laptop.
         </p>
         <div className="bg-blue-950/30 border border-cyan-500/20 rounded-lg p-4 text-left">
@@ -164,7 +164,7 @@ function MobileNotSupported() {
  */
 function CollapsiblePCSpec({ pcId, spec, ipAddress }: { pcId: string; spec: PCSpecs; ipAddress?: string }) {
   const [isOpen, setIsOpen] = useState(true);
-  
+
   return (
     <div className="bg-cyan-800/50 dark:bg-cyan-800/50 border border-cyan-300 dark:border-cyan-700 rounded-lg overflow-hidden shadow-sm">
       <button
@@ -186,7 +186,7 @@ function CollapsiblePCSpec({ pcId, spec, ipAddress }: { pcId: string; spec: PCSp
           <ChevronDown className="w-4 h-4 text-cyan-400" />
         )}
       </button>
-      
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -245,7 +245,7 @@ function CollapsiblePCSpec({ pcId, spec, ipAddress }: { pcId: string; spec: PCSp
 export default function Home() {
   // Mobile detection state
   const [isMobile, setIsMobile] = useState(false);
-  
+
   const [gameState, setGameState] = useState<GameState>({
     currentPhase: "idle",
     hardwareInstalled: false,
@@ -260,11 +260,11 @@ export default function Home() {
 
     pcSpecs: {},
   });
-  
+
   // ============================================================================
   // EFFECTS
   // ============================================================================
-  
+
   /**
    * Mobile device detection
    * Checks if viewport width is below 1024px and shows mobile warning
@@ -273,7 +273,7 @@ export default function Home() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 864);
     };
-    
+
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
@@ -301,7 +301,7 @@ export default function Home() {
    * @param specs - Optional hardware specifications
    * @param pcId - Optional PC identifier for multi-PC support
    */
-  const completeHardware = (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string }, pcId?: string) => {
+  const completeHardware = (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string; cooler: string }, pcId?: string) => {
     const cpuModels = [
       "Intel Core i7-12700K [12 Cores / 20 Threads @ 3.6GHz]",
       "AMD Ryzen 7 5800X [8 Cores / 16 Threads @ 3.8GHz]",
@@ -326,7 +326,7 @@ export default function Home() {
       "NVIDIA RTX 4070 [5888 Cores, 12GB GDDR6X]",
       "NVIDIA GTX 1660 Super [1408 Cores, 6GB GDDR6]"
     ];
-    
+
     const psus = [
       "450W 80+ Bronze",
       "550W 80+ Bronze",
@@ -334,13 +334,21 @@ export default function Home() {
       "750W 80+ Gold",
       "850W 80+ Platinum"
     ];
-    
+
+    const cooler = [
+      "CPU Cooler [Airflow: 6000 RPM]",
+      "CPU Cooler [Airflow: 8000 RPM]",
+      "CPU Cooler [Airflow: 10000 RPM]",
+      "CPU Cooler [Airflow: 12000 RPM]",
+      "CPU Cooler [Airflow: 14000 RPM]"
+    ];
+
     const selectedCPU = specs?.cpu || cpuModels[Math.floor(Math.random() * cpuModels.length)];
     const selectedRAM = specs?.ram || ramSizes[Math.floor(Math.random() * ramSizes.length)];
     const selectedStorage = specs?.storage || storages[Math.floor(Math.random() * storages.length)];
     const selectedGPU = specs?.gpu || gpus[Math.floor(Math.random() * gpus.length)];
     const selectedPSU = specs?.psu || psus[Math.floor(Math.random() * psus.length)];
-    
+
     // Calculate initial performance (without network)
     const performance = calculatePerformance({
       cpu: selectedCPU,
@@ -348,9 +356,9 @@ export default function Home() {
       storage: selectedStorage,
       gpu: selectedGPU,
     });
-    
+
     const performanceTier = getPerformanceTier(performance.overall);
-    
+
     // Create PC spec entry
     const newPCSpec: PCSpecs = {
       cpuModel: selectedCPU,
@@ -361,7 +369,7 @@ export default function Home() {
       osInstalled: null,
       performanceMetrics: performance,
     };
-    
+
     setGameState((prev) => ({
       ...prev,
       hardwareInstalled: true,
@@ -396,18 +404,18 @@ export default function Home() {
   const completeOS = (os: OSType, distro?: string, pcId?: string) => {
     setGameState((prev) => {
       // Update pcSpecs if pcId is provided
-      const updatedPcSpecs = pcId && prev.pcSpecs[pcId] 
-        ? { 
-            ...prev.pcSpecs, 
-            [pcId]: { 
-              ...prev.pcSpecs[pcId], 
-              osInstalled: os, 
-              linuxDistro: os === "linux" ? distro : undefined,
-              windowsEdition: os === "windows" ? distro : undefined
-            } 
+      const updatedPcSpecs = pcId && prev.pcSpecs[pcId]
+        ? {
+          ...prev.pcSpecs,
+          [pcId]: {
+            ...prev.pcSpecs[pcId],
+            osInstalled: os,
+            linuxDistro: os === "linux" ? distro : undefined,
+            windowsEdition: os === "windows" ? distro : undefined
           }
+        }
         : prev.pcSpecs;
-      
+
       return {
         ...prev,
         osInstalled: os,
@@ -443,7 +451,7 @@ export default function Home() {
     const elapsedTime = Math.floor((Date.now() - gameState.startTime) / 1000);
     const minutes = Math.floor(elapsedTime / 60);
     const seconds = elapsedTime % 60;
-    
+
     // Recalculate performance with network
     const performance = calculatePerformance(
       {
@@ -454,9 +462,9 @@ export default function Home() {
       },
       { ip: ipAddress, subnet: subnetMask, gateway, dns }
     );
-    
+
     const performanceTier = getPerformanceTier(performance.overall);
-    
+
     setGameState((prev) => ({
       ...prev,
       networkConnected: true,
@@ -548,11 +556,11 @@ export default function Home() {
       const newPcSpecs = { ...prev.pcSpecs };
       const removedSpec = newPcSpecs[pcId];
       delete newPcSpecs[pcId];
-      
+
       // Check if there are any remaining PCs with hardware installed
       const hasAnyHardware = Object.keys(newPcSpecs).length > 0;
       const hasAnyOS = Object.values(newPcSpecs).some(spec => spec.osInstalled);
-      
+
       return {
         ...prev,
         pcSpecs: newPcSpecs,
@@ -561,7 +569,7 @@ export default function Home() {
         activePCId: hasAnyHardware ? Object.keys(newPcSpecs)[0] : undefined,
       };
     });
-    
+
     addLog(`PC dihapus dari konfigurasi. Metrik performa diperbarui.`);
   };
 
@@ -574,7 +582,7 @@ export default function Home() {
     <main id="main-container" className="min-h-screen bg-[#0a1628] text-cyan-100 flex relative">
       {/* Animated Background Effect */}
       <AnimatedBackground />
-      
+
       {/* Left Sidebar - System Specs */}
       {gameState.hardwareInstalled && (
         <aside className="w-80 bg-[#0d1b2a]/90 backdrop-blur-md border-r border-cyan-500/30 p-6 flex flex-col gap-6 h-screen overflow-y-auto scrollbar-hide relative z-10 transition-all duration-300">
@@ -584,10 +592,10 @@ export default function Home() {
           <div className="space-y-3">
             {Object.keys(gameState.pcSpecs || {}).length > 0 ? (
               Object.entries(gameState.pcSpecs || {}).map(([pcId, spec]) => (
-                <CollapsiblePCSpec 
-                  key={pcId} 
-                  pcId={pcId} 
-                  spec={spec} 
+                <CollapsiblePCSpec
+                  key={pcId}
+                  pcId={pcId}
+                  spec={spec}
                   ipAddress={gameState.ipAddress}
                 />
               ))
@@ -634,7 +642,7 @@ export default function Home() {
         <header className="mb-8 px-8 flex items-start justify-between">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent flex items-center gap-3">
-              <Monitor 
+              <Monitor
                 className="w-9 h-9 text-cyan-400"
               />
               Virtual Lab
@@ -643,7 +651,7 @@ export default function Home() {
               [BLUEPRINT v2.1] // Hardware → OS → Network
             </p>
           </div>
-          
+
           <div className="flex gap-3">
             <button
               onClick={toggleInfo}
@@ -651,14 +659,14 @@ export default function Home() {
             >
               <Info className="w-4 h-4" /> Tentang
             </button>
-            
+
             <button
               onClick={toggleWiki}
               className="px-4 py-2 bg-blue-900/50 border border-cyan-500/50 rounded text-sm font-mono text-cyan-300 hover:text-white hover:border-cyan-400 hover:bg-blue-800/50 transition-all flex items-center gap-2 backdrop-blur-sm"
             >
               📚 Wiki & Panduan
             </button>
-            
+
             {gameState.currentPhase === "complete" && (
               <button
                 onClick={resetLab}
@@ -669,34 +677,34 @@ export default function Home() {
             )}
           </div>
         </header>
-        
+
         <div className="px-8 flex-1 flex flex-col">
-          <Stage 
-          gameState={gameState}
-          setGameState={setGameState}
-          addLog={addLog}
-          completeHardware={completeHardware}
-          completeOS={completeOS}
-          completeNetwork={completeNetwork}
-          toggleVM={toggleVM}
-          resetLab={resetLab}
-          toggleBrowser={toggleBrowser}
-          removePCSpecs={removePCSpecs}
+          <Stage
+            gameState={gameState}
+            setGameState={setGameState}
+            addLog={addLog}
+            completeHardware={completeHardware}
+            completeOS={completeOS}
+            completeNetwork={completeNetwork}
+            toggleVM={toggleVM}
+            resetLab={resetLab}
+            toggleBrowser={toggleBrowser}
+            removePCSpecs={removePCSpecs}
           />
         </div>
       </div>
 
       {/* Right Sidebar - Logs */}
       <Sidebar gameState={gameState} />
-      
+
       <AnimatePresence>
         {gameState.wikiOpen && (
           <WikiPanel
             currentPhase={
               gameState.currentPhase === "idle" ? "overview" :
-              gameState.currentPhase === "hardware" ? "hardware" :
-              gameState.currentPhase === "os" ? "os" :
-              gameState.currentPhase === "network" ? "network" : "overview"
+                gameState.currentPhase === "hardware" ? "hardware" :
+                  gameState.currentPhase === "os" ? "os" :
+                    gameState.currentPhase === "network" ? "network" : "overview"
             }
             onClose={toggleWiki}
           />
@@ -751,7 +759,7 @@ export default function Home() {
             >
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
-              
+
               {/* Header with gradient */}
               <div className="relative border-b border-cyan-500/20 p-6 bg-gradient-to-r from-blue-950/50 via-blue-900/30 to-blue-950/50">
                 <motion.div

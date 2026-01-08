@@ -30,7 +30,7 @@ interface StageProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   addLog: (message: string) => void;
-  completeHardware: (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string }, pcId?: string) => void;
+  completeHardware: (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string; cooler: string }, pcId?: string) => void;
   completeOS: (os: OSType, distro?: string, pcId?: string) => void;
   completeNetwork: () => void;
   toggleVM: () => void;
@@ -92,7 +92,7 @@ export default function Stage({
   };
 
   // Wrapper functions that mark the SPECIFIC module as configured
-  const handleCompleteHardware = (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string }) => {
+  const handleCompleteHardware = (specs?: { cpu: string; ram: string; storage: string; gpu: string; psu: string; cooler: string }) => {
     completeHardware(specs, configuringModuleId || undefined);
     // Mark only the specific PC module being configured
     if (configuringModuleId) {
